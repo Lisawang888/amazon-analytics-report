@@ -1769,11 +1769,6 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
     </div>
 
     <div class="section">
-      <div class="section-title"><span class="dot" style="background:#E24B4A"></span>个人PDCA · 重点关注（每人最多3项）</div>
-      <div id="operator-pdca" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
-    </div>
-
-    <div class="section">
       <div class="section-title"><span class="dot" style="background:#BA7517"></span>运营环比趋势</div>
       <div class="chart-grid">
         <div class="chart-card">
@@ -2098,36 +2093,6 @@ function switchTab(name) {
   });
   document.getElementById('operator-kpi-cards').innerHTML = kpiHtml;
 
-  // ===== 个人PDCA 按人出具 =====
-  var pdcaHtml = '';
-  sortedOps.forEach(function(op) {
-    var items = opsById[op];
-    var problems = [];
-    items.forEach(function(a) {
-      var margin = a['利润率']||0; var acos = a['ACoS']||0;
-      var refund = a['退款率']||0; var days = a['库存天数']||999;
-      if (margin < 0 && a['销售额'] > 100) problems.push({pri:1, text:'亏损 '+a['父ASIN']+' 利润率'+margin.toFixed(1)+'%', act:'缩减广告预算或提价'});
-      if (acos > 50) problems.push({pri:1, text:'ACoS爆炸 '+a['父ASIN']+' '+acos.toFixed(1)+'%', act:'暂停广告或优化关键词'});
-      if (days > 0 && days < 15 && a['销售额'] > 100) problems.push({pri:1, text:'断货风险 '+a['父ASIN']+' 仅剩'+(a['FBA可售']||0)+'件', act:'立即补货'});
-      if (margin > 0 && margin < 5 && a['销售额'] > 1000) problems.push({pri:2, text:'薄利 '+a['父ASIN']+' '+margin.toFixed(1)+'%', act:'审核采购/物流成本'});
-      if (refund > 9) problems.push({pri:2, text:'高退款 '+a['父ASIN']+' '+refund.toFixed(1)+'%', act:'查看退货原因和差评'});
-      if (days > 0 && days < 30 && a['销售额'] > 100) problems.push({pri:2, text:'库存低 '+a['父ASIN']+' '+days+'天', act:'本周补货'});
-    });
-    problems.sort(function(a,b){return a.pri-b.pri;});
-    var top3 = problems.slice(0,3);
-    pdcaHtml += '<div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;padding:10px;width:300px;min-width:300px;flex-shrink:0;">';
-    pdcaHtml += '<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:#2C2C2A;">'+op+'</div>';
-    if (top3.length === 0) {
-      pdcaHtml += '<div style="color:#639922;font-size:11px;">P: 运行正常，无需关注</div>';
-    }
-    top3.forEach(function(p) {
-      var icon = p.pri===1 ? '🔴' : '🟠';
-      pdcaHtml += '<div style="font-size:11px;padding:4px 0;border-bottom:0.5px solid #eee;">'+icon+' <strong>P:</strong> '+p.text+'<br><span style="color:#888;font-size:10px;">→ '+p.act+'</span></div>';
-    });
-    pdcaHtml += '</div>';
-  });
-  document.getElementById('operator-pdca').innerHTML = pdcaHtml;
-
   // ===== 原有: 按业务员ASIN明细 =====
   var container = document.getElementById('operator-detail');
   var html = '';
@@ -2152,6 +2117,26 @@ function switchTab(name) {
     var margin = totalSales > 0 ? (totalProfit/totalSales*100).toFixed(1) : 0;
     var profitShare = totalAllProfit > 0 ? (totalProfit/totalAllProfit*100).toFixed(1) : 0;
     var stockAlerts = items.filter(function(a) { var d = a['库存天数']||999; return d > 0 && d < 30 && (a['销售额']||0) > 100; }).length;
+    // PDCA: 找该运营的TOP3问题
+    var problems = [];
+    items.forEach(function(a) {
+      var m = a['利润率']||0; var ac = a['ACoS']||0; var rf = a['退款率']||0; var ds = a['库存天数']||999;
+      if (m < 0 && a['销售额'] > 100) problems.push({pri:1, t:'亏损 '+a['父ASIN']+' '+m.toFixed(1)+'%', a:'缩减广告或提价'});
+      if (ac > 50) problems.push({pri:1, t:'ACoS爆炸 '+a['父ASIN']+' '+ac.toFixed(1)+'%', a:'暂停广告优化关键词'});
+      if (ds > 0 && ds < 15 && a['销售额'] > 100) problems.push({pri:1, t:'断货 '+a['父ASIN']+' '+(a['FBA可售']||0)+'件', a:'立即补货'});
+      if (m > 0 && m < 5 && a['销售额'] > 1000) problems.push({pri:2, t:'薄利 '+a['父ASIN']+' '+m.toFixed(1)+'%', a:'审核采购物流'});
+      if (rf > 9) problems.push({pri:2, t:'高退款 '+a['父ASIN']+' '+rf.toFixed(1)+'%', a:'查退货差评'});
+      if (ds > 0 && ds < 30 && a['销售额'] > 100) problems.push({pri:2, t:'库存低 '+a['父ASIN']+' '+ds+'天', a:'本周补货'});
+    });
+    problems.sort(function(a,b){return a.pri-b.pri;});
+    var top3 = problems.slice(0,3);
+    html += '<div style="background:#fff;border-radius:10px;border:0.5px solid #ddd;padding:14px;margin-bottom:4px;">';
+    html += '<div style="font-size:12px;font-weight:600;margin-bottom:4px;color:#E24B4A;">P: 重点关注（PDCA）</div>';
+    if (top3.length===0) html += '<span style="color:#639922;font-size:11px;">无异常，运行正常</span>';
+    top3.forEach(function(p){
+      html += '<div style="font-size:11px;padding:2px 0;">'+(p.pri===1?'🔴':'🟠')+' '+p.t+'<span style="color:#888;"> → '+p.a+'</span></div>';
+    });
+    html += '</div>';
     html += '<div style="background:#fff;border-radius:10px;border:0.5px solid #ddd;padding:14px;margin-bottom:12px;">';
     html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;">';
     html += '<span style="width:10px;height:10px;border-radius:50%;background:'+(colorMap[op]||'#888')+';display:inline-block;flex-shrink:0;"></span>';

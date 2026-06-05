@@ -816,7 +816,9 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
               <td><strong>孙杰组</strong></td>
               <td style="font-size:11px;color:#888;">孙杰、李韩笑、邱慧婷</td>
               <td style="text-align:right">$899,870</td>
+              <td style="text-align:right"><span class="change up">+19.7%</span></td>
               <td style="text-align:right">$91,833</td>
+              <td style="text-align:right"><span class="change up">+57.5%</span></td>
               <td style="text-align:right">10.2%</td>
               <td style="text-align:right"><strong>65.1%</strong></td>
               <td style="text-align:right">15608</td>
@@ -829,7 +831,9 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
               <td><strong>小伟组</strong></td>
               <td style="font-size:11px;color:#888;">小伟、何秋秋、朱佳磊、夏栢芝、未分配</td>
               <td style="text-align:right">$624,707</td>
+              <td style="text-align:right"><span class="change up">+11.5%</span></td>
               <td style="text-align:right">$49,272</td>
+              <td style="text-align:right"><span class="change down">-1.8%</span></td>
               <td style="text-align:right">7.9%</td>
               <td style="text-align:right"><strong>34.9%</strong></td>
               <td style="text-align:right">7929</td>
@@ -1790,7 +1794,7 @@ function switchTab(name) {
     else if (days < 30) status = '<span class="tag amber">需补货</span>';
     else if (days > 180) status = '<span class="tag amber">积压</span>';
     else status = '<span class="tag green">正常</span>';
-    var xferAsins = ["B0D8H2H3HW", "B0D8GYHTVB", "B0DZT7J1PJ", "B0FT143W2W", "B0F1TG58YF", "B0FVRVHL5H", "B0DYDNTHDX", "B0F3VXP9T7", "B0F21B2B6H"];
+    var xferAsins = ["B0DZT7J1PJ", "B0F21B2B6H", "B0F3VXP9T7", "B0FVRVHL5H", "B0FT143W2W", "B0DYDNTHDX", "B0F1TG58YF", "B0D8H2H3HW", "B0D8GYHTVB"];
     var xferLabel = '<span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span>';
     html += '<tr><td><strong>'+a['父ASIN']+'</strong>'+(xferAsins.indexOf(a['父ASIN'])>=0?xferLabel:'')+'</td>';
     html += '<td>'+a['业务员']+'</td>';
@@ -1850,7 +1854,7 @@ function switchTab(name) {
   var container = document.getElementById('operator-detail');
   var html = '';
   var colorMap = { '孙杰': '#378ADD', '小伟': '#639922', '何秋秋': '#7F77DD', '邱慧婷': '#BA7517', '朱佳磊': '#E24B4A', '夏栢芝': '#1D9E75', '朱斌斌': '#888780', '李韩笑': '#534AB7', '郑文茜': '#1D9E75', '赵健栋': '#185FA5' };
-  var xferAsins = ["B0D8H2H3HW", "B0D8GYHTVB", "B0DZT7J1PJ", "B0FT143W2W", "B0F1TG58YF", "B0FVRVHL5H", "B0DYDNTHDX", "B0F3VXP9T7", "B0F21B2B6H"];
+  var xferAsins = ["B0DZT7J1PJ", "B0F21B2B6H", "B0F3VXP9T7", "B0FVRVHL5H", "B0FT143W2W", "B0DYDNTHDX", "B0F1TG58YF", "B0D8H2H3HW", "B0D8GYHTVB"];
   var xferLabel = '<span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span>';
   // 固定阈值标色（同Python端）
   function ratioTag(v,key) {

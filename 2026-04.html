@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>亚马逊利润分析报告 · 2026-04</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #2C2C2A; font-size: 14px; line-height: 1.6; }
@@ -126,7 +126,15 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
   }catch(e){}
 })();
 </script>
-<div id="report-content">
+<div id="report-content" style="display:none;">
+
+<div id="loading-screen" style="position:fixed;inset:0;background:#f5f4f0;display:flex;align-items:center;justify-content:center;z-index:99998;font-family:-apple-system,sans-serif;">
+  <div style="text-align:center;">
+    <div style="font-size:20px;color:#2C2C2A;margin-bottom:10px;">数据加载中...</div>
+    <div style="color:#888;font-size:13px;">正在生成报告图表</div>
+  </div>
+</div>
+<script>window.addEventListener('DOMContentLoaded',function(){document.getElementById('report-content').style.display='';document.getElementById('loading-screen').style.display='none';});</script>
 <div style="background:#2C2C2A;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
   <span style="color:#fff;font-size:13px;font-weight:500;">月度报告：</span>
   <a href="2025-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2025-04</a><a href="2025-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2025-05</a><a href="2026-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;background:#378ADD;color:#fff;font-weight:500">2026-04</a><a href="2026-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2026-05</a>

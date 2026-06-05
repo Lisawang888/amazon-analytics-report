@@ -98,7 +98,21 @@
 </style>
 </head>
 <body>
-
+<div id="pw-gate" style="position:fixed;inset:0;background:#2C2C2A;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="background:#fff;padding:40px;border-radius:12px;text-align:center;width:360px;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+    <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+    <h2 style="font-size:18px;color:#2C2C2A;margin:0 0 6px 0;">亚马逊利润分析报告</h2>
+    <p style="color:#888;font-size:13px;margin:0 0 20px 0;">请输入访问密码</p>
+    <input id="pw-input" type="password" placeholder="密码" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:15px;outline:none;text-align:center;" autofocus>
+    <div id="pw-error" style="color:#E24B4A;font-size:12px;margin-top:8px;display:none;">密码错误，请重试</div>
+    <button onclick="checkPw()" style="margin-top:14px;width:100%;padding:10px;background:#378ADD;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;">确认</button>
+  </div>
+</div>
+<script>
+function checkPw(){var p=document.getElementById('pw-input').value;if(p==='huomai123'){document.getElementById('pw-gate').style.display='none';}else{document.getElementById('pw-error').style.display='block';}}
+document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPw();});
+</script>
+<div id="report-content">
 <div class="header">
   <div>
     <h1>亚马逊利润分析报告 · 2026-05</h1>
@@ -2168,5 +2182,6 @@ function switchTab(name) {
   container.innerHTML = html;
 })();
 </script>
+</div>
 </body>
 </html>

@@ -538,7 +538,7 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
               <td style="text-align:right">1.8%</td>
             </tr>
             <tr>
-              <td><strong>B0F21B2B6H</strong></td>
+              <td><strong>B0F21B2B6H</strong><span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span></td>
               <td>MLTR-US</td>
               <td>何秋秋</td>
               <td style="text-align:right">$53,555</td>
@@ -1675,7 +1675,7 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
               <td style="text-align:right">1.8%</td>
             </tr>
             <tr>
-              <td><strong>B0F21B2B6H</strong></td>
+              <td><strong>B0F21B2B6H</strong><span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span></td>
               <td>MLTR-US</td>
               <td>何秋秋</td>
               <td style="text-align:right">$53,555</td>
@@ -2016,7 +2016,9 @@ function switchTab(name) {
     else if (days < 30) status = '<span class="tag amber">需补货</span>';
     else if (days > 180) status = '<span class="tag amber">积压</span>';
     else status = '<span class="tag green">正常</span>';
-    html += '<tr><td><strong>'+a['父ASIN']+'</strong></td>';
+    var xferAsins = ["B0D8H2H3HW", "B0D8GYHTVB", "B0DZT7J1PJ", "B0FT143W2W", "B0F1TG58YF", "B0FVRVHL5H", "B0DYDNTHDX", "B0F3VXP9T7", "B0F21B2B6H"];
+    var xferLabel = '<span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span>';
+    html += '<tr><td><strong>'+a['父ASIN']+'</strong>'+(xferAsins.indexOf(a['父ASIN'])>=0?xferLabel:'')+'</td>';
     html += '<td>'+a['业务员']+'</td>';
     html += '<td style="text-align:right">'+(a['FBA可售']||0).toLocaleString()+'</td>';
     html += '<td style="text-align:right">'+a['销量'].toLocaleString()+'</td>';
@@ -2074,6 +2076,8 @@ function switchTab(name) {
   var container = document.getElementById('operator-detail');
   var html = '';
   var colorMap = { '孙杰': '#378ADD', '小伟': '#639922', '何秋秋': '#7F77DD', '邱慧婷': '#BA7517', '朱佳磊': '#E24B4A', '夏栢芝': '#1D9E75', '朱斌斌': '#888780', '李韩笑': '#534AB7', '郑文茜': '#1D9E75', '赵健栋': '#185FA5' };
+  var xferAsins = ["B0D8H2H3HW", "B0D8GYHTVB", "B0DZT7J1PJ", "B0FT143W2W", "B0F1TG58YF", "B0FVRVHL5H", "B0DYDNTHDX", "B0F3VXP9T7", "B0F21B2B6H"];
+  var xferLabel = '<span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span>';
   // 固定阈值标色（同Python端）
   function ratioTag(v,key) {
     var t = { '退款率':9, '采购成本占比':20, '佣金占比':15, '头程费用占比':7, '仓储费占比':2 };
@@ -2118,7 +2122,7 @@ function switchTab(name) {
       else if (days > 180) stk = '<span class="tag amber">'+days+'天</span>';
       else stk = '<span class="tag green">'+days+'天</span>';
       var profitShareASIN = totalAllProfit > 0 ? (a['利润']/totalAllProfit*100).toFixed(1) : 0;
-      html += '<tr><td><strong>'+a['父ASIN']+'</strong></td>';
+      html += '<tr><td><strong>'+a['父ASIN']+'</strong>'+(xferAsins.indexOf(a['父ASIN'])>=0?xferLabel:'')+'</td>';
       html += '<td style="text-align:right">$'+Math.round(a['销售额']).toLocaleString()+'</td>';
       html += '<td style="text-align:right">'+a['销量']+'</td>';
       html += '<td style="text-align:right" class="change '+pc+'">$'+Math.round(a['利润']).toLocaleString()+'</td>';

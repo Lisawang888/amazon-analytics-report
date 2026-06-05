@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #2C2C2A; font-size: 14px; line-height: 1.6; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #2C2C2A; font-size: 14px; line-height: 1.6; overflow-x: hidden; }
 
   .header { background: #fff; border-bottom: 0.5px solid #ddd; padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .header h1 { font-size: 16px; font-weight: 500; }
@@ -28,7 +28,7 @@
   .tab-btn.operator:hover { background: #FAEEDA; }
   .tab-btn.operator.active { color: #854F0B; border-bottom-color: #BA7517; }
 
-  .content { max-width: 1200px; width: 100%; margin: 0 auto; padding: 24px 40px; overflow-x: hidden; }
+  .content { max-width: 1200px; width: 100%; margin: 0 auto; padding: 24px 40px; box-sizing: border-box; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 

@@ -109,8 +109,22 @@
   </div>
 </div>
 <script>
-function checkPw(){var p=document.getElementById('pw-input').value;if(p==='huomai123'){document.getElementById('pw-gate').style.display='none';}else{document.getElementById('pw-error').style.display='block';}}
+function checkPw(){
+  var p=document.getElementById('pw-input').value;
+  if(p==='huomai123'){
+    var exp=new Date();exp.setDate(exp.getDate()+30);
+    localStorage.setItem('amz_report_auth',JSON.stringify({v:'1',exp:exp.getTime()}));
+    document.getElementById('pw-gate').style.display='none';}
+  else{document.getElementById('pw-error').style.display='block';}
+}
 document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPw();});
+// Auto-login if token valid
+(function(){
+  try{
+    var a=JSON.parse(localStorage.getItem('amz_report_auth')||'{}');
+    if(a.v==='1'&&a.exp>Date.now()){document.getElementById('pw-gate').style.display='none';}
+  }catch(e){}
+})();
 </script>
 <div id="report-content">
 <div style="background:#2C2C2A;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">

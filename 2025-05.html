@@ -210,7 +210,7 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
       <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;">
         <table class="data-table">
           <thead>
-            <tr><th>父ASIN</th><th>店铺</th><th>负责人</th><th style="text-align:right">销售额</th><th style="text-align:right">销量</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">ACoS</th><th style="text-align:right">ROAS</th><th style="text-align:right">退款率</th><th style="text-align:right">库存</th><th style="text-align:right">可售天数</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr>
+            <tr><th>父ASIN</th><th>店铺</th><th>负责人</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">销量</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">利润环比</th><th style="text-align:right">ACoS</th><th style="text-align:right">ROAS</th><th style="text-align:right">退款率</th><th style="text-align:right">库存</th><th style="text-align:right">可售天数</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr>
           </thead>
           <tbody>
             <tr>
@@ -594,13 +594,13 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
               <td style="text-align:right">0.1%</td>
             </tr>
             <tr style="background:#f5f4f0;font-weight:500;">
-              <td colspan="3" style="text-align:right">TOP20 合计</td>
+              <td colspan="3" style="text-align:right">合计</td>
               <td style="text-align:right">$1,514,807</td>
               <td style="text-align:right">27,214</td>
               <td style="text-align:right">$148,578</td>
               <td></td>
               <td style="text-align:right;color:#185FA5;">105.3%</td>
-              <td colspan="9"></td>
+              <td colspan="11"></td>
             </tr></tbody>
         </table>
       </div>
@@ -1474,13 +1474,13 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
               <td style="text-align:right">0.1%</td>
             </tr>
             <tr style="background:#f5f4f0;font-weight:500;">
-              <td colspan="3" style="text-align:right">TOP20 合计</td>
+              <td colspan="3" style="text-align:right">合计</td>
               <td style="text-align:right">$1,514,807</td>
               <td style="text-align:right">27,214</td>
               <td style="text-align:right">$148,578</td>
               <td></td>
               <td style="text-align:right;color:#185FA5;">105.3%</td>
-              <td colspan="9"></td>
+              <td colspan="11"></td>
             </tr></tbody>
         </table>
       </div>
@@ -1552,8 +1552,7 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-title"><span class="dot" style="background:#BA7517"></span>运营环比趋势</div>
+    
       <div class="chart-grid">
         <div class="chart-card">
           <div class="chart-title">销售额环比（%）</div>
@@ -1572,8 +1571,7 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-title"><span class="dot" style="background:#BA7517"></span>父ASIN 利润贡献度瀑布图</div>
+    
       <div style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #ddd;">
         <div class="chart-sub">正利润在上、负利润在下 | TOP30 按利润排序</div>
         <div style="position:relative;height:340px;">

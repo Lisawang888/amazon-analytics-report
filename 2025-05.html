@@ -127,17 +127,9 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
 })();
 </script>
 <div id="report-content">
-
-<div id="loading-screen" style="position:fixed;inset:0;background:#f5f4f0;display:flex;align-items:center;justify-content:center;z-index:99998;font-family:-apple-system,sans-serif;">
-  <div style="text-align:center;">
-    <div style="font-size:20px;color:#2C2C2A;margin-bottom:10px;">数据加载中...</div>
-    <div style="color:#888;font-size:13px;">正在生成报告图表</div>
-  </div>
-</div>
-<script>window.addEventListener('DOMContentLoaded',function(){document.getElementById('report-content').style.display='';document.getElementById('loading-screen').style.display='none';});</script>
 <div style="background:#2C2C2A;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
   <span style="color:#fff;font-size:13px;font-weight:500;">月度报告：</span>
-  <a href="2026-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2026-05</a><a href="2026-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2026-04</a><a href="2025-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;background:#378ADD;color:#fff;font-weight:500">2025-05</a><a href="2025-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2025-04</a>
+  <a href="2025-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2025-04</a><a href="2025-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;background:#378ADD;color:#fff;font-weight:500">2025-05</a><a href="2026-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2026-04</a><a href="2026-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2026-05</a>
 </div>
 <div class="header">
   <div>
@@ -1607,8 +1599,38 @@ document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.
     </div>
 
     <div class="section">
-      <div class="section-title"><span class="dot" style="background:#E24B4A"></span>待处理预警清单</div>
-      <div id="operator-alerts"></div>
+      <div class="section-title"><span class="dot" style="background:#E24B4A"></span>个人PDCA · 重点关注（每人最多3项）</div>
+      <div id="operator-pdca" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#BA7517"></span>运营环比趋势</div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">销售额环比（%）</div>
+          <div class="chart-sub">2025-05 vs 2025-04</div>
+          <div style="position:relative;height:280px;">
+            <canvas id="opSalesMomChart" role="img" aria-label="运营销售额环比"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">利润环比（%）</div>
+          <div class="chart-sub">2025-05 vs 2025-04</div>
+          <div style="position:relative;height:280px;">
+            <canvas id="opProfitMomChart" role="img" aria-label="运营利润环比"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#BA7517"></span>父ASIN 利润贡献度瀑布图</div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #ddd;">
+        <div class="chart-sub">正利润在上、负利润在下 | TOP30 按利润排序</div>
+        <div style="position:relative;height:340px;">
+          <canvas id="profitWaterfallChart" role="img" aria-label="利润贡献瀑布图"></canvas>
+        </div>
+      </div>
     </div>
 
     <div class="section">
@@ -1906,37 +1928,35 @@ function switchTab(name) {
   });
   document.getElementById('operator-kpi-cards').innerHTML = kpiHtml;
 
-  // ===== 待处理预警清单 =====
-  var alertHtml = '<div style="background:#fff;border-radius:10px;border:0.5px solid #ddd;padding:12px;">';
-  var redItems = [], amberItems = [];
-  asinData.forEach(function(a) {
-    var op = a['业务员']||'未分配';
-    var profit = a['利润']||0; var margin = a['利润率']||0;
-    var acos = a['ACoS']||0; var refund = a['退款率']||0;
-    var days = a['库存天数']||999;
-    if (margin < 0 && a['销售额'] > 100) redItems.push({op:op, asin:a['父ASIN'], text:'亏损 | 利润率'+margin.toFixed(1)+'% | 亏$'+Math.round(-profit).toLocaleString(), action:'检查广告ACoS和促销折扣'});
-    if (acos > 50) redItems.push({op:op, asin:a['父ASIN'], text:'ACoS爆炸 '+acos.toFixed(1)+'%', action:'暂停或大幅降低此ASIN广告'});
-    if (days > 0 && days < 15 && a['销售额'] > 100) redItems.push({op:op, asin:a['父ASIN'], text:'断货风险 | '+days+'天 | 剩'+(a['FBA可售']||0)+'件', action:'立即创建补货计划'});
-    if (margin > 0 && margin < 5 && a['销售额'] > 1000) amberItems.push({op:op, asin:a['父ASIN'], text:'薄利 | '+margin.toFixed(1)+'%', action:'审核采购成本或物流费'});
-    if (refund > 9) amberItems.push({op:op, asin:a['父ASIN'], text:'退款率高 | '+refund.toFixed(1)+'%', action:'查看差评和退货原因'});
-    if (days > 0 && days < 30 && a['销售额'] > 100) amberItems.push({op:op, asin:a['父ASIN'], text:'库存低 | '+days+'天', action:'本周内安排补货'});
-    if (days > 180 && a['FBA可售'] > 10) amberItems.push({op:op, asin:a['父ASIN'], text:'积压 | '+days+'天 | '+a['FBA可售']+'件', action:'促销清理或移除订单'});
+  // ===== 个人PDCA 按人出具 =====
+  var pdcaHtml = '';
+  sortedOps.forEach(function(op) {
+    var items = opsById[op];
+    var problems = [];
+    items.forEach(function(a) {
+      var margin = a['利润率']||0; var acos = a['ACoS']||0;
+      var refund = a['退款率']||0; var days = a['库存天数']||999;
+      if (margin < 0 && a['销售额'] > 100) problems.push({pri:1, text:'亏损 '+a['父ASIN']+' 利润率'+margin.toFixed(1)+'%', act:'缩减广告预算或提价'});
+      if (acos > 50) problems.push({pri:1, text:'ACoS爆炸 '+a['父ASIN']+' '+acos.toFixed(1)+'%', act:'暂停广告或优化关键词'});
+      if (days > 0 && days < 15 && a['销售额'] > 100) problems.push({pri:1, text:'断货风险 '+a['父ASIN']+' 仅剩'+(a['FBA可售']||0)+'件', act:'立即补货'});
+      if (margin > 0 && margin < 5 && a['销售额'] > 1000) problems.push({pri:2, text:'薄利 '+a['父ASIN']+' '+margin.toFixed(1)+'%', act:'审核采购/物流成本'});
+      if (refund > 9) problems.push({pri:2, text:'高退款 '+a['父ASIN']+' '+refund.toFixed(1)+'%', act:'查看退货原因和差评'});
+      if (days > 0 && days < 30 && a['销售额'] > 100) problems.push({pri:2, text:'库存低 '+a['父ASIN']+' '+days+'天', act:'本周补货'});
+    });
+    problems.sort(function(a,b){return a.pri-b.pri;});
+    var top3 = problems.slice(0,3);
+    pdcaHtml += '<div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;padding:10px;width:300px;min-width:300px;flex-shrink:0;">';
+    pdcaHtml += '<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:#2C2C2A;">'+op+'</div>';
+    if (top3.length === 0) {
+      pdcaHtml += '<div style="color:#639922;font-size:11px;">P: 运行正常，无需关注</div>';
+    }
+    top3.forEach(function(p) {
+      var icon = p.pri===1 ? '🔴' : '🟠';
+      pdcaHtml += '<div style="font-size:11px;padding:4px 0;border-bottom:0.5px solid #eee;">'+icon+' <strong>P:</strong> '+p.text+'<br><span style="color:#888;font-size:10px;">→ '+p.act+'</span></div>';
+    });
+    pdcaHtml += '</div>';
   });
-  if (redItems.length > 0) {
-    alertHtml += '<div style="font-size:13px;font-weight:600;color:#A32D2D;margin-bottom:6px;">立即处理（'+redItems.length+'项）</div>';
-    redItems.slice(0, 8).forEach(function(a) {
-      alertHtml += '<div style="background:#FFF0F0;border-left:3px solid #E24B4A;padding:6px 10px;margin-bottom:4px;border-radius:4px;font-size:12px;"><strong>'+a.asin+'</strong>（'+a.op+'）: '+a.text+'<br><span style="color:#888;font-size:10px;">建议: '+a.action+'</span></div>';
-    });
-  }
-  if (amberItems.length > 0) {
-    alertHtml += '<div style="font-size:13px;font-weight:600;color:#854F0B;margin:8px 0 6px 0;">本周关注（'+amberItems.length+'项）</div>';
-    amberItems.slice(0, 10).forEach(function(a) {
-      alertHtml += '<div style="background:#FFF7ED;border-left:3px solid #BA7517;padding:6px 10px;margin-bottom:4px;border-radius:4px;font-size:12px;"><strong>'+a.asin+'</strong>（'+a.op+'）: '+a.text+'<br><span style="color:#888;font-size:10px;">建议: '+a.action+'</span></div>';
-    });
-  }
-  if (redItems.length === 0 && amberItems.length === 0) alertHtml += '<span style="color:#888;">所有ASIN运行正常</span>';
-  alertHtml += '</div>';
-  document.getElementById('operator-alerts').innerHTML = alertHtml;
+  document.getElementById('operator-pdca').innerHTML = pdcaHtml;
 
   // ===== 原有: 按业务员ASIN明细 =====
   var container = document.getElementById('operator-detail');

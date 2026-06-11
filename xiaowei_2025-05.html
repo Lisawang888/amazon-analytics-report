@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>亚马逊利润分析报告 · 2025-05</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #2C2C2A; font-size: 14px; line-height: 1.6; overflow-x: hidden; }
+
+  .header { background: #fff; border-bottom: 0.5px solid #ddd; padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header h1 { font-size: 16px; font-weight: 500; }
+  .header .sub { font-size: 12px; color: #888; }
+  .badge { background: #E6F1FB; color: #185FA5; font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 0.5px solid #378ADD; }
+
+  .tab-nav { display: flex; background: #fff; border-bottom: 0.5px solid #ddd; padding: 0 40px; position: sticky; top: 69px; z-index: 99; }
+  .tab-btn { padding: 14px 24px; font-size: 13px; cursor: pointer; border: none; background: none; color: #888; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn:hover { color: #2C2C2A; }
+  .tab-btn.active { font-weight: 500; }
+  .tab-btn.boss { border-left: 3px solid transparent; }
+  .tab-btn.boss:hover { background: #E6F1FB; }
+  .tab-btn.boss.active { color: #185FA5; border-bottom-color: #378ADD; }
+  .tab-btn.manager { border-left: 3px solid transparent; }
+  .tab-btn.manager:hover { background: #EAF3DE; }
+  .tab-btn.manager.active { color: #3B6D11; border-bottom-color: #639922; }
+  .tab-btn.operator { border-left: 3px solid transparent; }
+  .tab-btn.operator:hover { background: #FAEEDA; }
+  .tab-btn.operator.active { color: #854F0B; border-bottom-color: #BA7517; }
+  .tab-btn.product { border-left: 3px solid transparent; }
+  .tab-btn.product:hover { background: #F0E6F7; }
+  .tab-btn.product.active { color: #6B2D8B; border-bottom-color: #7F277D; }
+
+  .content { max-width: 1200px; width: 100%; margin: 0 auto; padding: 24px 40px; box-sizing: border-box; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 14px; font-weight: 500; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 0.5px solid #e0e0e0; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .kpi-card { background: #fff; border-radius: 10px; padding: 14px; border: 0.5px solid #e0e0e0; }
+  .kpi-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .kpi-card .value { font-size: 20px; font-weight: 500; }
+  .kpi-card .change { font-size: 11px; margin-top: 3px; }
+  .kpi-card .change.up { color: #3B6D11; }
+  .kpi-card .change.down { color: #A32D2D; }
+  .kpi-card .change.warn { color: #854F0B; }
+  .kpi-card.blue { border-top: 2px solid #378ADD; }
+  .kpi-card.green { border-top: 2px solid #639922; }
+  .kpi-card.amber { border-top: 2px solid #BA7517; }
+
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .chart-card { background: #fff; border-radius: 10px; padding: 16px; border: 0.5px solid #e0e0e0; }
+  .chart-card .chart-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .chart-card .chart-sub { font-size: 11px; color: #888; margin-bottom: 12px; }
+  .chart-card canvas { width: 100% !important; }
+
+  .data-table { width: 100%; table-layout: auto; border-collapse: collapse; font-size: 13px; }
+  .data-table th { background: #f5f4f0; padding: 6px 8px; text-align: left; font-weight: 500; font-size: 12px; color: #666; border-bottom: 0.5px solid #ddd; white-space: nowrap; }
+  .data-table td { padding: 6px 8px; border-bottom: 0.5px solid #f0f0f0; white-space: nowrap; }
+  .data-table tr:hover td { background: #fafaf8; }
+
+  .tag { font-size: 11px; padding: 2px 7px; border-radius: 4px; display: inline-block; }
+  .tag.red { background: #FCEBEB; color: #A32D2D; }
+  .tag.green { background: #EAF3DE; color: #3B6D11; }
+  .tag.amber { background: #FAEEDA; color: #854F0B; }
+  .tag.blue { background: #E6F1FB; color: #185FA5; }
+
+  .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 8px; border-left: 3px solid; }
+  .alert.red { background: #FCEBEB; border-color: #E24B4A; color: #791F1F; }
+  .alert.amber { background: #FAEEDA; border-color: #BA7517; color: #633806; }
+
+  .report-header { border-radius: 10px; padding: 20px 24px; color: white; margin-bottom: 20px; }
+  .report-header.blue { background: linear-gradient(135deg, #185FA5, #378ADD); }
+  .report-header.green { background: linear-gradient(135deg, #3B6D11, #639922); }
+  .report-header.amber { background: linear-gradient(135deg, #854F0B, #BA7517); }
+  .report-header h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+  .report-header p { font-size: 12px; opacity: 0.85; }
+  .report-header .meta { display: flex; gap: 20px; margin-top: 10px; }
+  .report-header .meta-item { font-size: 11px; opacity: 0.75; }
+  .report-header .meta-item strong { display: block; font-size: 13px; font-weight: 500; opacity: 1; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .info-card { background: #fff; border-radius: 10px; padding: 16px; border: 0.5px solid #e0e0e0; }
+  .info-card h3 { font-size: 13px; font-weight: 500; margin-bottom: 10px; }
+  .info-card ul { list-style: none; padding: 0; }
+  .info-card ul li { padding: 5px 0; font-size: 12px; border-bottom: 0.5px solid #f5f5f5; }
+  .info-card ul li:last-child { border: none; }
+  .info-card.blue ul li::before { content: "●"; color: #378ADD; margin-right: 8px; font-size: 8px; }
+  .info-card.green ul li::before { content: "●"; color: #639922; margin-right: 8px; font-size: 8px; }
+
+  @media (max-width: 768px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+    .tab-nav { padding: 0 12px; overflow-x: auto; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div id="pw-gate" style="position:fixed;inset:0;background:#2C2C2A;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="background:#fff;padding:40px;border-radius:12px;text-align:center;width:360px;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+    <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+    <h2 style="font-size:18px;color:#2C2C2A;margin:0 0 6px 0;">亚马逊利润分析报告</h2>
+    <p style="color:#888;font-size:13px;margin:0 0 20px 0;">请输入访问密码</p>
+    <input id="pw-input" type="password" placeholder="密码" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:15px;outline:none;text-align:center;" autofocus>
+    <div id="pw-error" style="color:#E24B4A;font-size:12px;margin-top:8px;display:none;">密码错误，请重试</div>
+    <button onclick="checkPw()" style="margin-top:14px;width:100%;padding:10px;background:#378ADD;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer;">确认</button>
+  </div>
+</div>
+<script>
+function checkPw(){
+  var p=document.getElementById('pw-input').value;
+  if(p==='13777514236-77'){
+    var exp=new Date();exp.setDate(exp.getDate()+30);
+    localStorage.setItem('amz_report_auth',JSON.stringify({v:'1',exp:exp.getTime()}));
+    document.getElementById('pw-gate').style.display='none';}
+  else{document.getElementById('pw-error').style.display='block';}
+}
+document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPw();});
+// Auto-login if token valid
+(function(){
+  try{
+    var a=JSON.parse(localStorage.getItem('amz_report_auth')||'{}');
+    if(a.v==='1'&&a.exp>Date.now()){document.getElementById('pw-gate').style.display='none';}
+  }catch(e){}
+})();
+</script>
+<div id="report-content">
+<div style="background:#2C2C2A;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;max-width:1200px;margin:0 auto;box-sizing:border-box;">
+  <span style="color:#fff;font-size:13px;font-weight:500;">月度报告：</span>
+  <a href="xiaowei_2026-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2026-05</a><a href="xiaowei_2026-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2026-04</a><a href="xiaowei_2025-05.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;background:#378ADD;color:#fff;font-weight:500">2025-05</a><a href="xiaowei_2025-04.html" style="color:#ccc;text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;border:0.5px solid #555;">2025-04</a>
+</div>
+<div class="header">
+  <div>
+    <h1>亚马逊利润分析报告 · 2025-05</h1>
+    <div class="sub">数据源: 赛狐ERP利润报表 · 自动处理 · 更新于2026-06-11</div>
+  </div>
+  <div class="badge">真实数据 · 同比分析</div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn manager" onclick="switchTab('manager')">运营主管报</button>
+  <button class="tab-btn operator" onclick="switchTab('operator')">运营个人报</button>
+      <button class="tab-btn product" onclick="switchTab('product')">产品报表</button>
+</div>
+
+<!-- ===== 运营主管报 ===== -->
+<div id="tab-manager" class="tab-panel active">
+  <div class="content">
+    <div class="report-header green">
+      <h2>运营管理报告 · 主管版</h2>
+      <p>团队绩效对比 · ASIN表现追踪 · 2025-05</p>
+      <div class="meta">
+        <div class="meta-item"><strong>2025-05</strong>报告周期</div>
+        <div class="meta-item"><strong>5人</strong>团队规模</div>
+        <div class="meta-item"><strong>20个</strong>活跃ASIN</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>运营指标概览</div>
+      <div class="kpi-grid">
+        <div class="kpi-card green"><div class="label">整体ACoS</div><div class="value">28.9%</div><div class="change down">偏高</div></div>
+        <div class="kpi-card green"><div class="label">广告花费占比</div><div class="value">13.4%</div><div class="change warn">总销售额占比</div></div>
+        <div class="kpi-card green"><div class="label">活跃父ASIN</div><div class="value">34</div><div class="change">-</div></div>
+        <div class="kpi-card green"><div class="label">退款率</div><div class="value">8.3%</div><div class="change down">关注</div></div>
+        <div class="kpi-card green"><div class="label">广告销售额</div><div class="value">$687,150</div><div class="change">广告贡献</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>团队绩效对比</div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">各运营销售额 vs 利润</div>
+          <div class="chart-sub">柱=销售额, 线=利润</div>
+          <div style="position:relative;height:250px;">
+            <canvas id="teamChart" role="img" aria-label="团队销售额利润对比">团队对比</canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">各运营 ACoS 对比</div>
+          <div class="chart-sub">健康线: &lt;25%</div>
+          <div style="position:relative;height:250px;">
+            <canvas id="teamAcosChart" role="img" aria-label="团队ACoS对比">ACoS对比</canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>小组绩效总览</div>
+      <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;max-width:100%;">
+        <table class="data-table">
+          <thead>
+            <tr><th>小组</th><th>成员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>小伟组</strong></td>
+              <td style="font-size:11px;color:#888;">小伟、何秋秋、朱佳磊、夏栢芝、未分配</td>
+              <td style="text-align:right">$624,707</td>
+              <td style="text-align:right"><span class="change up">+11.5%</span></td>
+              <td style="text-align:right">$49,272</td>
+              <td style="text-align:right"><span class="change down">-1.8%</span></td>
+              <td style="text-align:right">7.9%</td>
+              <td style="text-align:right"><strong>34.9%</strong></td>
+              <td style="text-align:right">7929</td>
+              <td style="text-align:right">9.1%</td>
+              <td style="text-align:right">32.7%</td>
+              <td style="text-align:right">23</td>
+              <td style="text-align:center"><span class='tag red'>2</span></td>
+            </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#378ADD"></span>孙杰组 · 成员绩效明细</div>
+      <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;max-width:100%;">
+        <table class="data-table">
+          <thead>
+            <tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>小伟组 · 成员绩效明细</div>
+      <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;max-width:100%;">
+        <table class="data-table">
+          <thead>
+            <tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>小伟</strong></td>
+              <td style="text-align:right">$572,067</td>
+              <td style="text-align:right"><span class="change up">+8.7%</span></td>
+              <td style="text-align:right">$50,870</td>
+              <td style="text-align:right"><span class="change up">+5.3%</span></td>
+              <td style="text-align:right">9.0%</td>
+              <td style="text-align:right"><strong>36.1%</strong></td>
+              <td style="text-align:right">7486</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">9.2%</span></td>
+              <td style="text-align:right"><span class="tag amber">31.3%</span></td>
+              <td style="text-align:right">15</td>
+              <td style="text-align:center"><span class='tag red'>2</span></td>
+            </tr>
+            <tr>
+              <td><strong>何秋秋</strong></td>
+              <td style="text-align:right">$29,587</td>
+              <td style="text-align:right"><span class="change up">+27.8%</span></td>
+              <td style="text-align:right">$-3,160</td>
+              <td style="text-align:right"><span class="change down">-279.2%</span></td>
+              <td style="text-align:right">-13.9%</td>
+              <td style="text-align:right"><strong>-2.2%</strong></td>
+              <td style="text-align:right">250</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">9.2%</span></td>
+              <td style="text-align:right"><span class="tag red">51.4%</span></td>
+              <td style="text-align:right">2</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr>
+            <tr>
+              <td><strong>朱佳磊</strong></td>
+              <td style="text-align:right">$22,663</td>
+              <td style="text-align:right"><span class="change up">+116.9%</span></td>
+              <td style="text-align:right">$1,673</td>
+              <td style="text-align:right"><span class="change up">+1061.2%</span></td>
+              <td style="text-align:right">9.4%</td>
+              <td style="text-align:right"><strong>1.2%</strong></td>
+              <td style="text-align:right">190</td>
+              <td style="text-align:right">3.7%</td>
+              <td style="text-align:right"><span class="tag red">47.4%</span></td>
+              <td style="text-align:right">2</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr>
+            <tr>
+              <td><strong>夏栢芝</strong></td>
+              <td style="text-align:right">$390</td>
+              <td style="text-align:right">-</td>
+              <td style="text-align:right">$-107</td>
+              <td style="text-align:right">-</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><strong>-0.1%</strong></td>
+              <td style="text-align:right">3</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">1</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr>
+            <tr>
+              <td><strong>未分配</strong></td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">-</td>
+              <td style="text-align:right">$-5</td>
+              <td style="text-align:right"><span class="change up">+81.8%</span></td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><strong>-0.0%</strong></td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">3</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>运营绩效明细表（全量）</div>
+      <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;max-width:100%;">
+        <table class="data-table">
+          <thead>
+            <tr><th>业务员</th><th>组别</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">广告花费</th><th style="text-align:right">父ASIN</th><th>预警</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>小伟</strong></td>
+              <td><span class="tag blue">小伟组</span></td>
+              <td style="text-align:right">$572,067</td>
+              <td style="text-align:right"><span class="change up">+8.7%</span></td>
+              <td style="text-align:right">$50,870</td>
+              <td style="text-align:right"><span class="change up">+5.3%</span></td>
+              <td style="text-align:right">9.0%</td>
+              <td style="text-align:right"><strong>36.1%</strong></td>
+              <td style="text-align:right">7486</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">9.2%</span></td>
+              <td style="text-align:right"><span class="tag amber">31.3%</span></td>
+              <td style="text-align:right">$95,395</td>
+              <td style="text-align:right">15</td>
+              <td style="text-align:center"><span class='tag red'>2</span></td>
+            </tr>
+            <tr>
+              <td><strong>何秋秋</strong></td>
+              <td><span class="tag blue">小伟组</span></td>
+              <td style="text-align:right">$29,587</td>
+              <td style="text-align:right"><span class="change up">+27.8%</span></td>
+              <td style="text-align:right">$-3,160</td>
+              <td style="text-align:right"><span class="change down">-279.2%</span></td>
+              <td style="text-align:right">-13.9%</td>
+              <td style="text-align:right"><strong>-2.2%</strong></td>
+              <td style="text-align:right">250</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">9.2%</span></td>
+              <td style="text-align:right"><span class="tag red">51.4%</span></td>
+              <td style="text-align:right">$7,762</td>
+              <td style="text-align:right">2</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr>
+            <tr>
+              <td><strong>朱佳磊</strong></td>
+              <td><span class="tag blue">小伟组</span></td>
+              <td style="text-align:right">$22,663</td>
+              <td style="text-align:right"><span class="change up">+116.9%</span></td>
+              <td style="text-align:right">$1,673</td>
+              <td style="text-align:right"><span class="change up">+1061.2%</span></td>
+              <td style="text-align:right">9.4%</td>
+              <td style="text-align:right"><strong>1.2%</strong></td>
+              <td style="text-align:right">190</td>
+              <td style="text-align:right">3.7%</td>
+              <td style="text-align:right"><span class="tag red">47.4%</span></td>
+              <td style="text-align:right">$4,592</td>
+              <td style="text-align:right">2</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr>
+            <tr>
+              <td><strong>夏栢芝</strong></td>
+              <td><span class="tag blue">小伟组</span></td>
+              <td style="text-align:right">$390</td>
+              <td style="text-align:right">-</td>
+              <td style="text-align:right">$-107</td>
+              <td style="text-align:right">-</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><strong>-0.1%</strong></td>
+              <td style="text-align:right">3</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">1</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr>
+            <tr>
+              <td><strong>未分配</strong></td>
+              <td><span class="tag blue">小伟组</span></td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">-</td>
+              <td style="text-align:right">$-5</td>
+              <td style="text-align:right"><span class="change up">+81.8%</span></td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><strong>-0.0%</strong></td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">3</td>
+              <td style="text-align:center"><span class='tag green'>0</span></td>
+            </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>父ASIN 完整排行（按销售额）</div>
+      <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;max-width:100%;">
+        <table class="data-table">
+          <thead>
+            <tr><th>父ASIN</th><th>店铺</th><th>负责人</th><th style="text-align:right">销售额</th><th style="text-align:right">销量</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">ACoS</th><th style="text-align:right">ROAS</th><th style="text-align:right">退款率</th><th style="text-align:right">库存</th><th style="text-align:right">可售天数</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>B0GCJXMYBH</strong></td>
+              <td>MLTR-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$182,181</td>
+              <td style="text-align:right">2516</td>
+              <td style="text-align:right">$10,108</td>
+              <td style="text-align:right" class="change warn">5.6%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">7.2%</td>
+              <td style="text-align:right"><span class="tag amber">26.7%</span></td>
+              <td style="text-align:right">3.7x</td>
+              <td style="text-align:right">8.6%</td>
+              <td style="text-align:right">10,679</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">127天</span></td>
+              <td style="text-align:right">18.3%</td>
+              <td style="text-align:right">14.9%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">8.6%</span></td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">3.3%</span></td>
+            </tr>
+            <tr>
+              <td><strong>B0DJXZLTBP</strong></td>
+              <td>MLTR-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$128,530</td>
+              <td style="text-align:right">1402</td>
+              <td style="text-align:right">$11,851</td>
+              <td style="text-align:right" class="change warn">9.3%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">8.4%</td>
+              <td style="text-align:right"><span class="tag amber">30.0%</span></td>
+              <td style="text-align:right">3.3x</td>
+              <td style="text-align:right">6.1%</td>
+              <td style="text-align:right">6,280</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">134天</span></td>
+              <td style="text-align:right">17.7%</td>
+              <td style="text-align:right">14.9%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">9.5%</span></td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">2.2%</span></td>
+            </tr>
+            <tr>
+              <td><strong>B0DJQMJMPG</strong></td>
+              <td>MLTR-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$72,820</td>
+              <td style="text-align:right">1548</td>
+              <td style="text-align:right">$7,683</td>
+              <td style="text-align:right" class="change up">11.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">5.4%</td>
+              <td style="text-align:right"><span class="tag amber">31.5%</span></td>
+              <td style="text-align:right">3.2x</td>
+              <td style="text-align:right">8.7%</td>
+              <td style="text-align:right">2,974</td>
+              <td style="text-align:right">58天</td>
+              <td style="text-align:right">13.0%</td>
+              <td style="text-align:right">14.4%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">7.7%</span></td>
+              <td style="text-align:right">1.5%</td>
+            </tr>
+            <tr>
+              <td><strong>B0DTJYJJR7</strong></td>
+              <td>MLTR-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$68,848</td>
+              <td style="text-align:right">602</td>
+              <td style="text-align:right">$15,784</td>
+              <td style="text-align:right" class="change up">23.5%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">11.2%</td>
+              <td style="text-align:right"><span class="tag amber">38.3%</span></td>
+              <td style="text-align:right">2.6x</td>
+              <td style="text-align:right">5.8%</td>
+              <td style="text-align:right">2,311</td>
+              <td style="text-align:right">115天</td>
+              <td style="text-align:right">13.0%</td>
+              <td style="text-align:right">14.7%</td>
+              <td style="text-align:right">6.0%</td>
+              <td style="text-align:right">0.4%</td>
+            </tr>
+            <tr>
+              <td><strong>B0D3DS9MCJ</strong></td>
+              <td>YMAM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$60,992</td>
+              <td style="text-align:right">1592</td>
+              <td style="text-align:right">$3,612</td>
+              <td style="text-align:right" class="change warn">6.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">2.6%</td>
+              <td style="text-align:right"><span class="tag amber">32.3%</span></td>
+              <td style="text-align:right">3.1x</td>
+              <td style="text-align:right">8.0%</td>
+              <td style="text-align:right">106</td>
+              <td style="text-align:right">2天</td>
+              <td style="text-align:right">17.1%</td>
+              <td style="text-align:right">14.8%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">9.1%</span></td>
+              <td style="text-align:right">1.6%</td>
+            </tr>
+            <tr>
+              <td><strong>B0DN6FQRXR</strong></td>
+              <td>MLTR-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$43,062</td>
+              <td style="text-align:right">775</td>
+              <td style="text-align:right">$4,397</td>
+              <td style="text-align:right" class="change up">10.4%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">3.1%</td>
+              <td style="text-align:right"><span class="tag amber">32.1%</span></td>
+              <td style="text-align:right">3.1x</td>
+              <td style="text-align:right">7.9%</td>
+              <td style="text-align:right">635</td>
+              <td style="text-align:right">25天</td>
+              <td style="text-align:right">14.5%</td>
+              <td style="text-align:right">14.8%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">9.0%</span></td>
+              <td style="text-align:right">1.0%</td>
+            </tr>
+            <tr>
+              <td><strong>B0F21B2B6H</strong><span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span></td>
+              <td>MLTR-US</td>
+              <td>何秋秋</td>
+              <td style="text-align:right">$15,789</td>
+              <td style="text-align:right">132</td>
+              <td style="text-align:right">$98</td>
+              <td style="text-align:right" class="change down">0.7%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">0.1%</td>
+              <td style="text-align:right"><span class="tag red">45.2%</span></td>
+              <td style="text-align:right">2.2x</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">15.2%</span></td>
+              <td style="text-align:right">269</td>
+              <td style="text-align:right">61天</td>
+              <td style="text-align:right">14.4%</td>
+              <td style="text-align:right">14.3%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">7.4%</span></td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">2.4%</span></td>
+            </tr>
+            <tr>
+              <td><strong>B0D8GYHTVB</strong><span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span></td>
+              <td>MLTR-US</td>
+              <td>朱佳磊</td>
+              <td style="text-align:right">$14,804</td>
+              <td style="text-align:right">144</td>
+              <td style="text-align:right">$2,539</td>
+              <td style="text-align:right" class="change up">18.1%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">1.8%</td>
+              <td style="text-align:right"><span class="tag red">42.2%</span></td>
+              <td style="text-align:right">2.4x</td>
+              <td style="text-align:right">4.2%</td>
+              <td style="text-align:right">377</td>
+              <td style="text-align:right">79天</td>
+              <td style="text-align:right">16.6%</td>
+              <td style="text-align:right">14.2%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">7.7%</span></td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">4.1%</span></td>
+            </tr>
+            <tr>
+              <td><strong>B0DYJDDB5R</strong></td>
+              <td>HMMM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$14,690</td>
+              <td style="text-align:right">327</td>
+              <td style="text-align:right">$-699</td>
+              <td style="text-align:right" class="change down">-5.1%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.5%</td>
+              <td style="text-align:right"><span class="tag red">42.6%</span></td>
+              <td style="text-align:right">2.3x</td>
+              <td style="text-align:right">5.5%</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right">13.9%</td>
+              <td style="text-align:right">13.1%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">11.9%</span></td>
+              <td style="text-align:right">1.4%</td>
+            </tr>
+            <tr>
+              <td><strong>B0DYDNTHDX</strong><span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span></td>
+              <td>MLTR-US</td>
+              <td>何秋秋</td>
+              <td style="text-align:right">$13,799</td>
+              <td style="text-align:right">139</td>
+              <td style="text-align:right">$-3,258</td>
+              <td style="text-align:right" class="change down">-42.1%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-2.3%</td>
+              <td style="text-align:right"><span class="tag red">60.0%</span></td>
+              <td style="text-align:right">1.7x</td>
+              <td style="text-align:right">2.2%</td>
+              <td style="text-align:right">255</td>
+              <td style="text-align:right">55天</td>
+              <td style="text-align:right">18.2%</td>
+              <td style="text-align:right">8.5%</td>
+              <td style="text-align:right">4.9%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">2.3%</span></td>
+            </tr>
+            <tr>
+              <td><strong>B0DZT7J1PJ</strong><span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span></td>
+              <td>MLTR-US</td>
+              <td>朱佳磊</td>
+              <td style="text-align:right">$7,859</td>
+              <td style="text-align:right">57</td>
+              <td style="text-align:right">$-866</td>
+              <td style="text-align:right" class="change down">-22.7%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.6%</td>
+              <td style="text-align:right"><span class="tag red">58.1%</span></td>
+              <td style="text-align:right">1.7x</td>
+              <td style="text-align:right">1.8%</td>
+              <td style="text-align:right">492</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">259天</span></td>
+              <td style="text-align:right">11.3%</td>
+              <td style="text-align:right">7.4%</td>
+              <td style="text-align:right">4.1%</td>
+              <td style="text-align:right">0.1%</td>
+            </tr>
+            <tr>
+              <td><strong>B0DS21KZPM</strong></td>
+              <td>MLTR-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$640</td>
+              <td style="text-align:right">8</td>
+              <td style="text-align:right">$-383</td>
+              <td style="text-align:right" class="change down">-61.8%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.3%</td>
+              <td style="text-align:right"><span class="tag red">103.4%</span></td>
+              <td style="text-align:right">1.0x</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">37.5%</span></td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right">16.5%</td>
+              <td style="text-align:right">14.5%</td>
+              <td style="text-align:right">4.0%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">8.8%</span></td>
+            </tr>
+            <tr>
+              <td><strong>B0H1J5YPB5</strong></td>
+              <td>YYFI-US</td>
+              <td>夏栢芝</td>
+              <td style="text-align:right">$390</td>
+              <td style="text-align:right">3</td>
+              <td style="text-align:right">$-107</td>
+              <td style="text-align:right" class="change down">0.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.1%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0x</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">5,658</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">56580天</span></td>
+              <td style="text-align:right">12.8%</td>
+              <td style="text-align:right">0.2%</td>
+              <td style="text-align:right">6.3%</td>
+              <td style="text-align:right">0.0%</td>
+            </tr>
+            <tr>
+              <td><strong>B0FD7659QK</strong></td>
+              <td>YMAM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$150</td>
+              <td style="text-align:right">31</td>
+              <td style="text-align:right">$-1,232</td>
+              <td style="text-align:right" class="change down">0.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.9%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0.0x</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">52</td>
+              <td style="text-align:right">50天</td>
+              <td style="text-align:right">3.8%</td>
+              <td style="text-align:right">6.2%</td>
+              <td style="text-align:right">1.0%</td>
+              <td style="text-align:right">0.0%</td>
+            </tr>
+            <tr>
+              <td><strong>B0D7BVVPJG</strong></td>
+              <td>YMAM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$120</td>
+              <td style="text-align:right">3</td>
+              <td style="text-align:right">$-129</td>
+              <td style="text-align:right" class="change down">-107.7%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.1%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0x</td>
+              <td style="text-align:right">1.3%</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">43.2%</span></td>
+              <td style="text-align:right">15.0%</td>
+              <td style="text-align:right">5.8%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">11.1%</span></td>
+            </tr>
+            <tr>
+              <td><strong>B0BW3VQ7P3</strong></td>
+              <td>MLTR-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$34</td>
+              <td style="text-align:right">2</td>
+              <td style="text-align:right">$-110</td>
+              <td style="text-align:right" class="change down">-323.7%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.1%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0x</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right">19.6%</td>
+              <td style="text-align:right"><span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">15.0%</span></td>
+              <td style="text-align:right">4.2%</td>
+              <td style="text-align:right">1.1%</td>
+            </tr>
+            <tr>
+              <td><strong>B0D7DJTCND</strong></td>
+              <td>YMAM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">$-74</td>
+              <td style="text-align:right" class="change down">0.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">-0.1%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0x</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+            </tr>
+            <tr>
+              <td><strong>B0CNLT4ZWG</strong></td>
+              <td>YMAM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">$1</td>
+              <td style="text-align:right" class="change down">0.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">0.0%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0x</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+            </tr>
+            <tr>
+              <td><strong>B0DCSM86G5</strong></td>
+              <td>YMAM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">$18</td>
+              <td style="text-align:right" class="change down">0.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">0.0%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0x</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+            </tr>
+            <tr>
+              <td><strong>B0D4HL4FS2</strong></td>
+              <td>YMAM-US</td>
+              <td>小伟</td>
+              <td style="text-align:right">$0</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">$43</td>
+              <td style="text-align:right" class="change down">0.0%</td>
+              <td style="text-align:right;color:#185FA5;font-weight:500;">0.0%</td>
+              <td style="text-align:right"><span class="tag green">0.0%</span></td>
+              <td style="text-align:right">0x</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0</td>
+              <td style="text-align:right">0天</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+              <td style="text-align:right">0.0%</td>
+            </tr>
+            <tr style="background:#f5f4f0;font-weight:500;">
+              <td colspan="3" style="text-align:right">合计</td>
+              <td style="text-align:right">$624,707</td>
+              <td style="text-align:right">9,281</td>
+              <td style="text-align:right">$49,277</td>
+              <td></td>
+              <td style="text-align:right;color:#185FA5;">34.9%</td>
+              <td colspan="11"></td>
+            </tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>库存健康明细（按库存天数排序）</div>
+      <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;max-width:100%;">
+        <table class="data-table">
+          <thead>
+            <tr><th>父ASIN</th><th>负责人</th><th style="text-align:right">FBA可售</th><th style="text-align:right">月销量</th><th style="text-align:right">日均销量</th><th style="text-align:right">可售天数</th><th style="text-align:right">库存货值</th><th style="text-align:right">销售额</th><th>状态</th></tr>
+          </thead>
+          <tbody id="inventory-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 产品报表 ===== -->
+<div id="tab-product" class="tab-panel">
+  <div class="content">
+    <div class="report-header" style="background:linear-gradient(135deg,#6C3483,#9B59B6);border-left:4px solid #7F277D;">
+      <h2>产品维度报表</h2>
+      <p>父ASIN排名 · 销售额/利润同环比 · 2025-05</p>
+      <div class="meta">
+        <div class="meta-item"><strong>2025-05</strong>报告周期</div>
+        <div class="meta-item"><strong>按销售额降序</strong> | 点击表头排序</div>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;overflow-x:auto;max-width:100%;">
+      <table class="data-table" id="product-table">
+        <thead>
+          <tr>
+            <th>#</th><th>父ASIN</th><th>负责人</th><th>店铺</th>
+            <th style="text-align:right;cursor:pointer" onclick="sortProductTable('销售额')">销售额 ▾</th>
+            <th style="text-align:right;cursor:pointer" onclick="sortProductTable('销售额环比')">环比</th>
+            <th style="text-align:right;cursor:pointer" onclick="sortProductTable('销售额同比')">同比</th>
+            <th style="text-align:right;cursor:pointer" onclick="sortProductTable('利润')">利润 ▾</th>
+            <th style="text-align:right;cursor:pointer" onclick="sortProductTable('利润环比')">环比</th>
+            <th style="text-align:right;cursor:pointer" onclick="sortProductTable('利润同比')">同比</th>
+            <th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th>
+            <th style="text-align:right">退款率</th><th style="text-align:right">FBA</th><th style="text-align:right">可售天数</th>
+          </tr>
+        </thead>
+        <tbody id="product-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 运营个人报 ===== -->
+<div id="tab-operator" class="tab-panel">
+  <div class="content">
+    <div class="report-header amber">
+      <h2>运营个人报表 · 行动指引</h2>
+      <p>KPI概览 · 待处理预警 · 环比趋势 · 2025-05</p>
+      <div class="meta">
+        <div class="meta-item"><strong>2025-05</strong>报告周期</div>
+        <div class="meta-item"><strong>按优先级</strong>展示方式</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#BA7517"></span>个人KPI概览</div>
+      <div style="font-size:13px;font-weight:500;color:#3B6D11;margin-bottom:6px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3B6D11;margin-right:6px;"></span>孙杰组</div>
+      <div id="operator-kpi-sunjie" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;"></div>
+      <div style="font-size:13px;font-weight:500;color:#639922;margin-bottom:6px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#639922;margin-right:6px;"></span>小伟组</div>
+      <div id="operator-kpi-xiaowei" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#BA7517"></span>运营环比趋势</div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">销售额环比（%）</div>
+          <div class="chart-sub">2025-05 vs 2025-04</div>
+          <div style="position:relative;height:280px;">
+            <canvas id="opSalesMomChart" role="img" aria-label="运营销售额环比"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">利润环比（%）</div>
+          <div class="chart-sub">2025-05 vs 2025-04</div>
+          <div style="position:relative;height:280px;">
+            <canvas id="opProfitMomChart" role="img" aria-label="运营利润环比"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#BA7517"></span>父ASIN 利润贡献度瀑布图</div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #ddd;">
+        <div class="chart-sub">正利润在上、负利润在下 | TOP30 按利润排序</div>
+        <div style="position:relative;height:340px;">
+          <canvas id="profitWaterfallChart" role="img" aria-label="利润贡献瀑布图"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#BA7517"></span>按业务员：负责ASIN明细</div>
+      <div id="operator-detail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  var btn = document.querySelector('.tab-btn.' + name);
+  if (btn) btn.classList.add('active');
+}
+
+// 同比图
+(function() {
+  var el=document.getElementById('yoyChart');if(!el)return;var ctx=el.getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['2025-05', '2025-05'],
+      datasets: [
+        { label: '营收(万$)', data: [152.5, 152.5], backgroundColor: '#378ADD', borderRadius: 4 },
+        { label: '利润(万$)', data: [14.1, 14.1], backgroundColor: '#639922', borderRadius: 4 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+  });
+})();
+
+// 店铺营收占比
+(function() {
+  var el=document.getElementById('storeChart');if(!el)return;var ctx=el.getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: ["YLDE-US", "MLTR-US", "YMAM-US", "HMMM-US", "YYFI-US"], datasets: [{ data: [57.2, 36.0, 4.0, 1.9, 0.9], backgroundColor: ['#378ADD','#639922','#BA7517','#7F77DD','#E24B4A','#1D9E75','#888780','#534AB7','#185FA5','#C7820A'], borderWidth: 2, borderColor: '#fff' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '60%' }
+  });
+})();
+
+// 利润率分布
+(function() {
+  var el=document.getElementById('profitDistChart');if(!el)return;var ctx=el.getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['亏损(<0%)', '低利润(0-5%)', '中等(5-15%)', '高利润(>15%)'],
+      datasets: [{ label: 'ASIN数', data: [12, 1, 5, 2], backgroundColor: ['#E24B4A','#EF9F27','#639922','#378ADD'], borderRadius: 4 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { stepSize:1, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+  });
+})();
+
+// 成本结构
+(function() {
+  var el=document.getElementById('costChart');if(!el)return;var ctx=el.getContext('2d');
+  var totalSales = 1524577.63;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['采购成本','物流配送费','佣金','广告费','仓储费'],
+      datasets: [{
+        label: '占比(%)',
+        data: [
+          16.9,
+          9.3,
+          5.9,
+          13.4,
+          0.9
+        ],
+        backgroundColor: ['#E24B4A','#BA7517','#378ADD','#7F77DD','#639922'], borderRadius: 4
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, indexAxis: 'y',
+      scales: { x: { ticks: { callback: function(v){return v+'%'}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, y: { ticks: { font:{size:11} }, grid: { display: false } } } }
+  });
+})();
+
+// 团队对比
+(function() {
+  var ctx = document.getElementById('teamChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ["\u5c0f\u4f1f", "\u4f55\u79cb\u79cb", "\u6731\u4f73\u78ca", "\u590f\u6822\u829d", "\u672a\u5206\u914d"],
+      datasets: [
+        { label: '销售额', data: [572066.95, 29587.29, 22662.99, 389.97, 0.0], backgroundColor: '#378ADD', borderRadius: 4, yAxisID: 'y' },
+        { label: '利润', data: [50869.76, -3159.53, 1673.0, -106.7, -5.03], type: 'line', borderColor: '#639922', borderWidth: 2, pointRadius:4, fill: false, yAxisID: 'y1', tension: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, labels: { font: { size: 11 }, boxWidth: 12 } } },
+      scales: {
+        y: { position: 'left', ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k'}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        y1: { position: 'right', ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k'}, font:{size:11} }, grid: { display: false } },
+        x: { ticks: { font:{size:11} }, grid: { display: false } }
+      }
+    }
+  });
+})();
+
+// ACoS对比
+(function() {
+  var ctx = document.getElementById('teamAcosChart').getContext('2d');
+  var acosData = [31.27, 51.37, 47.39, 0, 0];
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ["\u5c0f\u4f1f", "\u4f55\u79cb\u79cb", "\u6731\u4f73\u78ca", "\u590f\u6822\u829d", "\u672a\u5206\u914d"],
+      datasets: [{
+        label: 'ACoS%',
+        data: acosData,
+        backgroundColor: acosData.map(function(v){ return v>40 ? '#E24B4A' : v>25 ? '#BA7517' : '#639922' }),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { max: 60, ticks: { callback: function(v){return v+'%'}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { ticks: { font:{size:11} }, grid: { display: false } }
+      }
+    }
+  });
+})();
+
+
+// 运营销售额环比
+(function() {
+  var ctx = document.getElementById('opSalesMomChart').getContext('2d');
+  var opData = [{"name": "\u5c0f\u4f1f", "mom": 8.7}, {"name": "\u4f55\u79cb\u79cb", "mom": 27.8}, {"name": "\u6731\u4f73\u78ca", "mom": 116.9}];
+  var labels = opData.map(function(d) { return d.name; });
+  var moms = opData.map(function(d) { return d.mom; });
+  var colors = moms.map(function(v) { return v >= 0 ? '#639922' : '#E24B4A'; });
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: labels, datasets: [{ label: '销售额环比%', data: moms, borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.1)', fill: false, pointRadius: 5, pointBackgroundColor: '#BA7517', tension: 0.2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: function(v){return v+'%'}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { ticks: { font:{size:11} }, grid: { display: false } }
+      }
+    }
+  });
+})();
+
+// 运营利润环比
+(function() {
+  var ctx = document.getElementById('opProfitMomChart').getContext('2d');
+  var opData = [{"name": "\u5c0f\u4f1f", "mom": 5.3}, {"name": "\u4f55\u79cb\u79cb", "mom": -279.2}, {"name": "\u6731\u4f73\u78ca", "mom": 1061.2}, {"name": "\u672a\u5206\u914d", "mom": 81.8}];
+  var labels = opData.map(function(d) { return d.name; });
+  var moms = opData.map(function(d) { return d.mom; });
+  var colors = moms.map(function(v) { return v >= 0 ? '#639922' : '#E24B4A'; });
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: labels, datasets: [{ label: '利润环比%', data: moms, borderColor: '#639922', backgroundColor: 'rgba(99,153,34,0.1)', fill: false, pointRadius: 5, pointBackgroundColor: '#639922', tension: 0.2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: function(v){return v+'%'}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { ticks: { font:{size:11} }, grid: { display: false } }
+      }
+    }
+  });
+})();
+
+// 父ASIN利润贡献瀑布图（TOP30）
+(function() {
+  var ctx = document.getElementById('profitWaterfallChart').getContext('2d');
+  var asinData = [{"\u7236ASIN": "B0GCJXMYBH", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 182181.03, "\u51c0\u9500\u552e\u989d": 180459.44, "\u9500\u91cf": 2516, "\u8ba2\u5355\u91cf": 2023, "\u5e73\u5747\u552e\u4ef7": 72.27, "\u5229\u6da6": 10108.32, "\u5229\u6da6\u7387": 5.6, "\u9000\u6b3e\u7387": 8.59, "ACoS": 26.7, "\u5e7f\u544a\u9500\u552e\u989d": 84984.02, "\u5e7f\u544a\u82b1\u8d39": 22690.86, "\u5e7f\u544a\u8ba2\u5355\u91cf": 831, "FBA\u53ef\u552e": 10679, "\u5e93\u5b58\u5929\u6570": 127, "\u5e93\u5b58\u8d27\u503c": 771771, "\u9000\u6b3e\u91cf": 216, "\u91c7\u8d2d\u6210\u672c": 33385.52, "\u4ed3\u50a8\u8d39": 5999.99, "\u7269\u6d41\u914d\u9001\u8d39": 49153.17, "\u9500\u552e\u4f63\u91d1": 27072.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.58, "\u4f63\u91d1\u5360\u6bd4": 14.86, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 3.29, "\u9500\u552e\u989d\u73af\u6bd4": 6.9, "\u5229\u6da6\u73af\u6bd4": -21.9, "\u9500\u552e\u989d\u540c\u6bd4": -29.9, "\u5229\u6da6\u540c\u6bd4": -43.4}, {"\u7236ASIN": "B0DJXZLTBP", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 128530.18, "\u51c0\u9500\u552e\u989d": 127955.18, "\u9500\u91cf": 1402, "\u8ba2\u5355\u91cf": 1135, "\u5e73\u5747\u552e\u4ef7": 92.59, "\u5229\u6da6": 11850.56, "\u5229\u6da6\u7387": 9.26, "\u9000\u6b3e\u7387": 6.06, "ACoS": 30.01, "\u5e7f\u544a\u9500\u552e\u989d": 75475.85, "\u5e7f\u544a\u82b1\u8d39": 22647.78, "\u5e7f\u544a\u8ba2\u5355\u91cf": 694, "FBA\u53ef\u552e": 6280, "\u5e93\u5b58\u5929\u6570": 134, "\u5e93\u5b58\u8d27\u503c": 581465, "\u9000\u6b3e\u91cf": 85, "\u91c7\u8d2d\u6210\u672c": 22739.73, "\u4ed3\u50a8\u8d39": 2774.91, "\u7269\u6d41\u914d\u9001\u8d39": 29831.8, "\u9500\u552e\u4f63\u91d1": 19195.29, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.69, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.51, "\u4f63\u91d1\u5360\u6bd4": 14.93, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.16, "\u9500\u552e\u989d\u73af\u6bd4": -7.5, "\u5229\u6da6\u73af\u6bd4": 5.9, "\u9500\u552e\u989d\u540c\u6bd4": -43.8, "\u5229\u6da6\u540c\u6bd4": -40.7}, {"\u7236ASIN": "B0DJQMJMPG", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 72819.51, "\u51c0\u9500\u552e\u989d": 70093.11, "\u9500\u91cf": 1548, "\u8ba2\u5355\u91cf": 1365, "\u5e73\u5747\u552e\u4ef7": 45.69, "\u5229\u6da6": 7682.96, "\u5229\u6da6\u7387": 10.96, "\u9000\u6b3e\u7387": 8.66, "ACoS": 31.53, "\u5e7f\u544a\u9500\u552e\u989d": 30949.44, "\u5e7f\u544a\u82b1\u8d39": 9759.39, "\u5e7f\u544a\u8ba2\u5355\u91cf": 581, "FBA\u53ef\u552e": 2974, "\u5e93\u5b58\u5929\u6570": 58, "\u5e93\u5b58\u8d27\u503c": 135882, "\u9000\u6b3e\u91cf": 134, "\u91c7\u8d2d\u6210\u672c": 9466.23, "\u4ed3\u50a8\u8d39": 1068.63, "\u7269\u6d41\u914d\u9001\u8d39": 18320.75, "\u9500\u552e\u4f63\u91d1": 10513.56, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.99, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.67, "\u4f63\u91d1\u5360\u6bd4": 14.44, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.47, "\u9500\u552e\u989d\u73af\u6bd4": 17.0, "\u5229\u6da6\u73af\u6bd4": -13.6, "\u9500\u552e\u989d\u540c\u6bd4": 15.6, "\u5229\u6da6\u540c\u6bd4": -4.3}, {"\u7236ASIN": "B0DTJYJJR7", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 68847.81, "\u51c0\u9500\u552e\u989d": 67255.31, "\u9500\u91cf": 602, "\u8ba2\u5355\u91cf": 481, "\u5e73\u5747\u552e\u4ef7": 112.28, "\u5229\u6da6": 15784.1, "\u5229\u6da6\u7387": 23.47, "\u9000\u6b3e\u7387": 5.81, "ACoS": 38.3, "\u5e7f\u544a\u9500\u552e\u989d": 36991.29, "\u5e7f\u544a\u82b1\u8d39": 14168.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 258, "FBA\u53ef\u552e": 2311, "\u5e93\u5b58\u5929\u6570": 115, "\u5e93\u5b58\u8d27\u503c": 259479, "\u9000\u6b3e\u91cf": 35, "\u91c7\u8d2d\u6210\u672c": 8960.21, "\u4ed3\u50a8\u8d39": 292.11, "\u7269\u6d41\u914d\u9001\u8d39": 10557.69, "\u9500\u552e\u4f63\u91d1": 10088.95, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.01, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.99, "\u4f63\u91d1\u5360\u6bd4": 14.65, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.42, "\u9500\u552e\u989d\u73af\u6bd4": 61.7, "\u5229\u6da6\u73af\u6bd4": 99.9, "\u9500\u552e\u989d\u540c\u6bd4": -36.7, "\u5229\u6da6\u540c\u6bd4": 70.4}, {"\u7236ASIN": "B0D3DS9MCJ", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 60992.09, "\u51c0\u9500\u552e\u989d": 60080.09, "\u9500\u91cf": 1592, "\u8ba2\u5355\u91cf": 1528, "\u5e73\u5747\u552e\u4ef7": 37.76, "\u5229\u6da6": 3611.51, "\u5229\u6da6\u7387": 6.01, "\u9000\u6b3e\u7387": 8.04, "ACoS": 32.31, "\u5e7f\u544a\u9500\u552e\u989d": 39769.69, "\u5e7f\u544a\u82b1\u8d39": 12848.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 1001, "FBA\u53ef\u552e": 106, "\u5e93\u5b58\u5929\u6570": 2, "\u5e93\u5b58\u8d27\u503c": 4003, "\u9000\u6b3e\u91cf": 128, "\u91c7\u8d2d\u6210\u672c": 10462.26, "\u4ed3\u50a8\u8d39": 1001.66, "\u7269\u6d41\u914d\u9001\u8d39": 12919.63, "\u9500\u552e\u4f63\u91d1": 9014.34, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.15, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.07, "\u4f63\u91d1\u5360\u6bd4": 14.78, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.64, "\u9500\u552e\u989d\u73af\u6bd4": -8.9, "\u5229\u6da6\u73af\u6bd4": -49.0, "\u9500\u552e\u989d\u540c\u6bd4": 148.4, "\u5229\u6da6\u540c\u6bd4": 142.2}, {"\u7236ASIN": "B0DN6FQRXR", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 43062.35, "\u51c0\u9500\u552e\u989d": 42456.05, "\u9500\u91cf": 775, "\u8ba2\u5355\u91cf": 642, "\u5e73\u5747\u552e\u4ef7": 55.5, "\u5229\u6da6": 4397.2, "\u5229\u6da6\u7387": 10.36, "\u9000\u6b3e\u7387": 7.87, "ACoS": 32.1, "\u5e7f\u544a\u9500\u552e\u989d": 25972.08, "\u5e7f\u544a\u82b1\u8d39": 8337.66, "\u5e7f\u544a\u8ba2\u5355\u91cf": 385, "FBA\u53ef\u552e": 635, "\u5e93\u5b58\u5929\u6570": 25, "\u5e93\u5b58\u8d27\u503c": 35242, "\u9000\u6b3e\u91cf": 61, "\u91c7\u8d2d\u6210\u672c": 6240.11, "\u4ed3\u50a8\u8d39": 446.71, "\u7269\u6d41\u914d\u9001\u8d39": 8937.22, "\u9500\u552e\u4f63\u91d1": 6369.09, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.48, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.96, "\u4f63\u91d1\u5360\u6bd4": 14.79, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.04, "\u9500\u552e\u989d\u73af\u6bd4": 12.9, "\u5229\u6da6\u73af\u6bd4": 221.9, "\u9500\u552e\u989d\u540c\u6bd4": 89.9, "\u5229\u6da6\u540c\u6bd4": 28.7}, {"\u7236ASIN": "B0F21B2B6H", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 15788.68, "\u51c0\u9500\u552e\u989d": 15047.68, "\u9500\u91cf": 132, "\u8ba2\u5355\u91cf": 117, "\u5e73\u5747\u552e\u4ef7": 114.0, "\u5229\u6da6": 98.01, "\u5229\u6da6\u7387": 0.65, "\u9000\u6b3e\u7387": 15.15, "ACoS": 45.19, "\u5e7f\u544a\u9500\u552e\u989d": 8830.23, "\u5e7f\u544a\u82b1\u8d39": 3990.79, "\u5e7f\u544a\u8ba2\u5355\u91cf": 69, "FBA\u53ef\u552e": 269, "\u5e93\u5b58\u5929\u6570": 61, "\u5e93\u5b58\u8d27\u503c": 30666, "\u9000\u6b3e\u91cf": 20, "\u91c7\u8d2d\u6210\u672c": 2275.01, "\u4ed3\u50a8\u8d39": 378.95, "\u7269\u6d41\u914d\u9001\u8d39": 2592.72, "\u9500\u552e\u4f63\u91d1": 2257.33, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.41, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.44, "\u4f63\u91d1\u5360\u6bd4": 14.3, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.4, "\u9500\u552e\u989d\u73af\u6bd4": -27.5, "\u5229\u6da6\u73af\u6bd4": -95.6, "\u9500\u552e\u989d\u540c\u6bd4": -70.4, "\u5229\u6da6\u540c\u6bd4": -98.2}, {"\u7236ASIN": "B0D8GYHTVB", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 14803.56, "\u51c0\u9500\u552e\u989d": 14049.56, "\u9500\u91cf": 144, "\u8ba2\u5355\u91cf": 136, "\u5e73\u5747\u552e\u4ef7": 97.57, "\u5229\u6da6": 2539.29, "\u5229\u6da6\u7387": 18.07, "\u9000\u6b3e\u7387": 4.17, "ACoS": 42.25, "\u5e7f\u544a\u9500\u552e\u989d": 6540.32, "\u5e7f\u544a\u82b1\u8d39": 2763.07, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 377, "\u5e93\u5b58\u5929\u6570": 79, "\u5e93\u5b58\u8d27\u503c": 36784, "\u9000\u6b3e\u91cf": 6, "\u91c7\u8d2d\u6210\u672c": 2465.11, "\u4ed3\u50a8\u8d39": 610.79, "\u7269\u6d41\u914d\u9001\u8d39": 2546.64, "\u9500\u552e\u4f63\u91d1": 2107.55, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.65, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.65, "\u4f63\u91d1\u5360\u6bd4": 14.24, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 4.13, "\u9500\u552e\u989d\u73af\u6bd4": 41.7, "\u5229\u6da6\u73af\u6bd4": 1662.4, "\u9500\u552e\u989d\u540c\u6bd4": -41.3, "\u5229\u6da6\u540c\u6bd4": -58.2}, {"\u7236ASIN": "B0DYJDDB5R", "\u5e97\u94fa": "HMMM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "MM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 14690.12, "\u51c0\u9500\u552e\u989d": 13820.03, "\u9500\u91cf": 327, "\u8ba2\u5355\u91cf": 271, "\u5e73\u5747\u552e\u4ef7": 44.73, "\u5229\u6da6": -698.86, "\u5229\u6da6\u7387": -5.06, "\u9000\u6b3e\u7387": 5.5, "ACoS": 42.56, "\u5e7f\u544a\u9500\u552e\u989d": 10524.48, "\u5e7f\u544a\u82b1\u8d39": 4479.55, "\u5e7f\u544a\u8ba2\u5355\u91cf": 193, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 18, "\u91c7\u8d2d\u6210\u672c": 2040.8, "\u4ed3\u50a8\u8d39": 202.5, "\u7269\u6d41\u914d\u9001\u8d39": 3273.44, "\u9500\u552e\u4f63\u91d1": 1925.74, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.89, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 11.89, "\u4f63\u91d1\u5360\u6bd4": 13.11, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.38, "\u9500\u552e\u989d\u73af\u6bd4": 1252.4, "\u5229\u6da6\u73af\u6bd4": -107.3, "\u9500\u552e\u989d\u540c\u6bd4": 4435.2, "\u5229\u6da6\u540c\u6bd4": -278.2}, {"\u7236ASIN": "B0DYDNTHDX", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 13798.61, "\u51c0\u9500\u552e\u989d": 7731.13, "\u9500\u91cf": 139, "\u8ba2\u5355\u91cf": 133, "\u5e73\u5747\u552e\u4ef7": 88.86, "\u5229\u6da6": -3257.54, "\u5229\u6da6\u7387": -42.14, "\u9000\u6b3e\u7387": 2.16, "ACoS": 60.04, "\u5e7f\u544a\u9500\u552e\u989d": 6281.32, "\u5e7f\u544a\u82b1\u8d39": 3771.59, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 255, "\u5e93\u5b58\u5929\u6570": 55, "\u5e93\u5b58\u8d27\u503c": 22659, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 2509.92, "\u4ed3\u50a8\u8d39": 311.84, "\u7269\u6d41\u914d\u9001\u8d39": 2045.88, "\u9500\u552e\u4f63\u91d1": 1175.4, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.19, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.94, "\u4f63\u91d1\u5360\u6bd4": 8.52, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.26, "\u9500\u552e\u989d\u73af\u6bd4": 900.0, "\u5229\u6da6\u73af\u6bd4": -626.3, "\u9500\u552e\u989d\u540c\u6bd4": 31.3, "\u5229\u6da6\u540c\u6bd4": -344.7}, {"\u7236ASIN": "B0DZT7J1PJ", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 7859.43, "\u51c0\u9500\u552e\u989d": 3819.73, "\u9500\u91cf": 57, "\u8ba2\u5355\u91cf": 54, "\u5e73\u5747\u552e\u4ef7": 136.42, "\u5229\u6da6": -866.29, "\u5229\u6da6\u7387": -22.68, "\u9000\u6b3e\u7387": 1.75, "ACoS": 58.07, "\u5e7f\u544a\u9500\u552e\u989d": 3149.78, "\u5e7f\u544a\u82b1\u8d39": 1828.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 19, "FBA\u53ef\u552e": 492, "\u5e93\u5b58\u5929\u6570": 259, "\u5e93\u5b58\u8d27\u503c": 67119, "\u9000\u6b3e\u91cf": 1, "\u91c7\u8d2d\u6210\u672c": 890.75, "\u4ed3\u50a8\u8d39": 9.23, "\u7269\u6d41\u914d\u9001\u8d39": 821.37, "\u9500\u552e\u4f63\u91d1": 582.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 11.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.11, "\u4f63\u91d1\u5360\u6bd4": 7.41, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.12, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -47.3, "\u5229\u6da6\u540c\u6bd4": -129.0}, {"\u7236ASIN": "B0DS21KZPM", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 639.92, "\u51c0\u9500\u552e\u989d": 619.92, "\u9500\u91cf": 8, "\u8ba2\u5355\u91cf": 5, "\u5e73\u5747\u552e\u4ef7": 77.49, "\u5229\u6da6": -383.1, "\u5229\u6da6\u7387": -61.8, "\u9000\u6b3e\u7387": 37.5, "ACoS": 103.38, "\u5e7f\u544a\u9500\u552e\u989d": 407.95, "\u5e7f\u544a\u82b1\u8d39": 421.73, "\u5e7f\u544a\u8ba2\u5355\u91cf": 5, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 105.74, "\u4ed3\u50a8\u8d39": 56.55, "\u7269\u6d41\u914d\u9001\u8d39": 87.3, "\u9500\u552e\u4f63\u91d1": 93.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.52, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.0, "\u4f63\u91d1\u5360\u6bd4": 14.53, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 8.84, "\u9500\u552e\u989d\u73af\u6bd4": 42.2, "\u5229\u6da6\u73af\u6bd4": -460.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0H1J5YPB5", "\u5e97\u94fa": "YYFI-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u590f\u6822\u829d", "\u5546\u54c1\u54c1\u724c": "FI", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 389.97, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -106.7, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 5658, "\u5e93\u5b58\u5929\u6570": 56580, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 49.96, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 31.11, "\u9500\u552e\u4f63\u91d1": 0.9, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.81, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 6.34, "\u4f63\u91d1\u5360\u6bd4": 0.23, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -99.6, "\u5229\u6da6\u540c\u6bd4": -100.6}, {"\u7236ASIN": "B0FD7659QK", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 149.99, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 31, "\u8ba2\u5355\u91cf": 31, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -1232.28, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 39.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 52, "\u5e93\u5b58\u5929\u6570": 50, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 574.52, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 451.89, "\u9500\u552e\u4f63\u91d1": 9.3, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 3.83, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 1.04, "\u4f63\u91d1\u5360\u6bd4": 6.2, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -96.2, "\u5229\u6da6\u540c\u6bd4": -1507.5}, {"\u7236ASIN": "B0D7BVVPJG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 119.97, "\u51c0\u9500\u552e\u989d": 119.97, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 39.99, "\u5229\u6da6": -129.25, "\u5229\u6da6\u7387": -107.74, "\u9000\u6b3e\u7387": 1.33, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 51.84, "\u4ed3\u50a8\u8d39": 13.28, "\u7269\u6d41\u914d\u9001\u8d39": 24.63, "\u9500\u552e\u4f63\u91d1": 18.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 43.21, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.78, "\u4f63\u91d1\u5360\u6bd4": 15.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 11.07, "\u9500\u552e\u989d\u73af\u6bd4": -97.9, "\u5229\u6da6\u73af\u6bd4": 80.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0BW3VQ7P3", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 33.98, "\u51c0\u9500\u552e\u989d": 33.98, "\u9500\u91cf": 2, "\u8ba2\u5355\u91cf": 2, "\u5e73\u5747\u552e\u4ef7": 16.99, "\u5229\u6da6": -110.0, "\u5229\u6da6\u7387": -323.72, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 6.66, "\u4ed3\u50a8\u8d39": 0.39, "\u7269\u6d41\u914d\u9001\u8d39": 11.04, "\u9500\u552e\u4f63\u91d1": 5.1, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 19.6, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.24, "\u4f63\u91d1\u5360\u6bd4": 15.01, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.15, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -206.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D7DJTCND", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -73.79, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 3.04, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": 54.7, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0CNLT4ZWG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 0.83, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.11, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -92.1, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0DCSM86G5", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 18.42, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -24.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D4HL4FS2", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 43.14, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}];
+  var sorted = asinData.slice().sort(function(a,b) { return b['利润'] - a['利润']; });
+  var labels = sorted.map(function(a) { return a['父ASIN'].slice(0,10)+' ('+(a['业务员']||'?')+')'; });
+  var profits = sorted.map(function(a) { return Math.round(a['利润']); });
+  var bgColors = profits.map(function(v) { return v >= 0 ? (v > 5000 ? '#639922' : '#8CB936') : '#E24B4A'; });
+  new Chart(ctx, {
+    type: 'bar',
+    data: { labels: labels, datasets: [{ label: '利润($)', data: profits, backgroundColor: bgColors, borderRadius: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k'}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { ticks: { font:{size:9} }, grid: { display: false } }
+      }
+    }
+  });
+})();
+
+// 产品报表排序功能
+var productSortKey = '销售额';
+var productSortDir = -1;
+function sortProductTable(key) {
+  if (productSortKey === key) { productSortDir *= -1; } else { productSortKey = key; productSortDir = -1; }
+  renderProductTable();
+}
+function renderProductTable() {
+  var asinData = [{"\u7236ASIN": "B0GCJXMYBH", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 182181.03, "\u51c0\u9500\u552e\u989d": 180459.44, "\u9500\u91cf": 2516, "\u8ba2\u5355\u91cf": 2023, "\u5e73\u5747\u552e\u4ef7": 72.27, "\u5229\u6da6": 10108.32, "\u5229\u6da6\u7387": 5.6, "\u9000\u6b3e\u7387": 8.59, "ACoS": 26.7, "\u5e7f\u544a\u9500\u552e\u989d": 84984.02, "\u5e7f\u544a\u82b1\u8d39": 22690.86, "\u5e7f\u544a\u8ba2\u5355\u91cf": 831, "FBA\u53ef\u552e": 10679, "\u5e93\u5b58\u5929\u6570": 127, "\u5e93\u5b58\u8d27\u503c": 771771, "\u9000\u6b3e\u91cf": 216, "\u91c7\u8d2d\u6210\u672c": 33385.52, "\u4ed3\u50a8\u8d39": 5999.99, "\u7269\u6d41\u914d\u9001\u8d39": 49153.17, "\u9500\u552e\u4f63\u91d1": 27072.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.58, "\u4f63\u91d1\u5360\u6bd4": 14.86, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 3.29, "\u9500\u552e\u989d\u73af\u6bd4": 6.9, "\u5229\u6da6\u73af\u6bd4": -21.9, "\u9500\u552e\u989d\u540c\u6bd4": -29.9, "\u5229\u6da6\u540c\u6bd4": -43.4}, {"\u7236ASIN": "B0DJXZLTBP", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 128530.18, "\u51c0\u9500\u552e\u989d": 127955.18, "\u9500\u91cf": 1402, "\u8ba2\u5355\u91cf": 1135, "\u5e73\u5747\u552e\u4ef7": 92.59, "\u5229\u6da6": 11850.56, "\u5229\u6da6\u7387": 9.26, "\u9000\u6b3e\u7387": 6.06, "ACoS": 30.01, "\u5e7f\u544a\u9500\u552e\u989d": 75475.85, "\u5e7f\u544a\u82b1\u8d39": 22647.78, "\u5e7f\u544a\u8ba2\u5355\u91cf": 694, "FBA\u53ef\u552e": 6280, "\u5e93\u5b58\u5929\u6570": 134, "\u5e93\u5b58\u8d27\u503c": 581465, "\u9000\u6b3e\u91cf": 85, "\u91c7\u8d2d\u6210\u672c": 22739.73, "\u4ed3\u50a8\u8d39": 2774.91, "\u7269\u6d41\u914d\u9001\u8d39": 29831.8, "\u9500\u552e\u4f63\u91d1": 19195.29, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.69, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.51, "\u4f63\u91d1\u5360\u6bd4": 14.93, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.16, "\u9500\u552e\u989d\u73af\u6bd4": -7.5, "\u5229\u6da6\u73af\u6bd4": 5.9, "\u9500\u552e\u989d\u540c\u6bd4": -43.8, "\u5229\u6da6\u540c\u6bd4": -40.7}, {"\u7236ASIN": "B0DJQMJMPG", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 72819.51, "\u51c0\u9500\u552e\u989d": 70093.11, "\u9500\u91cf": 1548, "\u8ba2\u5355\u91cf": 1365, "\u5e73\u5747\u552e\u4ef7": 45.69, "\u5229\u6da6": 7682.96, "\u5229\u6da6\u7387": 10.96, "\u9000\u6b3e\u7387": 8.66, "ACoS": 31.53, "\u5e7f\u544a\u9500\u552e\u989d": 30949.44, "\u5e7f\u544a\u82b1\u8d39": 9759.39, "\u5e7f\u544a\u8ba2\u5355\u91cf": 581, "FBA\u53ef\u552e": 2974, "\u5e93\u5b58\u5929\u6570": 58, "\u5e93\u5b58\u8d27\u503c": 135882, "\u9000\u6b3e\u91cf": 134, "\u91c7\u8d2d\u6210\u672c": 9466.23, "\u4ed3\u50a8\u8d39": 1068.63, "\u7269\u6d41\u914d\u9001\u8d39": 18320.75, "\u9500\u552e\u4f63\u91d1": 10513.56, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.99, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.67, "\u4f63\u91d1\u5360\u6bd4": 14.44, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.47, "\u9500\u552e\u989d\u73af\u6bd4": 17.0, "\u5229\u6da6\u73af\u6bd4": -13.6, "\u9500\u552e\u989d\u540c\u6bd4": 15.6, "\u5229\u6da6\u540c\u6bd4": -4.3}, {"\u7236ASIN": "B0DTJYJJR7", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 68847.81, "\u51c0\u9500\u552e\u989d": 67255.31, "\u9500\u91cf": 602, "\u8ba2\u5355\u91cf": 481, "\u5e73\u5747\u552e\u4ef7": 112.28, "\u5229\u6da6": 15784.1, "\u5229\u6da6\u7387": 23.47, "\u9000\u6b3e\u7387": 5.81, "ACoS": 38.3, "\u5e7f\u544a\u9500\u552e\u989d": 36991.29, "\u5e7f\u544a\u82b1\u8d39": 14168.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 258, "FBA\u53ef\u552e": 2311, "\u5e93\u5b58\u5929\u6570": 115, "\u5e93\u5b58\u8d27\u503c": 259479, "\u9000\u6b3e\u91cf": 35, "\u91c7\u8d2d\u6210\u672c": 8960.21, "\u4ed3\u50a8\u8d39": 292.11, "\u7269\u6d41\u914d\u9001\u8d39": 10557.69, "\u9500\u552e\u4f63\u91d1": 10088.95, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.01, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.99, "\u4f63\u91d1\u5360\u6bd4": 14.65, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.42, "\u9500\u552e\u989d\u73af\u6bd4": 61.7, "\u5229\u6da6\u73af\u6bd4": 99.9, "\u9500\u552e\u989d\u540c\u6bd4": -36.7, "\u5229\u6da6\u540c\u6bd4": 70.4}, {"\u7236ASIN": "B0D3DS9MCJ", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 60992.09, "\u51c0\u9500\u552e\u989d": 60080.09, "\u9500\u91cf": 1592, "\u8ba2\u5355\u91cf": 1528, "\u5e73\u5747\u552e\u4ef7": 37.76, "\u5229\u6da6": 3611.51, "\u5229\u6da6\u7387": 6.01, "\u9000\u6b3e\u7387": 8.04, "ACoS": 32.31, "\u5e7f\u544a\u9500\u552e\u989d": 39769.69, "\u5e7f\u544a\u82b1\u8d39": 12848.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 1001, "FBA\u53ef\u552e": 106, "\u5e93\u5b58\u5929\u6570": 2, "\u5e93\u5b58\u8d27\u503c": 4003, "\u9000\u6b3e\u91cf": 128, "\u91c7\u8d2d\u6210\u672c": 10462.26, "\u4ed3\u50a8\u8d39": 1001.66, "\u7269\u6d41\u914d\u9001\u8d39": 12919.63, "\u9500\u552e\u4f63\u91d1": 9014.34, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.15, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.07, "\u4f63\u91d1\u5360\u6bd4": 14.78, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.64, "\u9500\u552e\u989d\u73af\u6bd4": -8.9, "\u5229\u6da6\u73af\u6bd4": -49.0, "\u9500\u552e\u989d\u540c\u6bd4": 148.4, "\u5229\u6da6\u540c\u6bd4": 142.2}, {"\u7236ASIN": "B0DN6FQRXR", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 43062.35, "\u51c0\u9500\u552e\u989d": 42456.05, "\u9500\u91cf": 775, "\u8ba2\u5355\u91cf": 642, "\u5e73\u5747\u552e\u4ef7": 55.5, "\u5229\u6da6": 4397.2, "\u5229\u6da6\u7387": 10.36, "\u9000\u6b3e\u7387": 7.87, "ACoS": 32.1, "\u5e7f\u544a\u9500\u552e\u989d": 25972.08, "\u5e7f\u544a\u82b1\u8d39": 8337.66, "\u5e7f\u544a\u8ba2\u5355\u91cf": 385, "FBA\u53ef\u552e": 635, "\u5e93\u5b58\u5929\u6570": 25, "\u5e93\u5b58\u8d27\u503c": 35242, "\u9000\u6b3e\u91cf": 61, "\u91c7\u8d2d\u6210\u672c": 6240.11, "\u4ed3\u50a8\u8d39": 446.71, "\u7269\u6d41\u914d\u9001\u8d39": 8937.22, "\u9500\u552e\u4f63\u91d1": 6369.09, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.48, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.96, "\u4f63\u91d1\u5360\u6bd4": 14.79, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.04, "\u9500\u552e\u989d\u73af\u6bd4": 12.9, "\u5229\u6da6\u73af\u6bd4": 221.9, "\u9500\u552e\u989d\u540c\u6bd4": 89.9, "\u5229\u6da6\u540c\u6bd4": 28.7}, {"\u7236ASIN": "B0F21B2B6H", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 15788.68, "\u51c0\u9500\u552e\u989d": 15047.68, "\u9500\u91cf": 132, "\u8ba2\u5355\u91cf": 117, "\u5e73\u5747\u552e\u4ef7": 114.0, "\u5229\u6da6": 98.01, "\u5229\u6da6\u7387": 0.65, "\u9000\u6b3e\u7387": 15.15, "ACoS": 45.19, "\u5e7f\u544a\u9500\u552e\u989d": 8830.23, "\u5e7f\u544a\u82b1\u8d39": 3990.79, "\u5e7f\u544a\u8ba2\u5355\u91cf": 69, "FBA\u53ef\u552e": 269, "\u5e93\u5b58\u5929\u6570": 61, "\u5e93\u5b58\u8d27\u503c": 30666, "\u9000\u6b3e\u91cf": 20, "\u91c7\u8d2d\u6210\u672c": 2275.01, "\u4ed3\u50a8\u8d39": 378.95, "\u7269\u6d41\u914d\u9001\u8d39": 2592.72, "\u9500\u552e\u4f63\u91d1": 2257.33, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.41, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.44, "\u4f63\u91d1\u5360\u6bd4": 14.3, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.4, "\u9500\u552e\u989d\u73af\u6bd4": -27.5, "\u5229\u6da6\u73af\u6bd4": -95.6, "\u9500\u552e\u989d\u540c\u6bd4": -70.4, "\u5229\u6da6\u540c\u6bd4": -98.2}, {"\u7236ASIN": "B0D8GYHTVB", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 14803.56, "\u51c0\u9500\u552e\u989d": 14049.56, "\u9500\u91cf": 144, "\u8ba2\u5355\u91cf": 136, "\u5e73\u5747\u552e\u4ef7": 97.57, "\u5229\u6da6": 2539.29, "\u5229\u6da6\u7387": 18.07, "\u9000\u6b3e\u7387": 4.17, "ACoS": 42.25, "\u5e7f\u544a\u9500\u552e\u989d": 6540.32, "\u5e7f\u544a\u82b1\u8d39": 2763.07, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 377, "\u5e93\u5b58\u5929\u6570": 79, "\u5e93\u5b58\u8d27\u503c": 36784, "\u9000\u6b3e\u91cf": 6, "\u91c7\u8d2d\u6210\u672c": 2465.11, "\u4ed3\u50a8\u8d39": 610.79, "\u7269\u6d41\u914d\u9001\u8d39": 2546.64, "\u9500\u552e\u4f63\u91d1": 2107.55, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.65, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.65, "\u4f63\u91d1\u5360\u6bd4": 14.24, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 4.13, "\u9500\u552e\u989d\u73af\u6bd4": 41.7, "\u5229\u6da6\u73af\u6bd4": 1662.4, "\u9500\u552e\u989d\u540c\u6bd4": -41.3, "\u5229\u6da6\u540c\u6bd4": -58.2}, {"\u7236ASIN": "B0DYJDDB5R", "\u5e97\u94fa": "HMMM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "MM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 14690.12, "\u51c0\u9500\u552e\u989d": 13820.03, "\u9500\u91cf": 327, "\u8ba2\u5355\u91cf": 271, "\u5e73\u5747\u552e\u4ef7": 44.73, "\u5229\u6da6": -698.86, "\u5229\u6da6\u7387": -5.06, "\u9000\u6b3e\u7387": 5.5, "ACoS": 42.56, "\u5e7f\u544a\u9500\u552e\u989d": 10524.48, "\u5e7f\u544a\u82b1\u8d39": 4479.55, "\u5e7f\u544a\u8ba2\u5355\u91cf": 193, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 18, "\u91c7\u8d2d\u6210\u672c": 2040.8, "\u4ed3\u50a8\u8d39": 202.5, "\u7269\u6d41\u914d\u9001\u8d39": 3273.44, "\u9500\u552e\u4f63\u91d1": 1925.74, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.89, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 11.89, "\u4f63\u91d1\u5360\u6bd4": 13.11, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.38, "\u9500\u552e\u989d\u73af\u6bd4": 1252.4, "\u5229\u6da6\u73af\u6bd4": -107.3, "\u9500\u552e\u989d\u540c\u6bd4": 4435.2, "\u5229\u6da6\u540c\u6bd4": -278.2}, {"\u7236ASIN": "B0DYDNTHDX", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 13798.61, "\u51c0\u9500\u552e\u989d": 7731.13, "\u9500\u91cf": 139, "\u8ba2\u5355\u91cf": 133, "\u5e73\u5747\u552e\u4ef7": 88.86, "\u5229\u6da6": -3257.54, "\u5229\u6da6\u7387": -42.14, "\u9000\u6b3e\u7387": 2.16, "ACoS": 60.04, "\u5e7f\u544a\u9500\u552e\u989d": 6281.32, "\u5e7f\u544a\u82b1\u8d39": 3771.59, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 255, "\u5e93\u5b58\u5929\u6570": 55, "\u5e93\u5b58\u8d27\u503c": 22659, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 2509.92, "\u4ed3\u50a8\u8d39": 311.84, "\u7269\u6d41\u914d\u9001\u8d39": 2045.88, "\u9500\u552e\u4f63\u91d1": 1175.4, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.19, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.94, "\u4f63\u91d1\u5360\u6bd4": 8.52, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.26, "\u9500\u552e\u989d\u73af\u6bd4": 900.0, "\u5229\u6da6\u73af\u6bd4": -626.3, "\u9500\u552e\u989d\u540c\u6bd4": 31.3, "\u5229\u6da6\u540c\u6bd4": -344.7}, {"\u7236ASIN": "B0DZT7J1PJ", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 7859.43, "\u51c0\u9500\u552e\u989d": 3819.73, "\u9500\u91cf": 57, "\u8ba2\u5355\u91cf": 54, "\u5e73\u5747\u552e\u4ef7": 136.42, "\u5229\u6da6": -866.29, "\u5229\u6da6\u7387": -22.68, "\u9000\u6b3e\u7387": 1.75, "ACoS": 58.07, "\u5e7f\u544a\u9500\u552e\u989d": 3149.78, "\u5e7f\u544a\u82b1\u8d39": 1828.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 19, "FBA\u53ef\u552e": 492, "\u5e93\u5b58\u5929\u6570": 259, "\u5e93\u5b58\u8d27\u503c": 67119, "\u9000\u6b3e\u91cf": 1, "\u91c7\u8d2d\u6210\u672c": 890.75, "\u4ed3\u50a8\u8d39": 9.23, "\u7269\u6d41\u914d\u9001\u8d39": 821.37, "\u9500\u552e\u4f63\u91d1": 582.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 11.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.11, "\u4f63\u91d1\u5360\u6bd4": 7.41, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.12, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -47.3, "\u5229\u6da6\u540c\u6bd4": -129.0}, {"\u7236ASIN": "B0DS21KZPM", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 639.92, "\u51c0\u9500\u552e\u989d": 619.92, "\u9500\u91cf": 8, "\u8ba2\u5355\u91cf": 5, "\u5e73\u5747\u552e\u4ef7": 77.49, "\u5229\u6da6": -383.1, "\u5229\u6da6\u7387": -61.8, "\u9000\u6b3e\u7387": 37.5, "ACoS": 103.38, "\u5e7f\u544a\u9500\u552e\u989d": 407.95, "\u5e7f\u544a\u82b1\u8d39": 421.73, "\u5e7f\u544a\u8ba2\u5355\u91cf": 5, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 105.74, "\u4ed3\u50a8\u8d39": 56.55, "\u7269\u6d41\u914d\u9001\u8d39": 87.3, "\u9500\u552e\u4f63\u91d1": 93.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.52, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.0, "\u4f63\u91d1\u5360\u6bd4": 14.53, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 8.84, "\u9500\u552e\u989d\u73af\u6bd4": 42.2, "\u5229\u6da6\u73af\u6bd4": -460.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0H1J5YPB5", "\u5e97\u94fa": "YYFI-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u590f\u6822\u829d", "\u5546\u54c1\u54c1\u724c": "FI", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 389.97, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -106.7, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 5658, "\u5e93\u5b58\u5929\u6570": 56580, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 49.96, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 31.11, "\u9500\u552e\u4f63\u91d1": 0.9, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.81, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 6.34, "\u4f63\u91d1\u5360\u6bd4": 0.23, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -99.6, "\u5229\u6da6\u540c\u6bd4": -100.6}, {"\u7236ASIN": "B0FD7659QK", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 149.99, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 31, "\u8ba2\u5355\u91cf": 31, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -1232.28, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 39.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 52, "\u5e93\u5b58\u5929\u6570": 50, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 574.52, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 451.89, "\u9500\u552e\u4f63\u91d1": 9.3, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 3.83, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 1.04, "\u4f63\u91d1\u5360\u6bd4": 6.2, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -96.2, "\u5229\u6da6\u540c\u6bd4": -1507.5}, {"\u7236ASIN": "B0D7BVVPJG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 119.97, "\u51c0\u9500\u552e\u989d": 119.97, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 39.99, "\u5229\u6da6": -129.25, "\u5229\u6da6\u7387": -107.74, "\u9000\u6b3e\u7387": 1.33, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 51.84, "\u4ed3\u50a8\u8d39": 13.28, "\u7269\u6d41\u914d\u9001\u8d39": 24.63, "\u9500\u552e\u4f63\u91d1": 18.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 43.21, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.78, "\u4f63\u91d1\u5360\u6bd4": 15.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 11.07, "\u9500\u552e\u989d\u73af\u6bd4": -97.9, "\u5229\u6da6\u73af\u6bd4": 80.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0BW3VQ7P3", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 33.98, "\u51c0\u9500\u552e\u989d": 33.98, "\u9500\u91cf": 2, "\u8ba2\u5355\u91cf": 2, "\u5e73\u5747\u552e\u4ef7": 16.99, "\u5229\u6da6": -110.0, "\u5229\u6da6\u7387": -323.72, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 6.66, "\u4ed3\u50a8\u8d39": 0.39, "\u7269\u6d41\u914d\u9001\u8d39": 11.04, "\u9500\u552e\u4f63\u91d1": 5.1, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 19.6, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.24, "\u4f63\u91d1\u5360\u6bd4": 15.01, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.15, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -206.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D7DJTCND", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -73.79, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 3.04, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": 54.7, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0CNLT4ZWG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 0.83, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.11, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -92.1, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0DCSM86G5", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 18.42, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -24.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D4HL4FS2", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 43.14, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}];
+  var totalAllProfit = asinData.reduce(function(s,i){return s+(i['利润']||0)},0);
+  var xferAsins = ["B0DZT7J1PJ", "B0F1TG58YF", "B0FVRVHL5H", "B0F3VXP9T7", "B0F21B2B6H", "B0D8H2H3HW", "B0FT143W2W", "B0DYDNTHDX", "B0D8GYHTVB"];
+  var xferLabel = '<span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span>';
+  var sorted = asinData.slice().sort(function(a,b) {
+    var va = a[productSortKey] || 0; var vb = b[productSortKey] || 0;
+    return (va - vb) * productSortDir;
+  });
+  var html = '';
+  sorted.forEach(function(a, idx) {
+    var sm = a['销售额环比']; var sy = a['销售额同比'];
+    var pm = a['利润环比']; var py = a['利润同比'];
+    var sms = sm != null ? ('<span style="color:'+(sm>=0?'#3B6D11':'#A32D2D')+'">'+(sm>=0?'+':'')+sm.toFixed(1)+'%</span>') : '-';
+    var sys = sy != null ? ('<span style="color:'+(sy>=0?'#3B6D11':'#A32D2D')+'">'+(sy>=0?'+':'')+sy.toFixed(1)+'%</span>') : '-';
+    var pms = pm != null ? ('<span style="color:'+(pm>=0?'#3B6D11':'#A32D2D')+'">'+(pm>=0?'+':'')+pm.toFixed(1)+'%</span>') : '-';
+    var pys = py != null ? ('<span style="color:'+(py>=0?'#3B6D11':'#A32D2D')+'">'+(py>=0?'+':'')+py.toFixed(1)+'%</span>') : '-';
+    var margin = a['利润率']||0;
+    var days = a['库存天数']||0;
+    var dt = days > 0 && days < 15 ? 'color:#A32D2D;font-weight:500;' : (days < 30 ? 'color:#854F0B;' : '');
+    var ac = a['ACoS'] < 25 ? 'tag green' : (a['ACoS'] < 40 ? 'tag amber' : 'tag red');
+    html += '<tr>';
+    html += '<td>'+(idx+1)+'</td>';
+    html += '<td><strong>'+a['父ASIN']+'</strong>'+(xferAsins.indexOf(a['父ASIN'])>=0?xferLabel:'')+'</td>';
+    html += '<td>'+a['业务员']+'</td><td>'+a['店铺']+'</td>';
+    html += '<td style="text-align:right">$'+Math.round(a['销售额']).toLocaleString()+'</td>';
+    html += '<td style="text-align:right">'+sms+'</td><td style="text-align:right">'+sys+'</td>';
+    html += '<td style="text-align:right">$'+Math.round(a['利润']).toLocaleString()+'</td>';
+    html += '<td style="text-align:right">'+pms+'</td><td style="text-align:right">'+pys+'</td>';
+    html += '<td style="text-align:right;color:'+(margin>10?'#3B6D11':(margin<5?'#A32D2D':''))+'">'+margin.toFixed(1)+'%</td>';
+    html += '<td style="text-align:right"><span class="'+ac+'">'+a['ACoS'].toFixed(1)+'%</span></td>';
+    html += '<td style="text-align:right">'+a['退款率'].toFixed(1)+'%</td>';
+    html += '<td style="text-align:right">'+(a['FBA可售']||0).toLocaleString()+'</td>';
+    html += '<td style="text-align:right;'+dt+'">'+(days<999?days+'天':'-')+'</td>';
+    html += '</tr>';
+  });
+  document.getElementById('product-tbody').innerHTML = html;
+}
+renderProductTable();
+
+// 库存健康明细表
+(function() {
+  var asinData = [{"\u7236ASIN": "B0GCJXMYBH", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 182181.03, "\u51c0\u9500\u552e\u989d": 180459.44, "\u9500\u91cf": 2516, "\u8ba2\u5355\u91cf": 2023, "\u5e73\u5747\u552e\u4ef7": 72.27, "\u5229\u6da6": 10108.32, "\u5229\u6da6\u7387": 5.6, "\u9000\u6b3e\u7387": 8.59, "ACoS": 26.7, "\u5e7f\u544a\u9500\u552e\u989d": 84984.02, "\u5e7f\u544a\u82b1\u8d39": 22690.86, "\u5e7f\u544a\u8ba2\u5355\u91cf": 831, "FBA\u53ef\u552e": 10679, "\u5e93\u5b58\u5929\u6570": 127, "\u5e93\u5b58\u8d27\u503c": 771771, "\u9000\u6b3e\u91cf": 216, "\u91c7\u8d2d\u6210\u672c": 33385.52, "\u4ed3\u50a8\u8d39": 5999.99, "\u7269\u6d41\u914d\u9001\u8d39": 49153.17, "\u9500\u552e\u4f63\u91d1": 27072.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.58, "\u4f63\u91d1\u5360\u6bd4": 14.86, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 3.29, "\u9500\u552e\u989d\u73af\u6bd4": 6.9, "\u5229\u6da6\u73af\u6bd4": -21.9, "\u9500\u552e\u989d\u540c\u6bd4": -29.9, "\u5229\u6da6\u540c\u6bd4": -43.4}, {"\u7236ASIN": "B0DJXZLTBP", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 128530.18, "\u51c0\u9500\u552e\u989d": 127955.18, "\u9500\u91cf": 1402, "\u8ba2\u5355\u91cf": 1135, "\u5e73\u5747\u552e\u4ef7": 92.59, "\u5229\u6da6": 11850.56, "\u5229\u6da6\u7387": 9.26, "\u9000\u6b3e\u7387": 6.06, "ACoS": 30.01, "\u5e7f\u544a\u9500\u552e\u989d": 75475.85, "\u5e7f\u544a\u82b1\u8d39": 22647.78, "\u5e7f\u544a\u8ba2\u5355\u91cf": 694, "FBA\u53ef\u552e": 6280, "\u5e93\u5b58\u5929\u6570": 134, "\u5e93\u5b58\u8d27\u503c": 581465, "\u9000\u6b3e\u91cf": 85, "\u91c7\u8d2d\u6210\u672c": 22739.73, "\u4ed3\u50a8\u8d39": 2774.91, "\u7269\u6d41\u914d\u9001\u8d39": 29831.8, "\u9500\u552e\u4f63\u91d1": 19195.29, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.69, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.51, "\u4f63\u91d1\u5360\u6bd4": 14.93, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.16, "\u9500\u552e\u989d\u73af\u6bd4": -7.5, "\u5229\u6da6\u73af\u6bd4": 5.9, "\u9500\u552e\u989d\u540c\u6bd4": -43.8, "\u5229\u6da6\u540c\u6bd4": -40.7}, {"\u7236ASIN": "B0DJQMJMPG", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 72819.51, "\u51c0\u9500\u552e\u989d": 70093.11, "\u9500\u91cf": 1548, "\u8ba2\u5355\u91cf": 1365, "\u5e73\u5747\u552e\u4ef7": 45.69, "\u5229\u6da6": 7682.96, "\u5229\u6da6\u7387": 10.96, "\u9000\u6b3e\u7387": 8.66, "ACoS": 31.53, "\u5e7f\u544a\u9500\u552e\u989d": 30949.44, "\u5e7f\u544a\u82b1\u8d39": 9759.39, "\u5e7f\u544a\u8ba2\u5355\u91cf": 581, "FBA\u53ef\u552e": 2974, "\u5e93\u5b58\u5929\u6570": 58, "\u5e93\u5b58\u8d27\u503c": 135882, "\u9000\u6b3e\u91cf": 134, "\u91c7\u8d2d\u6210\u672c": 9466.23, "\u4ed3\u50a8\u8d39": 1068.63, "\u7269\u6d41\u914d\u9001\u8d39": 18320.75, "\u9500\u552e\u4f63\u91d1": 10513.56, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.99, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.67, "\u4f63\u91d1\u5360\u6bd4": 14.44, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.47, "\u9500\u552e\u989d\u73af\u6bd4": 17.0, "\u5229\u6da6\u73af\u6bd4": -13.6, "\u9500\u552e\u989d\u540c\u6bd4": 15.6, "\u5229\u6da6\u540c\u6bd4": -4.3}, {"\u7236ASIN": "B0DTJYJJR7", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 68847.81, "\u51c0\u9500\u552e\u989d": 67255.31, "\u9500\u91cf": 602, "\u8ba2\u5355\u91cf": 481, "\u5e73\u5747\u552e\u4ef7": 112.28, "\u5229\u6da6": 15784.1, "\u5229\u6da6\u7387": 23.47, "\u9000\u6b3e\u7387": 5.81, "ACoS": 38.3, "\u5e7f\u544a\u9500\u552e\u989d": 36991.29, "\u5e7f\u544a\u82b1\u8d39": 14168.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 258, "FBA\u53ef\u552e": 2311, "\u5e93\u5b58\u5929\u6570": 115, "\u5e93\u5b58\u8d27\u503c": 259479, "\u9000\u6b3e\u91cf": 35, "\u91c7\u8d2d\u6210\u672c": 8960.21, "\u4ed3\u50a8\u8d39": 292.11, "\u7269\u6d41\u914d\u9001\u8d39": 10557.69, "\u9500\u552e\u4f63\u91d1": 10088.95, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.01, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.99, "\u4f63\u91d1\u5360\u6bd4": 14.65, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.42, "\u9500\u552e\u989d\u73af\u6bd4": 61.7, "\u5229\u6da6\u73af\u6bd4": 99.9, "\u9500\u552e\u989d\u540c\u6bd4": -36.7, "\u5229\u6da6\u540c\u6bd4": 70.4}, {"\u7236ASIN": "B0D3DS9MCJ", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 60992.09, "\u51c0\u9500\u552e\u989d": 60080.09, "\u9500\u91cf": 1592, "\u8ba2\u5355\u91cf": 1528, "\u5e73\u5747\u552e\u4ef7": 37.76, "\u5229\u6da6": 3611.51, "\u5229\u6da6\u7387": 6.01, "\u9000\u6b3e\u7387": 8.04, "ACoS": 32.31, "\u5e7f\u544a\u9500\u552e\u989d": 39769.69, "\u5e7f\u544a\u82b1\u8d39": 12848.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 1001, "FBA\u53ef\u552e": 106, "\u5e93\u5b58\u5929\u6570": 2, "\u5e93\u5b58\u8d27\u503c": 4003, "\u9000\u6b3e\u91cf": 128, "\u91c7\u8d2d\u6210\u672c": 10462.26, "\u4ed3\u50a8\u8d39": 1001.66, "\u7269\u6d41\u914d\u9001\u8d39": 12919.63, "\u9500\u552e\u4f63\u91d1": 9014.34, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.15, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.07, "\u4f63\u91d1\u5360\u6bd4": 14.78, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.64, "\u9500\u552e\u989d\u73af\u6bd4": -8.9, "\u5229\u6da6\u73af\u6bd4": -49.0, "\u9500\u552e\u989d\u540c\u6bd4": 148.4, "\u5229\u6da6\u540c\u6bd4": 142.2}, {"\u7236ASIN": "B0DN6FQRXR", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 43062.35, "\u51c0\u9500\u552e\u989d": 42456.05, "\u9500\u91cf": 775, "\u8ba2\u5355\u91cf": 642, "\u5e73\u5747\u552e\u4ef7": 55.5, "\u5229\u6da6": 4397.2, "\u5229\u6da6\u7387": 10.36, "\u9000\u6b3e\u7387": 7.87, "ACoS": 32.1, "\u5e7f\u544a\u9500\u552e\u989d": 25972.08, "\u5e7f\u544a\u82b1\u8d39": 8337.66, "\u5e7f\u544a\u8ba2\u5355\u91cf": 385, "FBA\u53ef\u552e": 635, "\u5e93\u5b58\u5929\u6570": 25, "\u5e93\u5b58\u8d27\u503c": 35242, "\u9000\u6b3e\u91cf": 61, "\u91c7\u8d2d\u6210\u672c": 6240.11, "\u4ed3\u50a8\u8d39": 446.71, "\u7269\u6d41\u914d\u9001\u8d39": 8937.22, "\u9500\u552e\u4f63\u91d1": 6369.09, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.48, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.96, "\u4f63\u91d1\u5360\u6bd4": 14.79, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.04, "\u9500\u552e\u989d\u73af\u6bd4": 12.9, "\u5229\u6da6\u73af\u6bd4": 221.9, "\u9500\u552e\u989d\u540c\u6bd4": 89.9, "\u5229\u6da6\u540c\u6bd4": 28.7}, {"\u7236ASIN": "B0F21B2B6H", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 15788.68, "\u51c0\u9500\u552e\u989d": 15047.68, "\u9500\u91cf": 132, "\u8ba2\u5355\u91cf": 117, "\u5e73\u5747\u552e\u4ef7": 114.0, "\u5229\u6da6": 98.01, "\u5229\u6da6\u7387": 0.65, "\u9000\u6b3e\u7387": 15.15, "ACoS": 45.19, "\u5e7f\u544a\u9500\u552e\u989d": 8830.23, "\u5e7f\u544a\u82b1\u8d39": 3990.79, "\u5e7f\u544a\u8ba2\u5355\u91cf": 69, "FBA\u53ef\u552e": 269, "\u5e93\u5b58\u5929\u6570": 61, "\u5e93\u5b58\u8d27\u503c": 30666, "\u9000\u6b3e\u91cf": 20, "\u91c7\u8d2d\u6210\u672c": 2275.01, "\u4ed3\u50a8\u8d39": 378.95, "\u7269\u6d41\u914d\u9001\u8d39": 2592.72, "\u9500\u552e\u4f63\u91d1": 2257.33, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.41, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.44, "\u4f63\u91d1\u5360\u6bd4": 14.3, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.4, "\u9500\u552e\u989d\u73af\u6bd4": -27.5, "\u5229\u6da6\u73af\u6bd4": -95.6, "\u9500\u552e\u989d\u540c\u6bd4": -70.4, "\u5229\u6da6\u540c\u6bd4": -98.2}, {"\u7236ASIN": "B0D8GYHTVB", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 14803.56, "\u51c0\u9500\u552e\u989d": 14049.56, "\u9500\u91cf": 144, "\u8ba2\u5355\u91cf": 136, "\u5e73\u5747\u552e\u4ef7": 97.57, "\u5229\u6da6": 2539.29, "\u5229\u6da6\u7387": 18.07, "\u9000\u6b3e\u7387": 4.17, "ACoS": 42.25, "\u5e7f\u544a\u9500\u552e\u989d": 6540.32, "\u5e7f\u544a\u82b1\u8d39": 2763.07, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 377, "\u5e93\u5b58\u5929\u6570": 79, "\u5e93\u5b58\u8d27\u503c": 36784, "\u9000\u6b3e\u91cf": 6, "\u91c7\u8d2d\u6210\u672c": 2465.11, "\u4ed3\u50a8\u8d39": 610.79, "\u7269\u6d41\u914d\u9001\u8d39": 2546.64, "\u9500\u552e\u4f63\u91d1": 2107.55, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.65, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.65, "\u4f63\u91d1\u5360\u6bd4": 14.24, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 4.13, "\u9500\u552e\u989d\u73af\u6bd4": 41.7, "\u5229\u6da6\u73af\u6bd4": 1662.4, "\u9500\u552e\u989d\u540c\u6bd4": -41.3, "\u5229\u6da6\u540c\u6bd4": -58.2}, {"\u7236ASIN": "B0DYJDDB5R", "\u5e97\u94fa": "HMMM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "MM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 14690.12, "\u51c0\u9500\u552e\u989d": 13820.03, "\u9500\u91cf": 327, "\u8ba2\u5355\u91cf": 271, "\u5e73\u5747\u552e\u4ef7": 44.73, "\u5229\u6da6": -698.86, "\u5229\u6da6\u7387": -5.06, "\u9000\u6b3e\u7387": 5.5, "ACoS": 42.56, "\u5e7f\u544a\u9500\u552e\u989d": 10524.48, "\u5e7f\u544a\u82b1\u8d39": 4479.55, "\u5e7f\u544a\u8ba2\u5355\u91cf": 193, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 18, "\u91c7\u8d2d\u6210\u672c": 2040.8, "\u4ed3\u50a8\u8d39": 202.5, "\u7269\u6d41\u914d\u9001\u8d39": 3273.44, "\u9500\u552e\u4f63\u91d1": 1925.74, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.89, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 11.89, "\u4f63\u91d1\u5360\u6bd4": 13.11, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.38, "\u9500\u552e\u989d\u73af\u6bd4": 1252.4, "\u5229\u6da6\u73af\u6bd4": -107.3, "\u9500\u552e\u989d\u540c\u6bd4": 4435.2, "\u5229\u6da6\u540c\u6bd4": -278.2}, {"\u7236ASIN": "B0DYDNTHDX", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 13798.61, "\u51c0\u9500\u552e\u989d": 7731.13, "\u9500\u91cf": 139, "\u8ba2\u5355\u91cf": 133, "\u5e73\u5747\u552e\u4ef7": 88.86, "\u5229\u6da6": -3257.54, "\u5229\u6da6\u7387": -42.14, "\u9000\u6b3e\u7387": 2.16, "ACoS": 60.04, "\u5e7f\u544a\u9500\u552e\u989d": 6281.32, "\u5e7f\u544a\u82b1\u8d39": 3771.59, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 255, "\u5e93\u5b58\u5929\u6570": 55, "\u5e93\u5b58\u8d27\u503c": 22659, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 2509.92, "\u4ed3\u50a8\u8d39": 311.84, "\u7269\u6d41\u914d\u9001\u8d39": 2045.88, "\u9500\u552e\u4f63\u91d1": 1175.4, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.19, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.94, "\u4f63\u91d1\u5360\u6bd4": 8.52, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.26, "\u9500\u552e\u989d\u73af\u6bd4": 900.0, "\u5229\u6da6\u73af\u6bd4": -626.3, "\u9500\u552e\u989d\u540c\u6bd4": 31.3, "\u5229\u6da6\u540c\u6bd4": -344.7}, {"\u7236ASIN": "B0DZT7J1PJ", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 7859.43, "\u51c0\u9500\u552e\u989d": 3819.73, "\u9500\u91cf": 57, "\u8ba2\u5355\u91cf": 54, "\u5e73\u5747\u552e\u4ef7": 136.42, "\u5229\u6da6": -866.29, "\u5229\u6da6\u7387": -22.68, "\u9000\u6b3e\u7387": 1.75, "ACoS": 58.07, "\u5e7f\u544a\u9500\u552e\u989d": 3149.78, "\u5e7f\u544a\u82b1\u8d39": 1828.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 19, "FBA\u53ef\u552e": 492, "\u5e93\u5b58\u5929\u6570": 259, "\u5e93\u5b58\u8d27\u503c": 67119, "\u9000\u6b3e\u91cf": 1, "\u91c7\u8d2d\u6210\u672c": 890.75, "\u4ed3\u50a8\u8d39": 9.23, "\u7269\u6d41\u914d\u9001\u8d39": 821.37, "\u9500\u552e\u4f63\u91d1": 582.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 11.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.11, "\u4f63\u91d1\u5360\u6bd4": 7.41, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.12, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -47.3, "\u5229\u6da6\u540c\u6bd4": -129.0}, {"\u7236ASIN": "B0DS21KZPM", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 639.92, "\u51c0\u9500\u552e\u989d": 619.92, "\u9500\u91cf": 8, "\u8ba2\u5355\u91cf": 5, "\u5e73\u5747\u552e\u4ef7": 77.49, "\u5229\u6da6": -383.1, "\u5229\u6da6\u7387": -61.8, "\u9000\u6b3e\u7387": 37.5, "ACoS": 103.38, "\u5e7f\u544a\u9500\u552e\u989d": 407.95, "\u5e7f\u544a\u82b1\u8d39": 421.73, "\u5e7f\u544a\u8ba2\u5355\u91cf": 5, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 105.74, "\u4ed3\u50a8\u8d39": 56.55, "\u7269\u6d41\u914d\u9001\u8d39": 87.3, "\u9500\u552e\u4f63\u91d1": 93.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.52, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.0, "\u4f63\u91d1\u5360\u6bd4": 14.53, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 8.84, "\u9500\u552e\u989d\u73af\u6bd4": 42.2, "\u5229\u6da6\u73af\u6bd4": -460.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0H1J5YPB5", "\u5e97\u94fa": "YYFI-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u590f\u6822\u829d", "\u5546\u54c1\u54c1\u724c": "FI", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 389.97, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -106.7, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 5658, "\u5e93\u5b58\u5929\u6570": 56580, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 49.96, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 31.11, "\u9500\u552e\u4f63\u91d1": 0.9, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.81, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 6.34, "\u4f63\u91d1\u5360\u6bd4": 0.23, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -99.6, "\u5229\u6da6\u540c\u6bd4": -100.6}, {"\u7236ASIN": "B0FD7659QK", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 149.99, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 31, "\u8ba2\u5355\u91cf": 31, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -1232.28, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 39.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 52, "\u5e93\u5b58\u5929\u6570": 50, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 574.52, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 451.89, "\u9500\u552e\u4f63\u91d1": 9.3, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 3.83, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 1.04, "\u4f63\u91d1\u5360\u6bd4": 6.2, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -96.2, "\u5229\u6da6\u540c\u6bd4": -1507.5}, {"\u7236ASIN": "B0D7BVVPJG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 119.97, "\u51c0\u9500\u552e\u989d": 119.97, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 39.99, "\u5229\u6da6": -129.25, "\u5229\u6da6\u7387": -107.74, "\u9000\u6b3e\u7387": 1.33, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 51.84, "\u4ed3\u50a8\u8d39": 13.28, "\u7269\u6d41\u914d\u9001\u8d39": 24.63, "\u9500\u552e\u4f63\u91d1": 18.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 43.21, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.78, "\u4f63\u91d1\u5360\u6bd4": 15.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 11.07, "\u9500\u552e\u989d\u73af\u6bd4": -97.9, "\u5229\u6da6\u73af\u6bd4": 80.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0BW3VQ7P3", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 33.98, "\u51c0\u9500\u552e\u989d": 33.98, "\u9500\u91cf": 2, "\u8ba2\u5355\u91cf": 2, "\u5e73\u5747\u552e\u4ef7": 16.99, "\u5229\u6da6": -110.0, "\u5229\u6da6\u7387": -323.72, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 6.66, "\u4ed3\u50a8\u8d39": 0.39, "\u7269\u6d41\u914d\u9001\u8d39": 11.04, "\u9500\u552e\u4f63\u91d1": 5.1, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 19.6, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.24, "\u4f63\u91d1\u5360\u6bd4": 15.01, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.15, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -206.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D7DJTCND", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -73.79, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 3.04, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": 54.7, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0CNLT4ZWG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 0.83, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.11, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -92.1, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0DCSM86G5", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 18.42, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -24.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D4HL4FS2", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 43.14, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}];
+  var sorted = asinData.slice().filter(function(a) { return (a['FBA可售'] > 0 || a['库存天数'] > 0); });
+  sorted.sort(function(a,b) { return (a['库存天数'] || 999) - (b['库存天数'] || 999); });
+  var tbody = document.getElementById('inventory-tbody');
+  var html = '';
+  sorted.forEach(function(a) {
+    var days = a['库存天数'] || 0;
+    var dailySales = a['销量'] / 30;
+    var status = '';
+    if (days === 0) status = '<span class="tag red">无库存</span>';
+    else if (days < 15) status = '<span class="tag red">断货风险</span>';
+    else if (days < 30) status = '<span class="tag amber">需补货</span>';
+    else if (days > 180) status = '<span class="tag amber">积压</span>';
+    else status = '<span class="tag green">正常</span>';
+    var xferAsins = ["B0DZT7J1PJ", "B0F1TG58YF", "B0FVRVHL5H", "B0F3VXP9T7", "B0F21B2B6H", "B0D8H2H3HW", "B0FT143W2W", "B0DYDNTHDX", "B0D8GYHTVB"];
+    var xferLabel = '<span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span>';
+    html += '<tr><td><strong>'+a['父ASIN']+'</strong>'+(xferAsins.indexOf(a['父ASIN'])>=0?xferLabel:'')+'</td>';
+    html += '<td>'+a['业务员']+'</td>';
+    html += '<td style="text-align:right">'+(a['FBA可售']||0).toLocaleString()+'</td>';
+    html += '<td style="text-align:right">'+a['销量'].toLocaleString()+'</td>';
+    html += '<td style="text-align:right">'+dailySales.toFixed(1)+'</td>';
+    html += '<td style="text-align:right;' + (days < 15 ? 'color:#A32D2D;font-weight:500;' : (days < 30 ? 'color:#854F0B;font-weight:500;' : '')) + '">'+days+'天</td>';
+    html += '<td style="text-align:right">$'+(a['库存货值']||0).toLocaleString()+'</td>';
+    html += '<td style="text-align:right">$'+Math.round(a['销售额']).toLocaleString()+'</td>';
+    html += '<td>'+status+'</td></tr>';
+  });
+  if (!sorted.length) html = '<tr><td colspan="8" style="text-align:center;color:#888;">暂无库存数据</td></tr>';
+  tbody.innerHTML = html;
+})();
+// ===== KPI卡片 + 预警清单 + 运营明细 =====
+(function() {
+  var opsById = {};
+  var asinData = [{"\u7236ASIN": "B0GCJXMYBH", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 182181.03, "\u51c0\u9500\u552e\u989d": 180459.44, "\u9500\u91cf": 2516, "\u8ba2\u5355\u91cf": 2023, "\u5e73\u5747\u552e\u4ef7": 72.27, "\u5229\u6da6": 10108.32, "\u5229\u6da6\u7387": 5.6, "\u9000\u6b3e\u7387": 8.59, "ACoS": 26.7, "\u5e7f\u544a\u9500\u552e\u989d": 84984.02, "\u5e7f\u544a\u82b1\u8d39": 22690.86, "\u5e7f\u544a\u8ba2\u5355\u91cf": 831, "FBA\u53ef\u552e": 10679, "\u5e93\u5b58\u5929\u6570": 127, "\u5e93\u5b58\u8d27\u503c": 771771, "\u9000\u6b3e\u91cf": 216, "\u91c7\u8d2d\u6210\u672c": 33385.52, "\u4ed3\u50a8\u8d39": 5999.99, "\u7269\u6d41\u914d\u9001\u8d39": 49153.17, "\u9500\u552e\u4f63\u91d1": 27072.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.58, "\u4f63\u91d1\u5360\u6bd4": 14.86, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 3.29, "\u9500\u552e\u989d\u73af\u6bd4": 6.9, "\u5229\u6da6\u73af\u6bd4": -21.9, "\u9500\u552e\u989d\u540c\u6bd4": -29.9, "\u5229\u6da6\u540c\u6bd4": -43.4}, {"\u7236ASIN": "B0DJXZLTBP", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 128530.18, "\u51c0\u9500\u552e\u989d": 127955.18, "\u9500\u91cf": 1402, "\u8ba2\u5355\u91cf": 1135, "\u5e73\u5747\u552e\u4ef7": 92.59, "\u5229\u6da6": 11850.56, "\u5229\u6da6\u7387": 9.26, "\u9000\u6b3e\u7387": 6.06, "ACoS": 30.01, "\u5e7f\u544a\u9500\u552e\u989d": 75475.85, "\u5e7f\u544a\u82b1\u8d39": 22647.78, "\u5e7f\u544a\u8ba2\u5355\u91cf": 694, "FBA\u53ef\u552e": 6280, "\u5e93\u5b58\u5929\u6570": 134, "\u5e93\u5b58\u8d27\u503c": 581465, "\u9000\u6b3e\u91cf": 85, "\u91c7\u8d2d\u6210\u672c": 22739.73, "\u4ed3\u50a8\u8d39": 2774.91, "\u7269\u6d41\u914d\u9001\u8d39": 29831.8, "\u9500\u552e\u4f63\u91d1": 19195.29, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.69, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.51, "\u4f63\u91d1\u5360\u6bd4": 14.93, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.16, "\u9500\u552e\u989d\u73af\u6bd4": -7.5, "\u5229\u6da6\u73af\u6bd4": 5.9, "\u9500\u552e\u989d\u540c\u6bd4": -43.8, "\u5229\u6da6\u540c\u6bd4": -40.7}, {"\u7236ASIN": "B0DJQMJMPG", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 72819.51, "\u51c0\u9500\u552e\u989d": 70093.11, "\u9500\u91cf": 1548, "\u8ba2\u5355\u91cf": 1365, "\u5e73\u5747\u552e\u4ef7": 45.69, "\u5229\u6da6": 7682.96, "\u5229\u6da6\u7387": 10.96, "\u9000\u6b3e\u7387": 8.66, "ACoS": 31.53, "\u5e7f\u544a\u9500\u552e\u989d": 30949.44, "\u5e7f\u544a\u82b1\u8d39": 9759.39, "\u5e7f\u544a\u8ba2\u5355\u91cf": 581, "FBA\u53ef\u552e": 2974, "\u5e93\u5b58\u5929\u6570": 58, "\u5e93\u5b58\u8d27\u503c": 135882, "\u9000\u6b3e\u91cf": 134, "\u91c7\u8d2d\u6210\u672c": 9466.23, "\u4ed3\u50a8\u8d39": 1068.63, "\u7269\u6d41\u914d\u9001\u8d39": 18320.75, "\u9500\u552e\u4f63\u91d1": 10513.56, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.99, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.67, "\u4f63\u91d1\u5360\u6bd4": 14.44, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.47, "\u9500\u552e\u989d\u73af\u6bd4": 17.0, "\u5229\u6da6\u73af\u6bd4": -13.6, "\u9500\u552e\u989d\u540c\u6bd4": 15.6, "\u5229\u6da6\u540c\u6bd4": -4.3}, {"\u7236ASIN": "B0DTJYJJR7", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,30\u5929\u5185\u6709BD,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 68847.81, "\u51c0\u9500\u552e\u989d": 67255.31, "\u9500\u91cf": 602, "\u8ba2\u5355\u91cf": 481, "\u5e73\u5747\u552e\u4ef7": 112.28, "\u5229\u6da6": 15784.1, "\u5229\u6da6\u7387": 23.47, "\u9000\u6b3e\u7387": 5.81, "ACoS": 38.3, "\u5e7f\u544a\u9500\u552e\u989d": 36991.29, "\u5e7f\u544a\u82b1\u8d39": 14168.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 258, "FBA\u53ef\u552e": 2311, "\u5e93\u5b58\u5929\u6570": 115, "\u5e93\u5b58\u8d27\u503c": 259479, "\u9000\u6b3e\u91cf": 35, "\u91c7\u8d2d\u6210\u672c": 8960.21, "\u4ed3\u50a8\u8d39": 292.11, "\u7269\u6d41\u914d\u9001\u8d39": 10557.69, "\u9500\u552e\u4f63\u91d1": 10088.95, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.01, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.99, "\u4f63\u91d1\u5360\u6bd4": 14.65, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.42, "\u9500\u552e\u989d\u73af\u6bd4": 61.7, "\u5229\u6da6\u73af\u6bd4": 99.9, "\u9500\u552e\u989d\u540c\u6bd4": -36.7, "\u5229\u6da6\u540c\u6bd4": 70.4}, {"\u7236ASIN": "B0D3DS9MCJ", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 60992.09, "\u51c0\u9500\u552e\u989d": 60080.09, "\u9500\u91cf": 1592, "\u8ba2\u5355\u91cf": 1528, "\u5e73\u5747\u552e\u4ef7": 37.76, "\u5229\u6da6": 3611.51, "\u5229\u6da6\u7387": 6.01, "\u9000\u6b3e\u7387": 8.04, "ACoS": 32.31, "\u5e7f\u544a\u9500\u552e\u989d": 39769.69, "\u5e7f\u544a\u82b1\u8d39": 12848.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 1001, "FBA\u53ef\u552e": 106, "\u5e93\u5b58\u5929\u6570": 2, "\u5e93\u5b58\u8d27\u503c": 4003, "\u9000\u6b3e\u91cf": 128, "\u91c7\u8d2d\u6210\u672c": 10462.26, "\u4ed3\u50a8\u8d39": 1001.66, "\u7269\u6d41\u914d\u9001\u8d39": 12919.63, "\u9500\u552e\u4f63\u91d1": 9014.34, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 17.15, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 9.07, "\u4f63\u91d1\u5360\u6bd4": 14.78, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.64, "\u9500\u552e\u989d\u73af\u6bd4": -8.9, "\u5229\u6da6\u73af\u6bd4": -49.0, "\u9500\u552e\u989d\u540c\u6bd4": 148.4, "\u5229\u6da6\u540c\u6bd4": 142.2}, {"\u7236ASIN": "B0DN6FQRXR", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 43062.35, "\u51c0\u9500\u552e\u989d": 42456.05, "\u9500\u91cf": 775, "\u8ba2\u5355\u91cf": 642, "\u5e73\u5747\u552e\u4ef7": 55.5, "\u5229\u6da6": 4397.2, "\u5229\u6da6\u7387": 10.36, "\u9000\u6b3e\u7387": 7.87, "ACoS": 32.1, "\u5e7f\u544a\u9500\u552e\u989d": 25972.08, "\u5e7f\u544a\u82b1\u8d39": 8337.66, "\u5e7f\u544a\u8ba2\u5355\u91cf": 385, "FBA\u53ef\u552e": 635, "\u5e93\u5b58\u5929\u6570": 25, "\u5e93\u5b58\u8d27\u503c": 35242, "\u9000\u6b3e\u91cf": 61, "\u91c7\u8d2d\u6210\u672c": 6240.11, "\u4ed3\u50a8\u8d39": 446.71, "\u7269\u6d41\u914d\u9001\u8d39": 8937.22, "\u9500\u552e\u4f63\u91d1": 6369.09, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.48, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 8.96, "\u4f63\u91d1\u5360\u6bd4": 14.79, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.04, "\u9500\u552e\u989d\u73af\u6bd4": 12.9, "\u5229\u6da6\u73af\u6bd4": 221.9, "\u9500\u552e\u989d\u540c\u6bd4": 89.9, "\u5229\u6da6\u540c\u6bd4": 28.7}, {"\u7236ASIN": "B0F21B2B6H", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 15788.68, "\u51c0\u9500\u552e\u989d": 15047.68, "\u9500\u91cf": 132, "\u8ba2\u5355\u91cf": 117, "\u5e73\u5747\u552e\u4ef7": 114.0, "\u5229\u6da6": 98.01, "\u5229\u6da6\u7387": 0.65, "\u9000\u6b3e\u7387": 15.15, "ACoS": 45.19, "\u5e7f\u544a\u9500\u552e\u989d": 8830.23, "\u5e7f\u544a\u82b1\u8d39": 3990.79, "\u5e7f\u544a\u8ba2\u5355\u91cf": 69, "FBA\u53ef\u552e": 269, "\u5e93\u5b58\u5929\u6570": 61, "\u5e93\u5b58\u8d27\u503c": 30666, "\u9000\u6b3e\u91cf": 20, "\u91c7\u8d2d\u6210\u672c": 2275.01, "\u4ed3\u50a8\u8d39": 378.95, "\u7269\u6d41\u914d\u9001\u8d39": 2592.72, "\u9500\u552e\u4f63\u91d1": 2257.33, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 14.41, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.44, "\u4f63\u91d1\u5360\u6bd4": 14.3, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.4, "\u9500\u552e\u989d\u73af\u6bd4": -27.5, "\u5229\u6da6\u73af\u6bd4": -95.6, "\u9500\u552e\u989d\u540c\u6bd4": -70.4, "\u5229\u6da6\u540c\u6bd4": -98.2}, {"\u7236ASIN": "B0D8GYHTVB", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 14803.56, "\u51c0\u9500\u552e\u989d": 14049.56, "\u9500\u91cf": 144, "\u8ba2\u5355\u91cf": 136, "\u5e73\u5747\u552e\u4ef7": 97.57, "\u5229\u6da6": 2539.29, "\u5229\u6da6\u7387": 18.07, "\u9000\u6b3e\u7387": 4.17, "ACoS": 42.25, "\u5e7f\u544a\u9500\u552e\u989d": 6540.32, "\u5e7f\u544a\u82b1\u8d39": 2763.07, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 377, "\u5e93\u5b58\u5929\u6570": 79, "\u5e93\u5b58\u8d27\u503c": 36784, "\u9000\u6b3e\u91cf": 6, "\u91c7\u8d2d\u6210\u672c": 2465.11, "\u4ed3\u50a8\u8d39": 610.79, "\u7269\u6d41\u914d\u9001\u8d39": 2546.64, "\u9500\u552e\u4f63\u91d1": 2107.55, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.65, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 7.65, "\u4f63\u91d1\u5360\u6bd4": 14.24, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 4.13, "\u9500\u552e\u989d\u73af\u6bd4": 41.7, "\u5229\u6da6\u73af\u6bd4": 1662.4, "\u9500\u552e\u989d\u540c\u6bd4": -41.3, "\u5229\u6da6\u540c\u6bd4": -58.2}, {"\u7236ASIN": "B0DYJDDB5R", "\u5e97\u94fa": "HMMM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "MM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 14690.12, "\u51c0\u9500\u552e\u989d": 13820.03, "\u9500\u91cf": 327, "\u8ba2\u5355\u91cf": 271, "\u5e73\u5747\u552e\u4ef7": 44.73, "\u5229\u6da6": -698.86, "\u5229\u6da6\u7387": -5.06, "\u9000\u6b3e\u7387": 5.5, "ACoS": 42.56, "\u5e7f\u544a\u9500\u552e\u989d": 10524.48, "\u5e7f\u544a\u82b1\u8d39": 4479.55, "\u5e7f\u544a\u8ba2\u5355\u91cf": 193, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 18, "\u91c7\u8d2d\u6210\u672c": 2040.8, "\u4ed3\u50a8\u8d39": 202.5, "\u7269\u6d41\u914d\u9001\u8d39": 3273.44, "\u9500\u552e\u4f63\u91d1": 1925.74, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 13.89, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 11.89, "\u4f63\u91d1\u5360\u6bd4": 13.11, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.38, "\u9500\u552e\u989d\u73af\u6bd4": 1252.4, "\u5229\u6da6\u73af\u6bd4": -107.3, "\u9500\u552e\u989d\u540c\u6bd4": 4435.2, "\u5229\u6da6\u540c\u6bd4": -278.2}, {"\u7236ASIN": "B0DYDNTHDX", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 13798.61, "\u51c0\u9500\u552e\u989d": 7731.13, "\u9500\u91cf": 139, "\u8ba2\u5355\u91cf": 133, "\u5e73\u5747\u552e\u4ef7": 88.86, "\u5229\u6da6": -3257.54, "\u5229\u6da6\u7387": -42.14, "\u9000\u6b3e\u7387": 2.16, "ACoS": 60.04, "\u5e7f\u544a\u9500\u552e\u989d": 6281.32, "\u5e7f\u544a\u82b1\u8d39": 3771.59, "\u5e7f\u544a\u8ba2\u5355\u91cf": 64, "FBA\u53ef\u552e": 255, "\u5e93\u5b58\u5929\u6570": 55, "\u5e93\u5b58\u8d27\u503c": 22659, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 2509.92, "\u4ed3\u50a8\u8d39": 311.84, "\u7269\u6d41\u914d\u9001\u8d39": 2045.88, "\u9500\u552e\u4f63\u91d1": 1175.4, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 18.19, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.94, "\u4f63\u91d1\u5360\u6bd4": 8.52, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 2.26, "\u9500\u552e\u989d\u73af\u6bd4": 900.0, "\u5229\u6da6\u73af\u6bd4": -626.3, "\u9500\u552e\u989d\u540c\u6bd4": 31.3, "\u5229\u6da6\u540c\u6bd4": -344.7}, {"\u7236ASIN": "B0DZT7J1PJ", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": "\u957f\u671f\u5c11\u8865,\u91cd\u70b9\u6d41\u91cf\u6b3e", "\u9500\u552e\u989d": 7859.43, "\u51c0\u9500\u552e\u989d": 3819.73, "\u9500\u91cf": 57, "\u8ba2\u5355\u91cf": 54, "\u5e73\u5747\u552e\u4ef7": 136.42, "\u5229\u6da6": -866.29, "\u5229\u6da6\u7387": -22.68, "\u9000\u6b3e\u7387": 1.75, "ACoS": 58.07, "\u5e7f\u544a\u9500\u552e\u989d": 3149.78, "\u5e7f\u544a\u82b1\u8d39": 1828.96, "\u5e7f\u544a\u8ba2\u5355\u91cf": 19, "FBA\u53ef\u552e": 492, "\u5e93\u5b58\u5929\u6570": 259, "\u5e93\u5b58\u8d27\u503c": 67119, "\u9000\u6b3e\u91cf": 1, "\u91c7\u8d2d\u6210\u672c": 890.75, "\u4ed3\u50a8\u8d39": 9.23, "\u7269\u6d41\u914d\u9001\u8d39": 821.37, "\u9500\u552e\u4f63\u91d1": 582.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 11.33, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.11, "\u4f63\u91d1\u5360\u6bd4": 7.41, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.12, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -47.3, "\u5229\u6da6\u540c\u6bd4": -129.0}, {"\u7236ASIN": "B0DS21KZPM", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "TR", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 639.92, "\u51c0\u9500\u552e\u989d": 619.92, "\u9500\u91cf": 8, "\u8ba2\u5355\u91cf": 5, "\u5e73\u5747\u552e\u4ef7": 77.49, "\u5229\u6da6": -383.1, "\u5229\u6da6\u7387": -61.8, "\u9000\u6b3e\u7387": 37.5, "ACoS": 103.38, "\u5e7f\u544a\u9500\u552e\u989d": 407.95, "\u5e7f\u544a\u82b1\u8d39": 421.73, "\u5e7f\u544a\u8ba2\u5355\u91cf": 5, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 3, "\u91c7\u8d2d\u6210\u672c": 105.74, "\u4ed3\u50a8\u8d39": 56.55, "\u7269\u6d41\u914d\u9001\u8d39": 87.3, "\u9500\u552e\u4f63\u91d1": 93.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 16.52, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.0, "\u4f63\u91d1\u5360\u6bd4": 14.53, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 8.84, "\u9500\u552e\u989d\u73af\u6bd4": 42.2, "\u5229\u6da6\u73af\u6bd4": -460.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0H1J5YPB5", "\u5e97\u94fa": "YYFI-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u590f\u6822\u829d", "\u5546\u54c1\u54c1\u724c": "FI", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 389.97, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -106.7, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 5658, "\u5e93\u5b58\u5929\u6570": 56580, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 49.96, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 31.11, "\u9500\u552e\u4f63\u91d1": 0.9, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 12.81, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 6.34, "\u4f63\u91d1\u5360\u6bd4": 0.23, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -99.6, "\u5229\u6da6\u540c\u6bd4": -100.6}, {"\u7236ASIN": "B0FD7659QK", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 149.99, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 31, "\u8ba2\u5355\u91cf": 31, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -1232.28, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 39.87, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 52, "\u5e93\u5b58\u5929\u6570": 50, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 574.52, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 451.89, "\u9500\u552e\u4f63\u91d1": 9.3, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 3.83, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 1.04, "\u4f63\u91d1\u5360\u6bd4": 6.2, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": -96.2, "\u5229\u6da6\u540c\u6bd4": -1507.5}, {"\u7236ASIN": "B0D7BVVPJG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 119.97, "\u51c0\u9500\u552e\u989d": 119.97, "\u9500\u91cf": 3, "\u8ba2\u5355\u91cf": 3, "\u5e73\u5747\u552e\u4ef7": 39.99, "\u5229\u6da6": -129.25, "\u5229\u6da6\u7387": -107.74, "\u9000\u6b3e\u7387": 1.33, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 51.84, "\u4ed3\u50a8\u8d39": 13.28, "\u7269\u6d41\u914d\u9001\u8d39": 24.63, "\u9500\u552e\u4f63\u91d1": 18.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 43.21, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 5.78, "\u4f63\u91d1\u5360\u6bd4": 15.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 11.07, "\u9500\u552e\u989d\u73af\u6bd4": -97.9, "\u5229\u6da6\u73af\u6bd4": 80.2, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0BW3VQ7P3", "\u5e97\u94fa": "MLTR-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": "\u6e05\u5b8c\u5f03\u7f6e", "\u9500\u552e\u989d": 33.98, "\u51c0\u9500\u552e\u989d": 33.98, "\u9500\u91cf": 2, "\u8ba2\u5355\u91cf": 2, "\u5e73\u5747\u552e\u4ef7": 16.99, "\u5229\u6da6": -110.0, "\u5229\u6da6\u7387": -323.72, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 6.66, "\u4ed3\u50a8\u8d39": 0.39, "\u7269\u6d41\u914d\u9001\u8d39": 11.04, "\u9500\u552e\u4f63\u91d1": 5.1, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 19.6, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 4.24, "\u4f63\u91d1\u5360\u6bd4": 15.01, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 1.15, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -206.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D7DJTCND", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": -73.79, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 4, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 3.04, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": 54.7, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0CNLT4ZWG", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": 0, "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 0.83, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.11, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -92.1, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0DCSM86G5", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 18.42, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": -24.0, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}, {"\u7236ASIN": "B0D4HL4FS2", "\u5e97\u94fa": "YMAM-US", "\u7ad9\u70b9": "\u7f8e\u56fd", "\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u5546\u54c1\u54c1\u724c": "AM", "\u4ea7\u54c1\u6807\u7b7e": 0, "\u9500\u552e\u989d": 0.0, "\u51c0\u9500\u552e\u989d": 0.0, "\u9500\u91cf": 0, "\u8ba2\u5355\u91cf": 0, "\u5e73\u5747\u552e\u4ef7": 0.0, "\u5229\u6da6": 43.14, "\u5229\u6da6\u7387": 0, "\u9000\u6b3e\u7387": 0.0, "ACoS": 0, "\u5e7f\u544a\u9500\u552e\u989d": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "\u5e7f\u544a\u8ba2\u5355\u91cf": 0, "FBA\u53ef\u552e": 0, "\u5e93\u5b58\u5929\u6570": 0, "\u5e93\u5b58\u8d27\u503c": 0, "\u9000\u6b3e\u91cf": 0, "\u91c7\u8d2d\u6210\u672c": 0.0, "\u4ed3\u50a8\u8d39": 0.0, "\u7269\u6d41\u914d\u9001\u8d39": 0.0, "\u9500\u552e\u4f63\u91d1": 0.0, "\u91c7\u8d2d\u6210\u672c\u5360\u6bd4": 0.0, "\u5934\u7a0b\u8d39\u7528\u5360\u6bd4": 0.0, "\u4f63\u91d1\u5360\u6bd4": 0.0, "\u4ed3\u50a8\u8d39\u5360\u6bd4": 0.0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null, "\u9500\u552e\u989d\u540c\u6bd4": null, "\u5229\u6da6\u540c\u6bd4": null}];
+  var totalAllSales = asinData.reduce(function(s,i){return s+(i['销售额']||0)},0);
+  var totalAllProfit = asinData.reduce(function(s,i){return s+(i['利润']||0)},0);
+  var opStats = [{"\u4e1a\u52a1\u5458": "\u5c0f\u4f1f", "\u6240\u5c5e\u7ec4": "\u5c0f\u4f1f\u7ec4", "\u9500\u552e\u989d": 572066.95, "\u5229\u6da6": 50869.76, "\u5229\u6da6\u7387": 9.04, "\u5229\u6da6\u5360\u6bd4": 36.1, "\u9500\u552e\u989d\u5360\u6bd4": 37.5, "\u8ba2\u5355\u91cf": 7486, "\u9000\u6b3e\u91cf": 688, "\u9000\u6b3e\u7387": 9.19, "\u5e7f\u544a\u82b1\u8d39": 95394.67, "ACoS": 31.27, "\u7ba1\u7406ASIN\u6570": 15, "\u5e93\u5b58\u9884\u8b66\u6570": 2, "\u9500\u552e\u989d\u73af\u6bd4": 8.7, "\u5229\u6da6\u73af\u6bd4": 5.3}, {"\u4e1a\u52a1\u5458": "\u4f55\u79cb\u79cb", "\u6240\u5c5e\u7ec4": "\u5c0f\u4f1f\u7ec4", "\u9500\u552e\u989d": 29587.29, "\u5229\u6da6": -3159.53, "\u5229\u6da6\u7387": -13.87, "\u5229\u6da6\u5360\u6bd4": -2.2, "\u9500\u552e\u989d\u5360\u6bd4": 1.9, "\u8ba2\u5355\u91cf": 250, "\u9000\u6b3e\u91cf": 23, "\u9000\u6b3e\u7387": 9.2, "\u5e7f\u544a\u82b1\u8d39": 7762.38, "ACoS": 51.37, "\u7ba1\u7406ASIN\u6570": 2, "\u5e93\u5b58\u9884\u8b66\u6570": 0, "\u9500\u552e\u989d\u73af\u6bd4": 27.8, "\u5229\u6da6\u73af\u6bd4": -279.2}, {"\u4e1a\u52a1\u5458": "\u6731\u4f73\u78ca", "\u6240\u5c5e\u7ec4": "\u5c0f\u4f1f\u7ec4", "\u9500\u552e\u989d": 22662.99, "\u5229\u6da6": 1673.0, "\u5229\u6da6\u7387": 9.36, "\u5229\u6da6\u5360\u6bd4": 1.2, "\u9500\u552e\u989d\u5360\u6bd4": 1.5, "\u8ba2\u5355\u91cf": 190, "\u9000\u6b3e\u91cf": 7, "\u9000\u6b3e\u7387": 3.68, "\u5e7f\u544a\u82b1\u8d39": 4592.03, "ACoS": 47.39, "\u7ba1\u7406ASIN\u6570": 2, "\u5e93\u5b58\u9884\u8b66\u6570": 0, "\u9500\u552e\u989d\u73af\u6bd4": 116.9, "\u5229\u6da6\u73af\u6bd4": 1061.2}, {"\u4e1a\u52a1\u5458": "\u590f\u6822\u829d", "\u6240\u5c5e\u7ec4": "\u5c0f\u4f1f\u7ec4", "\u9500\u552e\u989d": 389.97, "\u5229\u6da6": -106.7, "\u5229\u6da6\u7387": 0, "\u5229\u6da6\u5360\u6bd4": -0.1, "\u9500\u552e\u989d\u5360\u6bd4": 0.0, "\u8ba2\u5355\u91cf": 3, "\u9000\u6b3e\u91cf": 0, "\u9000\u6b3e\u7387": 0.0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "ACoS": 0, "\u7ba1\u7406ASIN\u6570": 1, "\u5e93\u5b58\u9884\u8b66\u6570": 0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": null}, {"\u4e1a\u52a1\u5458": "\u672a\u5206\u914d", "\u6240\u5c5e\u7ec4": "\u5c0f\u4f1f\u7ec4", "\u9500\u552e\u989d": 0.0, "\u5229\u6da6": -5.03, "\u5229\u6da6\u7387": 0, "\u5229\u6da6\u5360\u6bd4": -0.0, "\u9500\u552e\u989d\u5360\u6bd4": 0.0, "\u8ba2\u5355\u91cf": 0, "\u9000\u6b3e\u91cf": 0, "\u9000\u6b3e\u7387": 0, "\u5e7f\u544a\u82b1\u8d39": 0.0, "ACoS": 0, "\u7ba1\u7406ASIN\u6570": 3, "\u5e93\u5b58\u9884\u8b66\u6570": 0, "\u9500\u552e\u989d\u73af\u6bd4": null, "\u5229\u6da6\u73af\u6bd4": 81.8}];
+  asinData.forEach(function(a) {
+    var op = a['业务员'] || '未分配';
+    if (!opsById[op]) opsById[op] = [];
+    opsById[op].push(a);
+  });
+
+  // ===== 个人KPI卡片 (按组分) =====
+  var sunjieOps = opStats.filter(function(o){ return o['所属组'] === '孙杰组'; }).sort(function(a,b){ return (b['销售额']||0) - (a['销售额']||0); });
+  var xiaoweiOps = opStats.filter(function(o){ return o['所属组'] === '小伟组'; }).sort(function(a,b){ return (b['销售额']||0) - (a['销售额']||0); });
+  var sunjieTotalProfit = sunjieOps.reduce(function(s,o){return s+(o['利润']||0)},0);
+  var xiaoweiTotalProfit = xiaoweiOps.reduce(function(s,o){return s+(o['利润']||0)},0);
+  var TEAM_SUNJIE_SET = new Set(["\u90b1\u6167\u5a77", "\u674e\u97e9\u7b11", "\u8d75\u5065\u680b", "\u90d1\u6587\u831c", "\u5b59\u6770"]);
+  function renderKpiCards(opList, totalCount, teamProfit) {
+    var html = '';
+    opList.forEach(function(opSt, idx) {
+      var op = opSt['业务员'];
+      var items = opsById[op] || [];
+      var ts = opSt['销售额'] || 0;
+      var tp = opSt['利润'] || 0;
+      var margin = ts > 0 ? (tp/ts*100).toFixed(1) : 0;
+      var share = teamProfit > 0 ? (tp/teamProfit*100).toFixed(1) : 0;
+      var sm = opSt['销售额环比']; var pm = opSt['利润环比'];
+      var smStr = sm != null ? ('<span style="color:'+(sm>=0?'#3B6D11':'#A32D2D')+'">环比 '+(sm>=0?'+':'')+sm+'%</span>') : '';
+      var pmStr = pm != null ? ('<span style="color:'+(pm>=0?'#3B6D11':'#A32D2D')+'">环比 '+(pm>=0?'+':'')+pm+'%</span>') : '';
+      html += '<div style="background:#fff;border-radius:8px;border:0.5px solid #ddd;padding:10px;flex:1 1 180px;min-width:170px;">';
+      html += '<div style="font-size:12px;color:#666;margin-bottom:3px;"><strong>'+op+'</strong><span style="float:right;color:#999;font-size:10px;">#'+(idx+1)+'/'+totalCount+'</span></div>';
+      html += '<div style="font-size:13px;font-weight:500;">$'+(ts/1000).toFixed(0)+'k <span style="color:#888;font-size:11px;">销售额</span> <span style="font-size:10px;">'+smStr+'</span></div>';
+      html += '<div style="font-size:11px;color:#666;margin-top:2px;">$'+Math.round(tp).toLocaleString()+' <span style="color:#888;font-size:10px;">利润 ('+margin+'%)</span> <span style="font-size:10px;">'+pmStr+'</span></div>';
+      html += '<div style="font-size:10px;color:#999;margin-top:2px;"><span style="color:#185FA5;">利润占比: '+share+'%<span style="font-size:9px;">(团队)</span></span></div>';
+    });
+    return html;
+  }
+  document.getElementById('operator-kpi-sunjie').innerHTML = renderKpiCards(sunjieOps, sunjieOps.length, sunjieTotalProfit);
+  document.getElementById('operator-kpi-xiaowei').innerHTML = renderKpiCards(xiaoweiOps, xiaoweiOps.length, xiaoweiTotalProfit);
+
+  // ===== 原有: 按业务员ASIN明细 =====
+  var container = document.getElementById('operator-detail');
+  var html = '';
+  var colorMap = { '孙杰': '#378ADD', '小伟': '#639922', '何秋秋': '#7F77DD', '邱慧婷': '#BA7517', '朱佳磊': '#E24B4A', '夏栢芝': '#1D9E75', '朱斌斌': '#888780', '李韩笑': '#534AB7', '郑文茜': '#1D9E75', '赵健栋': '#185FA5' };
+  var xferAsins = ["B0DZT7J1PJ", "B0F1TG58YF", "B0FVRVHL5H", "B0F3VXP9T7", "B0F21B2B6H", "B0D8H2H3HW", "B0FT143W2W", "B0DYDNTHDX", "B0D8GYHTVB"];
+  var xferLabel = '<span style="font-size:9px;color:#888;font-weight:normal;margin-left:3px;">主管5月下放</span>';
+  // 固定阈值标色（同Python端）
+  function ratioTag(v,key) {
+    var t = { '退款率':9, '采购成本占比':20, '佣金占比':15, '头程费用占比':7, '仓储费占比':2 };
+    var threshold = t[key] || 999;
+    var txt = v.toFixed(1)+'%';
+    if (v > threshold) return '<span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">'+txt+'</span>';
+    return txt;
+  }
+  function stockTag(days) {
+    if (days > 120) return '<span style="background:#FCEBEB;color:#A32D2D;padding:1px 3px;border-radius:2px;font-size:11px;">'+days+'天</span>';
+    if (days <= 0) return '<span class="tag red">无库存</span>';
+    return days+'天';
+  }
+  for (var op in opsById) {
+    var items = opsById[op];
+    var totalSales = items.reduce(function(s,i){return s+(i['销售额']||0)},0);
+    var totalProfit = items.reduce(function(s,i){return s+(i['利润']||0)},0);
+    var margin = totalSales > 0 ? (totalProfit/totalSales*100).toFixed(1) : 0;
+    var profitShare = totalAllProfit > 0 ? (totalProfit/totalAllProfit*100).toFixed(1) : 0;
+    var stockAlerts = items.filter(function(a) { var d = a['库存天数']||999; return d > 0 && d < 30 && (a['销售额']||0) > 100; }).length;
+    html += '<div style="background:#fff;border-radius:10px;border:0.5px solid #ddd;padding:14px;margin-bottom:12px;">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;">';
+    html += '<span style="width:10px;height:10px;border-radius:50%;background:'+(colorMap[op]||'#888')+';display:inline-block;flex-shrink:0;"></span>';
+    html += '<strong style="font-size:14px;">'+op+'</strong>';
+    html += '<span style="color:#888;font-size:12px;">管理'+items.length+'个ASIN</span>';
+    html += '<span style="color:#888;font-size:12px;">总销售额: $'+totalSales.toLocaleString()+'</span>';
+    html += '<span style="color:#888;font-size:12px;">利润: $'+totalProfit.toLocaleString()+'</span>';
+    html += '<span style="color:#3B6D11;font-size:12px;font-weight:500;">利润率: '+margin+'%</span>';
+    html += '<span style="color:#185FA5;font-size:12px;font-weight:500;">利润占比: '+profitShare+'%</span>';
+    // 库存预警标签（仅BOSS版显示）
+    
+    html += '</div>';
+    html += '<table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">销量</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">库存</th><th style="text-align:right">可售天数</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody>';
+    items.forEach(function(a) {
+      var pc = a['利润率'] > 10 ? 'up' : (a['利润率'] < 5 ? 'down' : 'warn');
+      var ac = a['ACoS'] < 25 ? 'tag green' : (a['ACoS'] < 40 ? 'tag amber' : 'tag red');
+      var days = a['库存天数'] || 0;
+      var stk = '';
+      if (days === 0) stk = '<span class="tag red">无库存</span>';
+      else if (days < 15) stk = '<span class="tag red">'+days+'天</span>';
+      else if (days < 30) stk = '<span class="tag amber">'+days+'天</span>';
+      else if (days > 180) stk = '<span class="tag amber">'+days+'天</span>';
+      else stk = '<span class="tag green">'+days+'天</span>';
+      var profitShareASIN = totalAllProfit > 0 ? (a['利润']/totalAllProfit*100).toFixed(1) : 0;
+      html += '<tr><td><strong>'+a['父ASIN']+'</strong>'+(xferAsins.indexOf(a['父ASIN'])>=0?xferLabel:'')+'</td>';
+      html += '<td style="text-align:right">$'+Math.round(a['销售额']).toLocaleString()+'</td>';
+      html += '<td style="text-align:right">'+a['销量']+'</td>';
+      html += '<td style="text-align:right" class="change '+pc+'">$'+Math.round(a['利润']).toLocaleString()+'</td>';
+      html += '<td style="text-align:right;' + (a['利润率']<5?'color:#A32D2D;':'') + (a['利润率']>15?'color:#3B6D11;':'') + (a['利润率']>=5&&a['利润率']<=15?'':'') + '">'+a['利润率'].toFixed(1)+'%</td>';
+      html += '<td style="text-align:right;color:#185FA5;">'+profitShareASIN+'%</td>';
+      html += '<td style="text-align:right"><span class="'+ac+'">'+a['ACoS'].toFixed(1)+'%</span></td>';
+      html += '<td style="text-align:right">'+ratioTag(a['退款率']||0,'退款率')+'</td>';
+      html += '<td style="text-align:right">'+(a['FBA可售']||0).toLocaleString()+'</td>';
+      html += '<td style="text-align:right">'+stockTag(days)+'</td>';
+      html += '<td style="text-align:right">'+ratioTag(a['采购成本占比']||0,'采购成本占比')+'</td>';
+      html += '<td style="text-align:right">'+ratioTag(a['佣金占比']||0,'佣金占比')+'</td>';
+      html += '<td style="text-align:right">'+ratioTag(a['头程费用占比']||0,'头程费用占比')+'</td>';
+      html += '<td style="text-align:right">'+ratioTag(a['仓储费占比']||0,'仓储费占比')+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+  container.innerHTML = html;
+})();
+</script>
+</div>
+</body>
+</html>

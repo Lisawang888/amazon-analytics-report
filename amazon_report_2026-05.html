@@ -243,7 +243,8 @@ function chgClass(v) { if (v==null) return ''; return v>=0?'up':'down'; }
 
 function renderMonthNav() {
   var html = '';
-  CFG.periodsList.forEach(function(p) {
+  var periods = CFG.periodsList.slice().reverse();
+  periods.forEach(function(p) {
     var cls = p === CFG.focusPeriod ? 'font-weight:500;color:#2C2C2A;background:#f0f0f0;' : 'color:#888;';
     html += '<a href="' + CFG.navPrefix + p + '.html" style="text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;' + cls + '">' + p + '</a>';
   });

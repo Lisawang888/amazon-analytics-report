@@ -319,15 +319,15 @@ function renderBossTab() {
     var mt = DATA.trends;
     new Chart(document.getElementById('salesTrendChart').getContext('2d'), {
       type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月销售额',data:mt.sales_2025,backgroundColor:'#A8C4E2',borderRadius:2,order:2 },{ label:'26年月销售额',data:mt.sales_2026,backgroundColor:'#378ADD',borderRadius:2,order:2 },{ label:'同比增涨率(%)',data:mt.yoy_growth,type:'line',borderColor:'#E24B4A',borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1',order:1 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{ display:true,labels:{ font:{size:11},boxWidth:12,usePointStyle:true } } },scales:{ y:{ position:'left',title:{display:true,text:'销售额($)'},ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}} },y1:{ position:'right',title:{display:true,text:'同比增涨(%)'},ticks:{callback:function(v){return v+'%';}},grid:{display:false} } } }
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{ display:true,labels:{ font:{size:11},boxWidth:12,usePointStyle:true } } },scales:{ y:{ position:'left',title:{display:true,text:'销售额（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} },y1:{ position:'right',title:{display:true,text:'同比增涨率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}},grid:{display:false} } } }
     });
     new Chart(document.getElementById('rateTrendChart').getContext('2d'), {
       type: 'line', data: { labels: mt.months, datasets: [{ label:'25年毛利率',data:mt.rate_2025,borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年毛利率',data:mt.rate_2026,borderColor:'#378ADD',borderWidth:2,pointRadius:5,tension:0.3 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利率(%)'},ticks:{callback:function(v){return v+'%';}} } } }
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
     });
     new Chart(document.getElementById('profitTrendChart').getContext('2d'), {
       type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月毛利',data:mt.profit_2025,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年月毛利',data:mt.profit_2026,backgroundColor:'#378ADD',borderRadius:2 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}} } } }
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
     });
   }
 

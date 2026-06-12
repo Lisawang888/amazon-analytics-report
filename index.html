@@ -118,14 +118,28 @@
   <!-- Manager Tab -->
   <div id="tab-manager" class="tab-panel">
     <div class="report-header green"><h2>运营管理报告 · 主管版</h2><p>团队绩效对比 · ASIN表现追踪</p><div class="meta"><div class="meta-item"><strong>2026-05</strong>报告周期</div></div></div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>团队绩效对比</div><div class="kpi-grid" id="team-kpi"></div></div>
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>团队绩效对比</div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">各运营销售额 vs 利润</div><div class="chart-sub">柱=销售额, 线=利润</div><div style="height:250px;"><canvas id="teamChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">各运营 ACoS 对比</div><div class="chart-sub">健康线: &lt;25%</div><div style="height:250px;"><canvas id="teamAcosChart"></canvas></div></div>
+      </div>
+    </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>小组绩效总览</div><div class="data-table-wrapper"><table class="data-table" id="team-summary-table"></table></div></div>
+    <div class="section" id="sunjie-detail-section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>孙杰组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="sunjie-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="sunjie-rows-tbody"></tbody></table></div></div>
+    <div class="section" id="xiaowei-detail-section"><div class="section-title"><span class="dot" style="background:#639922"></span>小伟组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="xiaowei-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="xiaowei-rows-tbody"></tbody></table></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>父ASIN完整排行</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">销量</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th><th style="text-align:right" id="stock-alert-th">库存预警</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody id="asin-full-tbody"></tbody></table></div></div>
   </div>
 
   <!-- Operator Tab -->
   <div id="tab-operator" class="tab-panel">
     <div class="report-header amber"><h2>运营个人报告</h2><p>个人KPI · 环比趋势</p><div class="meta"><div class="meta-item"><strong>2026-05</strong>报告周期</div></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>运营环比趋势</div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">销售额环比（%）</div><div class="chart-sub" id="op-mom-label"></div><div style="height:280px;"><canvas id="opSalesMomChart"></canvas></div></div><div class="chart-card"><div class="chart-title">利润环比（%）</div><div class="chart-sub" id="op-profit-mom-label"></div><div style="height:280px;"><canvas id="opProfitMomChart"></canvas></div></div></div>
+    </div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>父ASIN 利润贡献度</div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #ddd;"><div class="chart-sub">正利润在上、负利润在下 · TOP30 按利润排序</div><div style="height:340px;"><canvas id="profitWaterfallChart"></canvas></div></div>
+    </div>
     <div id="operator-cards"></div>
   </div>
 
@@ -347,29 +361,123 @@ function renderManagerTab() {
   var teamStats = p.team_stats || [];
   var asins = p.asin_ranking || [];
 
-  // Team KPI
-  var tHtml = '';
-  teamStats.forEach(function(t){ tHtml += '<div class="kpi-card green"><div class="label">'+t['小组']+'</div><div class="value">'+fmt(t['销售额'])+'</div><div class="change">利润 '+fmt(t['利润'])+' ('+pctV(t['利润率'])+')</div><div class="change" style="font-size:10px;color:#888;">'+t['成员']+'</div></div>'; });
-  document.getElementById('team-kpi').innerHTML = tHtml;
+  // === 团队绩效对比图表 ===
+  var opLabels = ops.map(function(o){ return o['业务员']; });
+  var opSales = ops.map(function(o){ return o['销售额']||0; });
+  var opProfits = ops.map(function(o){ return o['利润']||0; });
 
-  // Team summary table
-  var thHtml = '<thead><tr><th>小组</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">管理ASIN</th><th style="text-align:right">环比</th></tr></thead><tbody>';
-  teamStats.forEach(function(t){ thHtml += '<tr><td>'+t['小组']+'</td><td style="text-align:right">'+fmt(t['销售额'])+'</td><td style="text-align:right">'+fmt(t['利润'])+'</td><td style="text-align:right">'+pctV(t['利润率'])+'</td><td style="text-align:right">'+pctV(t['利润占比'])+'</td><td style="text-align:right">'+(t['订单量']||0).toLocaleString()+'</td><td style="text-align:right">'+pctV(t['退款率'])+'</td><td style="text-align:right">'+pctV(t['ACoS'])+'</td><td style="text-align:right">'+(t['管理ASIN数']||0)+'</td><td style="text-align:right">'+chgTag(t['销售额环比'])+'</td></tr>'; });
+  var elTeam = document.getElementById('teamChart');
+  if (elTeam) new Chart(elTeam.getContext('2d'), {
+    type: 'bar', data: { labels: opLabels, datasets: [
+      { label: '销售额', data: opSales, backgroundColor: '#378ADD', borderRadius: 4, yAxisID: 'y' },
+      { label: '利润', data: opProfits, type: 'line', borderColor: '#639922', borderWidth: 2, pointRadius: 4, fill: false, yAxisID: 'y1', tension: 0 }
+    ] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { font: { size: 11 }, boxWidth: 12 } } },
+      scales: { y: { position: 'left', ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        y1: { position: 'right', ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k';}, font:{size:11} }, grid: { display: false } },
+        x: { ticks: { font:{size:11} }, grid: { display: false } } }
+    }
+  });
+
+  var elAcos = document.getElementById('teamAcosChart');
+  if (elAcos) {
+    var acosVals = ops.map(function(o){ return o['ACoS']||0; });
+    new Chart(elAcos.getContext('2d'), {
+      type: 'bar', data: { labels: opLabels, datasets: [{ label: 'ACoS%', data: acosVals, backgroundColor: acosVals.map(function(v){ return v>40?'#E24B4A':v>25?'#BA7517':'#639922' }), borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { max: 60, ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+    });
+  }
+
+  // === 小组绩效总览 (与V1完全一致的12列) ===
+  var thHtml = '<thead><tr><th>小组</th><th>成员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody>';
+  teamStats.forEach(function(t){
+    var sa = t['库存预警数']||0;
+    var saHtml = sa > 0 ? '<span class="tag red">'+sa+'</span>' : '<span class="tag green">0</span>';
+    thHtml += '<tr><td>'+t['小组']+'</td><td style="font-size:11px;color:#888;">'+t['成员']+'</td><td style="text-align:right">'+fmt(t['销售额'])+'</td><td style="text-align:right">'+chgTag(t['销售额环比'])+'</td><td style="text-align:right">'+fmt(t['利润'])+'</td><td style="text-align:right">'+chgTag(t['利润环比'])+'</td><td style="text-align:right">'+pctV(t['利润率'])+'</td><td style="text-align:right">'+pctV(t['利润占比'])+'</td><td style="text-align:right">'+(t['订单量']||0).toLocaleString()+'</td><td style="text-align:right">'+pctV(t['退款率'])+'</td><td style="text-align:right">'+pctV(t['ACoS'])+'</td><td style="text-align:right">'+(t['管理ASIN数']||0)+'</td><td>'+saHtml+'</td></tr>';
+  });
   document.getElementById('team-summary-table').innerHTML = thHtml + '</tbody>';
 
-  // ASIN full ranking
+  // === 孙杰组 · 成员绩效明细 ===
+  var sunjieOps = ops.filter(function(o){ return o['所属组']==='孙杰组'; }).sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+  var sunjieHtml = '';
+  sunjieOps.forEach(function(o){
+    var sa = o['库存预警数']||0;
+    var saHtml = sa > 0 ? '<span class="tag red">'+sa+'</span>' : '<span class="tag green">0</span>';
+    sunjieHtml += '<tr><td>'+o['业务员']+'</td><td style="text-align:right">'+fmt(o['销售额'])+'</td><td style="text-align:right">'+chgTag(o['销售额环比'])+'</td><td style="text-align:right">'+fmt(o['利润'])+'</td><td style="text-align:right">'+chgTag(o['利润环比'])+'</td><td style="text-align:right">'+pctV(o['利润率'])+'</td><td style="text-align:right">'+pctV(o['利润占比'])+'</td><td style="text-align:right">'+(o['订单量']||0).toLocaleString()+'</td><td style="text-align:right">'+pctV(o['退款率'])+'</td><td style="text-align:right">'+pctV(o['ACoS'])+'</td><td style="text-align:right">'+(o['管理ASIN数']||0)+'</td><td>'+saHtml+'</td></tr>';
+  });
+  document.getElementById('sunjie-rows-tbody').innerHTML = sunjieHtml;
+  if (!sunjieOps.length) document.getElementById('sunjie-detail-section').style.display = 'none';
+
+  // === 小伟组 · 成员绩效明细 ===
+  var xiaoweiOps = ops.filter(function(o){ return o['所属组']!=='孙杰组'; }).sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+  var xiaoweiHtml = '';
+  xiaoweiOps.forEach(function(o){
+    var sa = o['库存预警数']||0;
+    var saHtml = sa > 0 ? '<span class="tag red">'+sa+'</span>' : '<span class="tag green">0</span>';
+    xiaoweiHtml += '<tr><td>'+o['业务员']+'</td><td style="text-align:right">'+fmt(o['销售额'])+'</td><td style="text-align:right">'+chgTag(o['销售额环比'])+'</td><td style="text-align:right">'+fmt(o['利润'])+'</td><td style="text-align:right">'+chgTag(o['利润环比'])+'</td><td style="text-align:right">'+pctV(o['利润率'])+'</td><td style="text-align:right">'+pctV(o['利润占比'])+'</td><td style="text-align:right">'+(o['订单量']||0).toLocaleString()+'</td><td style="text-align:right">'+pctV(o['退款率'])+'</td><td style="text-align:right">'+pctV(o['ACoS'])+'</td><td style="text-align:right">'+(o['管理ASIN数']||0)+'</td><td>'+saHtml+'</td></tr>';
+  });
+  document.getElementById('xiaowei-rows-tbody').innerHTML = xiaoweiHtml;
+  if (!xiaoweiOps.length) document.getElementById('xiaowei-detail-section').style.display = 'none';
+
+  // For supervisor views (hideBossTab), show only matching team
+  if (CFG.hideBossTab && CFG.teamFilter) {
+    if (CFG.teamFilter === '孙杰组') document.getElementById('xiaowei-detail-section').style.display = 'none';
+    else document.getElementById('sunjie-detail-section').style.display = 'none';
+  }
+
+  // === 父ASIN完整排行 ===
   var isTeam = !!CFG.teamFilter;
-  if (isTeam) document.getElementById('stock-alert-th').style.display = 'none';
+  if (isTeam) {
+    var stockTh = document.getElementById('stock-alert-th');
+    if (stockTh) stockTh.style.display = 'none';
+  }
   var ah = '';
-  asins.forEach(function(a){ var pc=a['利润率']>10?'up':(a['利润率']<5?'down':'warn'); var stockDays=a['库存天数']||0; var stockAlert=(stockDays>0&&stockDays<15)?'<span class="tag red">缺货</span>':(stockDays>180?'<span class="tag amber">积压</span>':'<span class="tag green">正常</span>');
-    ah += '<tr><td>'+a['父ASIN']+' <span style="font-size:10px;color:#888;">'+a['业务员']+'</span></td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+(a['销量']||0)+'</td><td style="text-align:right;'+(a['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(a['利润'])+'</td><td style="text-align:right" class="'+pc+'">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['利润占比'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td>'+(isTeam?'':'<td>'+stockAlert+'</td>')+'<td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td></tr>'; });
+  asins.forEach(function(a){
+    var pc=a['利润率']>10?'up':(a['利润率']<5?'down':'warn');
+    var stockDays=a['库存天数']||0;
+    var stockAlert=(stockDays>0&&stockDays<15)?'<span class="tag red">缺货</span>':(stockDays>180?'<span class="tag amber">积压</span>':'<span class="tag green">正常</span>');
+    ah += '<tr><td>'+a['父ASIN']+' <span style="font-size:10px;color:#888;">'+a['业务员']+'</span></td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+(a['销量']||0)+'</td><td style="text-align:right;'+(a['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(a['利润'])+'</td><td style="text-align:right" class="'+pc+'">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['利润占比'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td>'+(isTeam?'':'<td>'+stockAlert+'</td>')+'<td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td></tr>';
+  });
   document.getElementById('asin-full-tbody').innerHTML = ah;
 }
 
 function renderOperatorTab() {
   var ops = DATA.period.operator_stats || [];
   var asins = DATA.period.asin_ranking || [];
-  // 按团队分组
+  var momLabel = DATA.period.mom_periods || '';
+
+  // === 运营环比趋势图 ===
+  document.getElementById('op-mom-label').textContent = momLabel;
+  document.getElementById('op-profit-mom-label').textContent = momLabel;
+
+  var opDataSm = ops.filter(function(o){ return o['销售额环比']!=null; }).map(function(o){ return {name:o['业务员'],v:o['销售额环比']}; });
+  var elSm = document.getElementById('opSalesMomChart');
+  if (elSm && opDataSm.length) new Chart(elSm.getContext('2d'), {
+    type: 'line', data: { labels: opDataSm.map(function(d){return d.name;}), datasets: [{ label: '销售额环比%', data: opDataSm.map(function(d){return d.v;}), borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.1)', fill: false, pointRadius: 5, pointBackgroundColor: '#BA7517', tension: 0.2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+  });
+
+  var opDataPm = ops.filter(function(o){ return o['利润环比']!=null; }).map(function(o){ return {name:o['业务员'],v:o['利润环比']}; });
+  var elPm = document.getElementById('opProfitMomChart');
+  if (elPm && opDataPm.length) new Chart(elPm.getContext('2d'), {
+    type: 'line', data: { labels: opDataPm.map(function(d){return d.name;}), datasets: [{ label: '利润环比%', data: opDataPm.map(function(d){return d.v;}), borderColor: '#639922', backgroundColor: 'rgba(99,153,34,0.1)', fill: false, pointRadius: 5, pointBackgroundColor: '#639922', tension: 0.2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+  });
+
+  // === 利润贡献瀑布图 (TOP30) ===
+  var elWf = document.getElementById('profitWaterfallChart');
+  if (elWf) {
+    var sorted = asins.slice().sort(function(a,b){ return (b['利润']||0)-(a['利润']||0); }).slice(0, 30);
+    var wfLabels = sorted.map(function(a){ return (a['父ASIN']||'').slice(0,10)+' ('+(a['业务员']||'?')+')'; });
+    var wfProfits = sorted.map(function(a){ return Math.round(a['利润']||0); });
+    var wfColors = wfProfits.map(function(v){ return v>=0 ? (v>5000?'#639922':'#8CB936') : '#E24B4A'; });
+    new Chart(elWf.getContext('2d'), {
+      type: 'bar', data: { labels: wfLabels, datasets: [{ label: '利润($)', data: wfProfits, backgroundColor: wfColors, borderRadius: 2 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:9} }, grid: { display: false } } } }
+    });
+  }
+
+  // === 按业务员ASIN明细 (团队分组) ===
   var sunjieOps = ops.filter(function(o){ return o['所属组'] === '孙杰组'; });
   var xiaoweiOps = ops.filter(function(o){ return o['所属组'] !== '孙杰组'; });
   sunjieOps.sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
@@ -389,7 +497,7 @@ function renderOperatorTab() {
       cards += '<div class="kpi-card green"><div class="label">ACoS</div><div class="value">'+pctV(o['ACoS'])+'</div></div>';
       cards += '<div class="kpi-card green"><div class="label">管理ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div><div class="change">销售额占比 '+pctV(o['销售额占比'])+'</div></div>';
       var sa = o['库存预警数']||0;
-      cards += '<div class="kpi-card '+(sa>0?'red':'green')+'"><div class="label">库存预警</div><div class="value">'+sa+'</div><div class="change '+(sa>0?'down':'up')+'">'+(sa>0?'⚠ 需关注':'[OK] 正常')+'</div></div>';
+      cards += '<div class="kpi-card '+(sa>0?'red':'green')+'"><div class="label">库存预警</div><div class="value">'+sa+'</div><div class="change '+(sa>0?'down':'up')+'">'+(sa>0?'[WARN] 需关注':'[OK] 正常')+'</div></div>';
       cards += '</div>';
       cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody>';
       oAsins.forEach(function(a){

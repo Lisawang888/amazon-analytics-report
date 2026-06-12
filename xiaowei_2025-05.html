@@ -71,6 +71,7 @@
   .report-header .meta-item strong { display: block; font-size: 13px; font-weight: 500; opacity: 1; }
   @media (max-width: 768px) { .content { padding: 16px 18px; } .chart-grid { grid-template-columns: 1fr; } }
 </style>
+<script>var AR_DATA = [{"month": "202501", "total": 301018.91, "stores": 5}, {"month": "202502", "total": 352884.4, "stores": 5}, {"month": "202503", "total": 515378.77, "stores": 5}, {"month": "202504", "total": 313254.82, "stores": 5}, {"month": "202505", "total": 546896.26, "stores": 5}, {"month": "202506", "total": 336797.05, "stores": 6}, {"month": "202507", "total": 558720.14, "stores": 7}, {"month": "202508", "total": 838940.08, "stores": 7}, {"month": "202509", "total": 586998.76, "stores": 7}, {"month": "202510", "total": 1043978.36, "stores": 7}, {"month": "202511", "total": 640862.83, "stores": 7}, {"month": "202512", "total": 971539.27, "stores": 12}, {"month": "202601", "total": 776667.51, "stores": 12}, {"month": "202602", "total": 834528.85, "stores": 12}, {"month": "202603", "total": 1441981.88, "stores": 12}, {"month": "202604", "total": 908004.44, "stores": 12}, {"month": "202605", "total": 1303694.13, "stores": 12}]; var INV_DATA = [{"month": "2025-01", "total": 5591259.83, "fba_in_stock": 5281211.36, "fba_in_transit": 310048.48, "domestic_in_stock": 0, "domestic_in_transit": 0, "overseas": 0}, {"month": "2025-02", "total": 6023268.56, "fba_in_stock": 5904915.43, "fba_in_transit": 118353.13, "domestic_in_stock": 0, "domestic_in_transit": 0, "overseas": 0}, {"month": "2025-03", "total": 4319623.03, "fba_in_stock": 3877759.12, "fba_in_transit": 358490.73, "domestic_in_stock": 67924.62, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-04", "total": 5348333.7, "fba_in_stock": 5115105.76, "fba_in_transit": 97314.76, "domestic_in_stock": 120464.62, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-05", "total": 6151788.56, "fba_in_stock": 5424822.53, "fba_in_transit": 520262.81, "domestic_in_stock": 191254.66, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-06", "total": 7770648.57, "fba_in_stock": 6795901.61, "fba_in_transit": 236286.33, "domestic_in_stock": 723012.07, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-07", "total": 8921948.58, "fba_in_stock": 7600710.07, "fba_in_transit": 240839.75, "domestic_in_stock": 607272.17, "domestic_in_transit": 457678.03, "overseas": 15448.56}, {"month": "2025-08", "total": 19098936.02, "fba_in_stock": 8213668.79, "fba_in_transit": 287601.43, "domestic_in_stock": 8331000.66, "domestic_in_transit": 2251216.58, "overseas": 15448.56}, {"month": "2025-09", "total": 16284057.53, "fba_in_stock": 10005758.25, "fba_in_transit": 3072854.7, "domestic_in_stock": 726190.39, "domestic_in_transit": 2229966.2, "overseas": 249287.99}, {"month": "2025-10", "total": 19559263.07, "fba_in_stock": 10069587.34, "fba_in_transit": 4521273.36, "domestic_in_stock": 1099166.39, "domestic_in_transit": 3619948.0, "overseas": 249287.99}, {"month": "2025-11", "total": 17505498.29, "fba_in_stock": 8996440.39, "fba_in_transit": 4922647.8, "domestic_in_stock": 738736.57, "domestic_in_transit": 2695650.0, "overseas": 152023.54}, {"month": "2025-12", "total": 21581680.8, "fba_in_stock": 9344021.38, "fba_in_transit": 3365816.34, "domestic_in_stock": 938616.94, "domestic_in_transit": 7781202.6, "overseas": 152023.54}, {"month": "2026-01", "total": 24629613.07, "fba_in_stock": 10261498.33, "fba_in_transit": 5449504.05, "domestic_in_stock": 1380055.95, "domestic_in_transit": 7386531.2, "overseas": 152023.54}, {"month": "2026-02", "total": 21511661.49, "fba_in_stock": 12504484.57, "fba_in_transit": 2382771.08, "domestic_in_stock": 998794.12, "domestic_in_transit": 5473588.18, "overseas": 152023.54}, {"month": "2026-03", "total": 28884311.97, "fba_in_stock": 13590703.21, "fba_in_transit": 1575125.55, "domestic_in_stock": 1672088.87, "domestic_in_transit": 12030945.78, "overseas": 15448.56}, {"month": "2026-04", "total": 38788083.19, "fba_in_stock": 14043225.14, "fba_in_transit": 6918342.74, "domestic_in_stock": 2472500.16, "domestic_in_transit": 15217440.18, "overseas": 136574.98}, {"month": "2026-05", "total": 35610758.99, "fba_in_stock": 16662194.44, "fba_in_transit": 9147064.52, "domestic_in_stock": 1483110.96, "domestic_in_transit": 8318389.07, "overseas": 0}];</script>
 </head>
 <body>
 <div id="pw-gate" style="max-width:360px;margin:120px auto;text-align:center;">
@@ -110,6 +111,8 @@
       <div class="section-title"><span class="dot" style="background:#378ADD"></span>年度经营趋势</div>
       <div class="chart-grid"><div class="chart-card" style="grid-column:span 2;"><div class="chart-title">月销售额趋势</div><div class="chart-sub">26年 vs 25年 月销售额对比</div><div style="height:260px;"><canvas id="salesTrendChart"></canvas></div></div></div>
       <div class="chart-grid"><div class="chart-card"><div class="chart-title">毛利率</div><div class="chart-sub">26年 vs 25年 毛利率对比</div><div style="height:230px;"><canvas id="rateTrendChart"></canvas></div></div><div class="chart-card"><div class="chart-title">月毛利趋势</div><div class="chart-sub">26年 vs 25年 毛利对比</div><div style="height:230px;"><canvas id="profitTrendChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card" style="grid-column:span 2;"><div class="chart-title">2026年回款趋势</div><div class="chart-sub">月度实际回款金额（USD）</div><div style="height:260px;"><canvas id="repaymentChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">2026年月度库存分布</div><div class="chart-sub">按仓库类型 · 含采购在途</div><div style="height:260px;"><canvas id="invDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">月度总库存趋势</div><div class="chart-sub">总库存金额（含采购在途）</div><div style="height:260px;"><canvas id="invTrendChart"></canvas></div></div></div>
     </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>站点汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>站点</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th></tr></thead><tbody id="site-tbody"></tbody></table></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>品牌汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>品牌</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="brand-tbody"></tbody></table></div></div>
@@ -347,6 +350,45 @@ function renderBossTab() {
     new Chart(document.getElementById('profitTrendChart').getContext('2d'), {
       type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月毛利',data:mt.profit_2025,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年月毛利',data:mt.profit_2026,backgroundColor:'#378ADD',borderRadius:2 }] },
       options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
+    });
+  }
+
+  // === 回款趋势图 ===
+  if (window.AR_DATA && AR_DATA.length > 0) {
+    var monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    var ar2025 = [null,null,null,null,null,null,null,null,null,null,null,null];
+    var ar2026 = [null,null,null,null,null,null,null,null,null,null,null,null];
+    AR_DATA.forEach(function(d){
+      var m = parseInt(d.month.substring(4)) - 1;
+      var v = d.total / 10000;
+      if (d.month.substr(0,4) === '2025') ar2025[m] = v;
+      if (d.month.substr(0,4) === '2026') ar2026[m] = v;
+    });
+    var yoyGrowth = ar2026.map(function(v,i){ return v && ar2025[i] ? Math.round((v/ar2025[i]-1)*1000)/10 : null; });
+    new Chart(document.getElementById('repaymentChart').getContext('2d'), {
+      type: 'bar', data: { labels: monthNames, datasets: [{ label:'25年回款',data:ar2025,backgroundColor:'#A8C4E2',borderRadius:2,order:2 },{ label:'26年回款',data:ar2026,backgroundColor:'#378ADD',borderRadius:2,order:2 },{ label:'同比增涨率(%)',data:yoyGrowth,type:'line',borderColor:'#E24B4A',borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1',order:1 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12,usePointStyle:true}} },scales:{ y:{ position:'left',title:{display:true,text:'回款金额（万美元）',font:{size:12}},ticks:{callback:function(v){return (v).toFixed(0)+'万';}} },y1:{ position:'right',title:{display:true,text:'同比增涨率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}},grid:{display:false} } } }
+    });
+  }
+
+  // === 月度库存分布 ===
+  if (window.INV_DATA && INV_DATA.length > 0) {
+    var invLabels = INV_DATA.map(function(d){ return d.month.substring(0,4)+'-'+d.month.substring(4); });
+    var fbaStock = INV_DATA.map(function(d){ return d.fba_in_stock/10000; });
+    var fbaTransit = INV_DATA.map(function(d){ return d.fba_in_transit/10000; });
+    var domStock = INV_DATA.map(function(d){ return d.domestic_in_stock/10000; });
+    var domTransit = INV_DATA.map(function(d){ return d.domestic_in_transit/10000; });
+    var overseas = INV_DATA.map(function(d){ return d.overseas/10000; });
+    new Chart(document.getElementById('invDistChart').getContext('2d'), {
+      type: 'bar', data: { labels: invLabels, datasets: [{ label:'FBA期末在库',data:fbaStock,backgroundColor:'#378ADD',borderRadius:0,stack:'s1' },{ label:'FBA期末在途',data:fbaTransit,backgroundColor:'#7AB8F5',borderRadius:0,stack:'s1' },{ label:'国内期末在库',data:domStock,backgroundColor:'#639922',borderRadius:0,stack:'s1' },{ label:'国内期末在途',data:domTransit,backgroundColor:'#A8D46A',borderRadius:0,stack:'s1' },{ label:'海外仓',data:overseas,backgroundColor:'#BA7517',borderRadius:4,stack:'s1' }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12,usePointStyle:true}} },scales:{ x:{ stacked:true },y:{ stacked:true,title:{display:true,text:'库存金额（万元）',font:{size:12}} } } }
+    });
+
+    // === 库存趋势 ===
+    var totalInv = INV_DATA.map(function(d){ return d.total/10000; });
+    new Chart(document.getElementById('invTrendChart').getContext('2d'), {
+      type: 'line', data: { labels: invLabels, datasets: [{ label:'总库存金额',data:totalInv,borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#378ADD',fill:true,tension:0.3 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'总库存（万元）',font:{size:12}} } } }
     });
   }
 

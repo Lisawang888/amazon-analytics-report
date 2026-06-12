@@ -355,17 +355,19 @@ function renderBossTab() {
 
   // === 回款趋势图 ===
   if (window.AR_DATA && AR_DATA.length > 0) {
-    var arMonths = AR_DATA.map(function(d){ return d.month.substring(0,4)+'-'+d.month.substring(4); });
-    var arValues = AR_DATA.map(function(d){ return d.total/10000; });
-    var ar2026 = AR_DATA.filter(function(d){ return d.month >= '202601'; });
-    var ar2025 = AR_DATA.filter(function(d){ return d.month.substr(0,4) === '2025'; });
-    var arLabels2026 = ar2026.map(function(d){ return d.month.substring(0,4)+'-'+d.month.substring(4); });
-    var arValues2026 = ar2026.map(function(d){ return d.total/10000; });
-    var arLabels2025 = ar2025.map(function(d){ return d.month.substring(0,4)+'-'+d.month.substring(4); });
-    var arValues2025 = ar2025.map(function(d){ return d.total/10000; });
+    var monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    var ar2025 = [null,null,null,null,null,null,null,null,null,null,null,null];
+    var ar2026 = [null,null,null,null,null,null,null,null,null,null,null,null];
+    AR_DATA.forEach(function(d){
+      var m = parseInt(d.month.substring(4)) - 1;
+      var v = d.total / 10000;
+      if (d.month.substr(0,4) === '2025') ar2025[m] = v;
+      if (d.month.substr(0,4) === '2026') ar2026[m] = v;
+    });
+    var yoyGrowth = ar2026.map(function(v,i){ return v && ar2025[i] ? Math.round((v/ar2025[i]-1)*1000)/10 : null; });
     new Chart(document.getElementById('repaymentChart').getContext('2d'), {
-      type: 'bar', data: { labels: arLabels2026, datasets: [{ label:'26年回款',data:arValues2026,backgroundColor:'#378ADD',borderRadius:4,order:2 },{ label:'25年回款',data:arValues2025,backgroundColor:'#A8C4E2',borderRadius:4,order:2 },{ label:'26年环比(%)',data:arValues2026.map(function(v,i){ return i>0&&arValues2026[i-1]?Math.round((v/arValues2026[i-1]-1)*1000)/10:null; }),type:'line',borderColor:'#E24B4A',borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1',order:1 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12,usePointStyle:true}} },scales:{ y:{ position:'left',title:{display:true,text:'回款金额（万美元）',font:{size:12}} },y1:{ position:'right',title:{display:true,text:'环比（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}},grid:{display:false} } } }
+      type: 'bar', data: { labels: monthNames, datasets: [{ label:'25年回款',data:ar2025,backgroundColor:'#A8C4E2',borderRadius:2,order:2 },{ label:'26年回款',data:ar2026,backgroundColor:'#378ADD',borderRadius:2,order:2 },{ label:'同比增涨率(%)',data:yoyGrowth,type:'line',borderColor:'#E24B4A',borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1',order:1 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12,usePointStyle:true}} },scales:{ y:{ position:'left',title:{display:true,text:'回款金额（万美元）',font:{size:12}},ticks:{callback:function(v){return (v).toFixed(0)+'万';}} },y1:{ position:'right',title:{display:true,text:'同比增涨率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}},grid:{display:false} } } }
     });
   }
 

@@ -373,7 +373,7 @@ function renderBossTab() {
 
   // === 月度库存分布 ===
   if (window.INV_DATA && INV_DATA.length > 0) {
-    var invLabels = INV_DATA.map(function(d){ return d.month.substring(0,4)+'-'+d.month.substring(4); });
+    var invLabels = INV_DATA.map(function(d){ var m=d.month.replace(/-/g,''); return m.substring(0,4)+'-'+m.substring(4,6); });
     var fbaStock = INV_DATA.map(function(d){ return d.fba_in_stock/10000; });
     var fbaTransit = INV_DATA.map(function(d){ return d.fba_in_transit/10000; });
     var domStock = INV_DATA.map(function(d){ return d.domestic_in_stock/10000; });
@@ -381,14 +381,14 @@ function renderBossTab() {
     var overseas = INV_DATA.map(function(d){ return d.overseas/10000; });
     new Chart(document.getElementById('invDistChart').getContext('2d'), {
       type: 'bar', data: { labels: invLabels, datasets: [{ label:'FBA期末在库',data:fbaStock,backgroundColor:'#378ADD',borderRadius:0,stack:'s1' },{ label:'FBA期末在途',data:fbaTransit,backgroundColor:'#7AB8F5',borderRadius:0,stack:'s1' },{ label:'国内期末在库',data:domStock,backgroundColor:'#639922',borderRadius:0,stack:'s1' },{ label:'国内期末在途',data:domTransit,backgroundColor:'#A8D46A',borderRadius:0,stack:'s1' },{ label:'海外仓',data:overseas,backgroundColor:'#BA7517',borderRadius:4,stack:'s1' }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12,usePointStyle:true}} },scales:{ x:{ stacked:true },y:{ stacked:true,title:{display:true,text:'库存金额（万元）',font:{size:12}} } } }
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12,usePointStyle:true}} },scales:{ x:{ stacked:true,ticks:{maxRotation:45,font:{size:10}} },y:{ stacked:true,title:{display:true,text:'库存金额（万元）',font:{size:12}} } } }
     });
 
     // === 库存趋势 ===
     var totalInv = INV_DATA.map(function(d){ return d.total/10000; });
     new Chart(document.getElementById('invTrendChart').getContext('2d'), {
       type: 'line', data: { labels: invLabels, datasets: [{ label:'总库存金额',data:totalInv,borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',borderWidth:2.5,pointRadius:5,pointBackgroundColor:'#378ADD',fill:true,tension:0.3 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'总库存（万元）',font:{size:12}} } } }
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'总库存（万元）',font:{size:12}} },x:{ ticks:{maxRotation:45,font:{size:10}} } } }
     });
   }
 

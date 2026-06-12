@@ -369,20 +369,42 @@ function renderManagerTab() {
 function renderOperatorTab() {
   var ops = DATA.period.operator_stats || [];
   var asins = DATA.period.asin_ranking || [];
+  // 按团队分组
+  var sunjieOps = ops.filter(function(o){ return o['所属组'] === '孙杰组'; });
+  var xiaoweiOps = ops.filter(function(o){ return o['所属组'] !== '孙杰组'; });
+  sunjieOps.sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+  xiaoweiOps.sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+
+  function renderOpCards(opList, totalProfit) {
+    var cards = '';
+    opList.forEach(function(o, idx) {
+      var opName = o['业务员'];
+      var oAsins = asins.filter(function(a){ return a['业务员']===opName; });
+      cards += '<div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>'+opName+' ('+o['所属组']+')</div>';
+      cards += '<div class="kpi-grid">';
+      cards += '<div class="kpi-card green"><div class="label">销售额</div><div class="value">'+fmt(o['销售额'])+'</div><div class="change '+chgClass(o['销售额环比'])+'">'+chgTag(o['销售额环比'])+' 环比</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">利润</div><div class="value">'+fmt(o['利润'])+' ('+pctV(o['利润率'])+')</div><div class="change '+chgClass(o['利润环比'])+'">'+chgTag(o['利润环比'])+' 环比</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">订单量</div><div class="value">'+(o['订单量']||0).toLocaleString()+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">退款率</div><div class="value">'+pctV(o['退款率'])+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">ACoS</div><div class="value">'+pctV(o['ACoS'])+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">管理ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div><div class="change">销售额占比 '+pctV(o['销售额占比'])+'</div></div>';
+      var sa = o['库存预警数']||0;
+      cards += '<div class="kpi-card '+(sa>0?'red':'green')+'"><div class="label">库存预警</div><div class="value">'+sa+'</div><div class="change '+(sa>0?'down':'up')+'">'+(sa>0?'⚠ 需关注':'[OK] 正常')+'</div></div>';
+      cards += '</div>';
+      cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody>';
+      oAsins.forEach(function(a){
+        cards += '<tr><td>'+a['父ASIN']+'</td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td><td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td></tr>';
+      });
+      cards += '</tbody></table></div></div>';
+    });
+    return cards;
+  }
+
+  var sunjieProfit = sunjieOps.reduce(function(s,o){ return s+(o['利润']||0); },0);
+  var xiaoweiProfit = xiaoweiOps.reduce(function(s,o){ return s+(o['利润']||0); },0);
   var html = '';
-  ops.sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
-  ops.forEach(function(o) {
-    var oAsins = asins.filter(function(a){ return a['业务员']===o['业务员']; });
-    html += '<div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>'+o['业务员']+' ('+o['所属组']+')</div>';
-    html += '<div class="kpi-grid"><div class="kpi-card green"><div class="label">销售额</div><div class="value">'+fmt(o['销售额'])+'</div><div class="change '+chgClass(o['销售额环比'])+'">'+chgTag(o['销售额环比'])+' 环比</div></div>';
-    html += '<div class="kpi-card green"><div class="label">利润</div><div class="value">'+fmt(o['利润'])+' ('+pctV(o['利润率'])+')</div><div class="change '+chgClass(o['利润环比'])+'">'+chgTag(o['利润环比'])+' 环比</div></div>';
-    html += '<div class="kpi-card green"><div class="label">订单量</div><div class="value">'+(o['订单量']||0).toLocaleString()+'</div></div>';
-    html += '<div class="kpi-card green"><div class="label">退款率</div><div class="value">'+pctV(o['退款率'])+'</div></div>';
-    html += '<div class="kpi-card green"><div class="label">ACoS</div><div class="value">'+pctV(o['ACoS'])+'</div></div></div>';
-    html += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th></tr></thead><tbody>';
-    oAsins.forEach(function(a){ html += '<tr><td>'+a['父ASIN']+'</td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right">'+pctV(a['退款率'])+'</td></tr>'; });
-    html += '</tbody></table></div></div>';
-  });
+  if (sunjieOps.length) html += '<div style="font-size:13px;font-weight:500;color:#3B6D11;margin-bottom:8px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3B6D11;margin-right:6px;"></span>孙杰组</div>' + renderOpCards(sunjieOps, sunjieProfit);
+  if (xiaoweiOps.length) html += '<div style="font-size:13px;font-weight:500;color:#639922;margin:12px 0 8px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#639922;margin-right:6px;"></span>小伟组</div>' + renderOpCards(xiaoweiOps, xiaoweiProfit);
   document.getElementById('operator-cards').innerHTML = html || '<p style="color:#888;">暂无数据</p>';
 }
 

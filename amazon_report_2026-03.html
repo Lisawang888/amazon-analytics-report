@@ -128,6 +128,10 @@
         <div class="chart-card"><div class="chart-title">各运营 ACoS 对比</div><div class="chart-sub">健康线: &lt;25%</div><div style="height:250px;"><canvas id="teamAcosChart"></canvas></div></div>
       </div>
     </div>
+    <div class="section" id="mgr-trend-section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>团队经营趋势</div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">月度利润趋势</div><div class="chart-sub">25年 vs 26年月利润对比</div><div style="height:260px;"><canvas id="teamProfitTrendChart"></canvas></div></div><div class="chart-card"><div class="chart-title">TACoS 趋势</div><div class="chart-sub">广告花费占总销售额比例</div><div style="height:260px;"><canvas id="teamTacosTrendChart"></canvas></div></div></div>
+    </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>小组绩效总览</div><div class="data-table-wrapper"><table class="data-table" id="team-summary-table"></table></div></div>
     <div class="section" id="sunjie-detail-section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>孙杰组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="sunjie-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="sunjie-rows-tbody"></tbody></table></div></div>
     <div class="section" id="xiaowei-detail-section"><div class="section-title"><span class="dot" style="background:#639922"></span>小伟组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="xiaowei-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="xiaowei-rows-tbody"></tbody></table></div></div>
@@ -432,6 +436,26 @@ function renderManagerTab() {
     new Chart(elAcos.getContext('2d'), {
       type: 'bar', data: { labels: opLabels, datasets: [{ label: 'ACoS%', data: acosVals, backgroundColor: acosVals.map(function(v){ return v>40?'#E24B4A':v>25?'#BA7517':'#639922' }), borderRadius: 4 }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { max: 60, ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+    });
+  }
+
+  // === 团队月度利润趋势 ===
+  if (DATA.trends && CFG.teamFilter) {
+    var mt = DATA.trends;
+    var isSun = CFG.teamFilter === '孙杰组';
+    var p25 = isSun ? mt.sj_profit_2025 : mt.xw_profit_2025;
+    var p26 = isSun ? mt.sj_profit_2026 : mt.xw_profit_2026;
+    var t25 = isSun ? mt.sj_tacos_2025 : mt.xw_tacos_2025;
+    var t26 = isSun ? mt.sj_tacos_2026 : mt.xw_tacos_2026;
+    var elPt = document.getElementById('teamProfitTrendChart');
+    if (elPt) new Chart(elPt.getContext('2d'), {
+      type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月利润',data:p25,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年月利润',data:p26,backgroundColor:'#639922',borderRadius:2 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'利润（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
+    });
+    var elTt = document.getElementById('teamTacosTrendChart');
+    if (elTt) new Chart(elTt.getContext('2d'), {
+      type: 'line', data: { labels: mt.months, datasets: [{ label:'25年TACoS',data:t25,borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年TACoS',data:t26,borderColor:'#639922',borderWidth:2.5,pointRadius:5,tension:0.3 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'TACoS（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
     });
   }
 

@@ -130,7 +130,8 @@
     </div>
     <div class="section" id="mgr-trend-section">
       <div class="section-title"><span class="dot" style="background:#639922"></span>团队经营趋势</div>
-      <div class="chart-grid"><div class="chart-card"><div class="chart-title">月度利润趋势</div><div class="chart-sub">25年 vs 26年月利润对比</div><div style="height:260px;"><canvas id="teamProfitTrendChart"></canvas></div></div><div class="chart-card"><div class="chart-title">TACoS 趋势</div><div class="chart-sub">广告花费占总销售额比例</div><div style="height:260px;"><canvas id="teamTacosTrendChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">月度销售额趋势</div><div class="chart-sub">25年 vs 26年月销售额对比</div><div style="height:260px;"><canvas id="teamSalesTrendChart"></canvas></div></div><div class="chart-card"><div class="chart-title">月度利润趋势</div><div class="chart-sub">25年 vs 26年月利润对比</div><div style="height:260px;"><canvas id="teamProfitTrendChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">毛利率趋势</div><div class="chart-sub">25年 vs 26年毛利率对比</div><div style="height:260px;"><canvas id="teamRateTrendChart"></canvas></div></div><div class="chart-card"><div class="chart-title">TACoS 趋势</div><div class="chart-sub">广告花费占总销售额比例</div><div style="height:260px;"><canvas id="teamTacosTrendChart"></canvas></div></div></div>
     </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>小组绩效总览</div><div class="data-table-wrapper"><table class="data-table" id="team-summary-table"></table></div></div>
     <div class="section" id="sunjie-detail-section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>孙杰组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="sunjie-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="sunjie-rows-tbody"></tbody></table></div></div>
@@ -439,18 +440,32 @@ function renderManagerTab() {
     });
   }
 
-  // === 团队月度利润趋势 ===
+  // === 团队月度利润/销售额/毛利率趋势 ===
   if (DATA.trends && CFG.teamFilter) {
     var mt = DATA.trends;
     var isSun = CFG.teamFilter === '孙杰组';
+    var s25 = isSun ? mt.sj_sales_2025 : mt.xw_sales_2025;
+    var s26 = isSun ? mt.sj_sales_2026 : mt.xw_sales_2026;
     var p25 = isSun ? mt.sj_profit_2025 : mt.xw_profit_2025;
     var p26 = isSun ? mt.sj_profit_2026 : mt.xw_profit_2026;
+    var r25 = isSun ? mt.sj_rate_2025 : mt.xw_rate_2025;
+    var r26 = isSun ? mt.sj_rate_2026 : mt.xw_rate_2026;
     var t25 = isSun ? mt.sj_tacos_2025 : mt.xw_tacos_2025;
     var t26 = isSun ? mt.sj_tacos_2026 : mt.xw_tacos_2026;
+    var elSt = document.getElementById('teamSalesTrendChart');
+    if (elSt) new Chart(elSt.getContext('2d'), {
+      type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年销售额',data:s25,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年销售额',data:s26,backgroundColor:'#639922',borderRadius:2 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'销售额（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
+    });
     var elPt = document.getElementById('teamProfitTrendChart');
     if (elPt) new Chart(elPt.getContext('2d'), {
       type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月利润',data:p25,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年月利润',data:p26,backgroundColor:'#639922',borderRadius:2 }] },
       options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'利润（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
+    });
+    var elRt = document.getElementById('teamRateTrendChart');
+    if (elRt) new Chart(elRt.getContext('2d'), {
+      type: 'line', data: { labels: mt.months, datasets: [{ label:'25年毛利率',data:r25,borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年毛利率',data:r26,borderColor:'#639922',borderWidth:2.5,pointRadius:5,tension:0.3 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
     });
     var elTt = document.getElementById('teamTacosTrendChart');
     if (elTt) new Chart(elTt.getContext('2d'), {

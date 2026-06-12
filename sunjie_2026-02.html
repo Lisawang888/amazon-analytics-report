@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>亚马逊利润分析报告 · 2026-02 · 孙杰组</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #2C2C2A; font-size: 14px; line-height: 1.6; overflow-x: hidden; }
+  .header { background: #fff; border-bottom: 0.5px solid #ddd; padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .header h1 { font-size: 16px; font-weight: 500; }
+  .header .sub { font-size: 12px; color: #888; }
+  .badge { background: #E6F1FB; color: #185FA5; font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 0.5px solid #378ADD; }
+  .tab-nav { display: flex; background: #fff; border-bottom: 0.5px solid #ddd; padding: 0 40px; position: sticky; top: 69px; z-index: 99; }
+  .tab-btn { padding: 14px 24px; font-size: 13px; cursor: pointer; border: none; background: none; color: #888; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn:hover { color: #2C2C2A; }
+  .tab-btn.active { font-weight: 500; }
+  .tab-btn.boss.active { color: #185FA5; border-bottom-color: #378ADD; }
+  .tab-btn.boss:hover { background: #E6F1FB; }
+  .tab-btn.manager.active { color: #3B6D11; border-bottom-color: #639922; }
+  .tab-btn.manager:hover { background: #EAF3DE; }
+  .tab-btn.operator.active { color: #854F0B; border-bottom-color: #BA7517; }
+  .tab-btn.operator:hover { background: #FAEEDA; }
+  .tab-btn.product.active { color: #6B2D8B; border-bottom-color: #7F277D; }
+  .tab-btn.product:hover { background: #F0E6F7; }
+  .tab-btn.inventory.active { color: #A32D2D; border-bottom-color: #E24B4A; }
+  .tab-btn.inventory:hover { background: #FDEBEB; }
+  .content { max-width: 1200px; margin: 0 auto; padding: 24px 40px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 14px; font-weight: 500; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 0.5px solid #e0e0e0; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .kpi-card { background: #fff; border-radius: 10px; padding: 14px; border: 0.5px solid #e0e0e0; }
+  .kpi-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .kpi-card .value { font-size: 20px; font-weight: 500; }
+  .kpi-card .change { font-size: 11px; margin-top: 3px; }
+  .kpi-card .change.up { color: #3B6D11; }
+  .kpi-card .change.down { color: #A32D2D; }
+  .kpi-card .change.warn { color: #854F0B; }
+  .kpi-card.blue { border-top: 2px solid #378ADD; }
+  .kpi-card.green { border-top: 2px solid #639922; }
+  .kpi-card.amber { border-top: 2px solid #BA7517; }
+  .kpi-card.red { border-top: 2px solid #E24B4A; }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .chart-card { background: #fff; border-radius: 10px; padding: 16px; border: 0.5px solid #e0e0e0; }
+  .chart-card .chart-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .chart-card .chart-sub { font-size: 11px; color: #888; margin-bottom: 12px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th { background: #f5f4f0; padding: 6px 8px; text-align: left; font-weight: 500; font-size: 12px; color: #666; border-bottom: 0.5px solid #ddd; white-space: nowrap; }
+  .data-table td { padding: 6px 8px; border-bottom: 0.5px solid #f0f0f0; white-space: nowrap; }
+  .data-table tr:hover td { background: #fafaf8; }
+  .tag { font-size: 11px; padding: 2px 7px; border-radius: 4px; display: inline-block; }
+  .tag.red { background: #FCEBEB; color: #A32D2D; }
+  .tag.green { background: #EAF3DE; color: #3B6D11; }
+  .tag.amber { background: #FAEEDA; color: #854F0B; }
+  .tag.blue { background: #E6F1FB; color: #185FA5; }
+  .alert { padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 8px; border-left: 3px solid; }
+  .alert.red { background: #FCEBEB; border-color: #E24B4A; color: #791F1F; }
+  .alert.amber { background: #FAEEDA; border-color: #BA7517; color: #633806; }
+  .report-header { border-radius: 10px; padding: 20px 24px; color: white; margin-bottom: 20px; }
+  .report-header.blue { background: linear-gradient(135deg, #185FA5, #378ADD); }
+  .report-header.green { background: linear-gradient(135deg, #3B6D11, #639922); }
+  .report-header.amber { background: linear-gradient(135deg, #854F0B, #BA7517); }
+  .report-header h2 { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+  .report-header p { font-size: 12px; opacity: 0.85; }
+  .report-header .meta { display: flex; gap: 20px; margin-top: 10px; }
+  .report-header .meta-item { font-size: 11px; opacity: 0.75; }
+  .report-header .meta-item strong { display: block; font-size: 13px; font-weight: 500; opacity: 1; }
+  @media (max-width: 768px) { .content { padding: 16px 18px; } .chart-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="pw-gate" style="max-width:360px;margin:120px auto;text-align:center;">
+  <h2 style="font-size:16px;margin-bottom:16px;">🔒 数据加密访问</h2>
+  <input id="pw-input" type="password" placeholder="密码" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:6px;font-size:14px;margin-bottom:10px;">
+  <button onclick="checkPw()" style="width:100%;padding:10px;background:#378ADD;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;">进入报告</button>
+  <p id="pw-error" style="color:#A32D2D;font-size:12px;margin-top:10px;display:none;">密码错误</p>
+</div>
+<div id="app" style="display:none;">
+<div class="header">
+  <div>
+    <h1>亚马逊利润分析报告 · 2026-02 · 孙杰组</h1>
+    <div class="sub">自动生成 · 数据来源：赛狐ERP</div>
+  </div>
+  <div class="badge">⚠ 建议咨询法务</div>
+</div>
+<div class="tab-nav" id="tab-nav">
+  <button class="tab-btn boss" onclick="switchTab('boss')">管理层月报</button>
+  <button class="tab-btn manager active" onclick="switchTab('manager')">运营主管报</button>
+  <button class="tab-btn operator" onclick="switchTab('operator')">运营个人报</button>
+  <button class="tab-btn product" onclick="switchTab('product')">产品报表</button>
+  <button class="tab-btn inventory" onclick="switchTab('inventory')">FBA库存</button>
+</div>
+<div style="background:#fff;padding:0 40px 8px;display:flex;gap:6px;overflow-x:auto;" id="month-nav"></div>
+
+<div class="content">
+  <!-- BOSS Tab -->
+  <div id="tab-boss" class="tab-panel">
+    <div class="report-header blue"><h2>运营管理报告 · 主管版</h2><p id="boss-subtitle">同比分析 · 战略决策支持</p><div class="meta"><div class="meta-item"><strong>2026-02</strong>报告周期</div><div class="meta-item"><strong>月报</strong>发送频率</div></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>核心经营指标</div><div class="kpi-grid" id="boss-kpi"></div></div>
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#378ADD"></span>营收与利润分析</div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">营收与利润同比</div><div class="chart-sub" id="yoy-subtitle"></div><div style="height:230px;"><canvas id="yoyChart"></canvas></div></div><div class="chart-card"><div class="chart-title">店铺营收占比</div><div class="chart-sub" id="store-subtitle"></div><div style="height:230px;"><canvas id="storeChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">ASIN 利润率分布</div><div class="chart-sub" id="profitdist-subtitle"></div><div style="height:230px;"><canvas id="profitDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">成本结构分析</div><div class="chart-sub">各项成本占总销售额比例</div><div style="height:230px;"><canvas id="costChart"></canvas></div></div></div>
+    </div>
+    <div class="section" id="trend-section">
+      <div class="section-title"><span class="dot" style="background:#378ADD"></span>年度经营趋势</div>
+      <div class="chart-grid"><div class="chart-card" style="grid-column:span 2;"><div class="chart-title">月销售额趋势</div><div class="chart-sub">26年 vs 25年 月销售额对比</div><div style="height:260px;"><canvas id="salesTrendChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">毛利率</div><div class="chart-sub">26年 vs 25年 毛利率对比</div><div style="height:230px;"><canvas id="rateTrendChart"></canvas></div></div><div class="chart-card"><div class="chart-title">月毛利趋势</div><div class="chart-sub">26年 vs 25年 毛利对比</div><div style="height:230px;"><canvas id="profitTrendChart"></canvas></div></div></div>
+    </div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>站点汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>站点</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th></tr></thead><tbody id="site-tbody"></tbody></table></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>品牌汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>品牌</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="brand-tbody"></tbody></table></div></div>
+  </div>
+
+  <!-- Manager Tab -->
+  <div id="tab-manager" class="tab-panel active">
+    <div class="report-header green"><h2>运营管理报告 · 主管版</h2><p>团队绩效对比 · ASIN表现追踪</p><div class="meta"><div class="meta-item"><strong>2026-02</strong>报告周期</div></div></div>
+    <div class="section">
+      <div class="section-title"><span class="dot" style="background:#639922"></span>团队绩效对比</div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-title">各运营销售额 vs 利润</div><div class="chart-sub">柱=销售额, 线=利润</div><div style="height:250px;"><canvas id="teamChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">各运营 ACoS 对比</div><div class="chart-sub">健康线: &lt;25%</div><div style="height:250px;"><canvas id="teamAcosChart"></canvas></div></div>
+      </div>
+    </div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>小组绩效总览</div><div class="data-table-wrapper"><table class="data-table" id="team-summary-table"></table></div></div>
+    <div class="section" id="sunjie-detail-section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>孙杰组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="sunjie-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="sunjie-rows-tbody"></tbody></table></div></div>
+    <div class="section" id="xiaowei-detail-section"><div class="section-title"><span class="dot" style="background:#639922"></span>小伟组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="xiaowei-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="xiaowei-rows-tbody"></tbody></table></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>父ASIN完整排行</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">销量</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th><th style="text-align:right" id="stock-alert-th">库存预警</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody id="asin-full-tbody"></tbody></table></div></div>
+  </div>
+
+  <!-- Operator Tab -->
+  <div id="tab-operator" class="tab-panel">
+    <div class="report-header amber"><h2>运营个人报告</h2><p>个人KPI · 环比趋势</p><div class="meta"><div class="meta-item"><strong>2026-02</strong>报告周期</div></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>运营环比趋势</div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">销售额环比（%）</div><div class="chart-sub" id="op-mom-label"></div><div style="height:280px;"><canvas id="opSalesMomChart"></canvas></div></div><div class="chart-card"><div class="chart-title">利润环比（%）</div><div class="chart-sub" id="op-profit-mom-label"></div><div style="height:280px;"><canvas id="opProfitMomChart"></canvas></div></div></div>
+    </div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>父ASIN 利润贡献度</div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #ddd;"><div class="chart-sub">正利润在上、负利润在下 · TOP30 按利润排序</div><div style="height:340px;"><canvas id="profitWaterfallChart"></canvas></div></div>
+    </div>
+    <div id="operator-cards"></div>
+  </div>
+
+  <!-- Product Tab -->
+  <div id="tab-product" class="tab-panel">
+    <div class="report-header" style="background:linear-gradient(135deg,#6B2D8B,#7F277D);"><h2>产品报表</h2><p>父ASIN排名 · 销售额/利润同环比</p><div class="meta"><div class="meta-item"><strong>2026-02</strong>报告周期</div></div></div>
+    <div class="section"><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right;cursor:pointer" onclick="sortProduct('销售额')">销售额 ▾</th><th style="text-align:right;cursor:pointer" onclick="sortProduct('销售额环比')">环比</th><th style="text-align:right;cursor:pointer" onclick="sortProduct('销售额同比')">同比</th><th style="text-align:right;cursor:pointer" onclick="sortProduct('利润')">利润</th><th style="text-align:right;cursor:pointer" onclick="sortProduct('利润环比')">环比</th><th style="text-align:right;cursor:pointer" onclick="sortProduct('利润同比')">同比</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">头程%</th></tr></thead><tbody id="product-tbody"></tbody></table></div></div>
+  </div>
+
+  <!-- FBA Tab -->
+  <div id="tab-inventory" class="tab-panel">
+    <div class="report-header" style="background:linear-gradient(135deg,#A32D2D,#E24B4A);"><h2>FBA 库存健康度</h2><p>库存现状 · 缺货/积压预警</p><div class="meta"><div class="meta-item"><strong>2026-02</strong>报告周期</div></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存总览</div><div class="kpi-grid" id="fba-kpi"></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存水平分布</div><div class="chart-grid"><div class="chart-card" style="grid-column:span 2;"><div class="chart-sub" id="fba-age-sub"></div><div style="height:260px;"><canvas id="fbaAgeChart"></canvas></div></div></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>健康象限</div><div style="height:420px;"><canvas id="fbaScatterChart"></canvas></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>业务员</th><th>所属组</th><th style="text-align:right">可售</th><th style="text-align:right">环比</th><th style="text-align:right">货值</th><th style="text-align:right">货值环比</th><th style="text-align:right">可售天数</th><th style="text-align:right">ASIN数</th><th style="text-align:right">滞销率</th></tr></thead><tbody id="fba-operator-tbody"></tbody></table></div></div>
+    <div class="two-col"><div class="info-card red"><h3>缺货预警</h3><div id="fba-oos-list"></div></div><div class="info-card amber"><h3>积压预警</h3><div id="fba-overstock-list"></div></div></div>
+  </div>
+</div>
+
+<script>
+var CFG = {
+  password: '17867896818-18',
+  focusPeriod: '2026-02',
+  navPrefix: 'sunjie_',
+  hideBossTab: true,
+  teamFilter: '孙杰组',
+  periodsList: ["2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05"],
+  focusMonthNum: '2026-02'.split('-')[1]
+};
+
+function checkPw() {
+  var p = document.getElementById('pw-input').value;
+  if (p === CFG.password) {
+    document.getElementById('pw-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    if (localStorage) localStorage.setItem('saihu_auth_' + CFG.navPrefix, '1');
+    initApp();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+  }
+}
+
+if (localStorage && localStorage.getItem('saihu_auth_' + CFG.navPrefix) === '1') {
+  document.getElementById('pw-gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelector('.tab-btn.' + name).classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+var DATA = {};
+async function initApp() {
+  try {
+    var base = 'report_data';
+    var [kpiRes, trendsRes, periodRes, fbaRes] = await Promise.all([
+      fetch(base + '/periods_kpi.json').then(function(r){return r.json();}),
+      fetch(base + '/monthly_trends.json').then(function(r){return r.json();}),
+      fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}),
+      fetch(base + '/fba_latest.json').then(function(r){return r.json();})
+    ]);
+    DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
+
+    if (CFG.teamFilter) applyTeamFilter();
+    renderMonthNav();
+    if (!CFG.hideBossTab) renderBossTab();
+    renderManagerTab();
+    renderOperatorTab();
+    renderProductTab();
+    renderFbaTab();
+  } catch(e) { console.error('Data load error:', e); }
+}
+
+function applyTeamFilter() {
+  var t = CFG.teamFilter;
+  var teamOps = new Set();
+  DATA.period.operator_stats.forEach(function(o){ if (o['所属组'] === t) teamOps.add(o['业务员']); });
+  DATA.period.operator_stats = DATA.period.operator_stats.filter(function(o){ return o['所属组'] === t; });
+  DATA.period.asin_ranking = DATA.period.asin_ranking.filter(function(a){ return teamOps.has(a['业务员']); });
+  var teamAsins = new Set(DATA.period.asin_ranking.map(function(a){ return a['父ASIN']; }));
+  DATA.period.alerts = DATA.period.alerts.filter(function(a){ return teamAsins.has(a['asin']); });
+  DATA.period.team_stats = DATA.period.team_stats.filter(function(ts){ return ts['小组'] === t; });
+  var tp = DATA.period.operator_stats.reduce(function(s,o){ return s+(o['利润']||0); },0);
+  var ts = DATA.period.operator_stats.reduce(function(s,o){ return s+(o['销售额']||0); },0);
+  DATA.period.operator_stats.forEach(function(o){ o['利润占比']=ts?Math.round(o['利润']/tp*1000)/10:0; o['销售额占比']=ts?Math.round(o['销售额']/ts*1000)/10:0; });
+  if (DATA.period.team_stats) DATA.period.team_stats.forEach(function(ts){ ts['利润占比']=tp?Math.round(ts['利润']/tp*1000)/10:0; });
+  if (DATA.fba) {
+    var fops = DATA.fba.operators.filter(function(o){ return o['所属组'] === t; });
+    DATA.fba.operators = fops;
+    DATA.fba.total_qty = fops.reduce(function(s,o){ return s+(o['可售']||0); },0);
+    DATA.fba.total_value = fops.reduce(function(s,o){ return s+(o['货值']||0); },0);
+    DATA.fba.total_cost = fops.reduce(function(s,o){ return s+(o['库存成本']||0); },0);
+    var fopNames = new Set(fops.map(function(o){ return o['业务员']; }));
+    DATA.fba.out_of_stock = DATA.fba.out_of_stock.filter(function(o){ return fopNames.has(o['业务员']); });
+    DATA.fba.overstock = DATA.fba.overstock.filter(function(o){ return fopNames.has(o['业务员']); });
+  }
+  if (CFG.hideBossTab) {
+    var bossBtn = document.querySelector('.tab-btn.boss');
+    if (bossBtn) bossBtn.style.display = 'none';
+  }
+}
+
+function fmt(v) { return v == null ? '$0' : '$' + Math.round(v).toLocaleString(); }
+function pct(v) { return v == null ? '-' : (v>=0?'+':'') + v + '%'; }
+function pctV(v) { return v == null ? '-' : v + '%'; }
+function chgTag(v) { if (v==null) return '-'; var arrow=v>=0?'↑':'↓'; var color=v>=0?'#3B6D11':'#A32D2D'; return '<span style="color:'+color+'">'+arrow+' '+(v>0?'+':'')+v+'%</span>'; }
+function chgClass(v) { if (v==null) return ''; return v>=0?'up':'down'; }
+
+// ========== RENDER FUNCTIONS ==========
+
+function renderMonthNav() {
+  var html = '';
+  var periods = CFG.periodsList.slice().reverse();
+  periods.forEach(function(p) {
+    var cls = p === CFG.focusPeriod ? 'font-weight:500;color:#2C2C2A;background:#f0f0f0;' : 'color:#888;';
+    html += '<a href="' + CFG.navPrefix + p + '.html" style="text-decoration:none;font-size:12px;padding:3px 10px;border-radius:4px;' + cls + '">' + p + '</a>';
+  });
+  document.getElementById('month-nav').innerHTML = html;
+}
+
+function renderBossTab() {
+  var p = DATA.period; var k = DATA.kpi[CFG.focusPeriod];
+  var yoy = p.yoy || {}; var mom = p.mom || {};
+  var yoyLabel = p.yoy_periods || '';
+  document.getElementById('boss-subtitle').textContent = '同比分析 · ' + yoyLabel + ' · 战略决策支持';
+
+  var kpiHtml = '';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">总营收</div><div class="value">' + fmt(k['总营收']) + '</div><div class="change ' + chgClass(yoy['总营收']) + '">' + pct(yoy['总营收']) + ' 同比</div><div class="change ' + chgClass(mom['总营收']) + '" style="font-size:10px;color:#888;">' + pct(mom['总营收']) + ' 环比</div></div>';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">净利润率</div><div class="value">' + k['净利润率'] + '%</div><div class="change ' + chgClass(yoy['净利润率']) + '">' + pct(yoy['净利润率']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">总利润</div><div class="value">' + fmt(k['总利润']) + '</div><div class="change ' + chgClass(yoy['总利润']) + '">' + pct(yoy['总利润']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">整体ACoS</div><div class="value">' + k['整体ACoS'] + '%</div><div class="change ' + (k['整体ACoS']<25?'up':'warn') + '">' + (k['整体ACoS']<25?'健康':'偏高') + '</div></div>';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">总订单量</div><div class="value">' + (k['总订单量']||0).toLocaleString() + '</div><div class="change ' + chgClass(yoy['总订单量']) + '">' + pct(yoy['总订单量']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">退款率</div><div class="value">' + k['退款率'] + '%</div><div class="change ' + (yoy['退款率']>0?'down':'up') + '">' + pct(yoy['退款率']) + ' 同比</div></div>';
+  document.getElementById('boss-kpi').innerHTML = kpiHtml;
+
+  // YoY chart
+  var periodsKeys = Object.keys(DATA.kpi).sort();
+  var sameMonth = periodsKeys.filter(function(pk){ return pk.split('-')[1] === CFG.focusMonthNum; });
+  var prevKey = sameMonth.length >= 2 ? sameMonth[sameMonth.length-2] : CFG.focusPeriod;
+  var prevKpi = DATA.kpi[prevKey] || k;
+  document.getElementById('yoy-subtitle').textContent = CFG.focusPeriod + ' vs ' + prevKey + ' (单位: 万美元)';
+  new Chart(document.getElementById('yoyChart').getContext('2d'), {
+    type: 'bar', data: { labels: [prevKey, CFG.focusPeriod], datasets: [{ label: '营收(万$)', data: [prevKpi['总营收']/10000, k['总营收']/10000], backgroundColor: ['#A8C4E2','#378ADD'] }, { label: '利润(万$)', data: [prevKpi['总利润']/10000, k['总利润']/10000], backgroundColor: ['#C4DCA8','#639922'] }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,labels:{font:{size:11}}} } }
+  });
+
+  // Store pie chart
+  var stores = p.store_stats || [];
+  var storeLabels = stores.map(function(s){ return s['店铺']; });
+  var storeValues = stores.map(function(s){ return s['销售额']; });
+  document.getElementById('store-subtitle').textContent = CFG.focusPeriod + ' 各店铺销售分布';
+  new Chart(document.getElementById('storeChart').getContext('2d'), {
+    type: 'doughnut', data: { labels: storeLabels, datasets: [{ data: storeValues, backgroundColor: ['#378ADD','#639922','#BA7517','#7F277D','#E24B4A','#40A0C0','#85B030','#D08020'] }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'right',labels:{font:{size:10},boxWidth:10}} } }
+  });
+
+  // Profit distribution
+  var asins = p.asin_ranking || [];
+  var dist = { loss:0, low:0, mid:0, high:0 };
+  asins.forEach(function(a){ var r=a['利润率']||0; if(r<0) dist.loss++; else if(r<5) dist.low++; else if(r<15) dist.mid++; else dist.high++; });
+  document.getElementById('profitdist-subtitle').textContent = '活跃ASIN: ' + k['活跃ASIN数'] + '个 (亏损'+dist.loss+'/低利润'+dist.low+'/中等'+dist.mid+'/高利润'+dist.high+')';
+  new Chart(document.getElementById('profitDistChart').getContext('2d'), {
+    type: 'doughnut', data: { labels: ['亏损(<0%)','低利润(0-5%)','中等(5-15%)','高利润(>15%)'], datasets: [{ data: [dist.loss,dist.low,dist.mid,dist.high], backgroundColor: ['#E24B4A','#BA7517','#378ADD','#639922'] }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'right',labels:{font:{size:10}}} } }
+  });
+
+  // Cost structure
+  var totalSales = k['总营收'] || 1;
+  var logistics = asins.reduce(function(s,a){ return s+Math.abs(a['物流配送费']||0); },0);
+  var commission = asins.reduce(function(s,a){ return s+Math.abs(a['销售佣金']||0); },0);
+  var storage = asins.reduce(function(s,a){ return s+Math.abs(a['仓储费']||0); },0);
+  var costData = {
+    '采购成本': Math.round(Math.abs(k['采购成本']||0)/totalSales*1000)/10,
+    '物流配送费': Math.round(logistics/totalSales*1000)/10,
+    '销售佣金': Math.round(commission/totalSales*1000)/10,
+    '广告费': Math.round((k['广告花费占比']||0)*10)/10,
+    '仓储费': Math.round(storage/totalSales*1000)/10
+  };
+  new Chart(document.getElementById('costChart').getContext('2d'), {
+    type: 'bar', data: { labels: Object.keys(costData), datasets: [{ label: '占比%', data: Object.values(costData), backgroundColor: ['#378ADD','#639922','#BA7517','#E24B4A','#7F277D'] }] },
+    options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ x:{ ticks:{ callback:function(v){ return v+'%'; }} } } }
+  });
+
+  // Trend charts
+  if (DATA.trends) {
+    var mt = DATA.trends;
+    new Chart(document.getElementById('salesTrendChart').getContext('2d'), {
+      type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月销售额',data:mt.sales_2025,backgroundColor:'#A8C4E2',borderRadius:2,order:2 },{ label:'26年月销售额',data:mt.sales_2026,backgroundColor:'#378ADD',borderRadius:2,order:2 },{ label:'同比增涨率(%)',data:mt.yoy_growth,type:'line',borderColor:'#E24B4A',borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1',order:1 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{ display:true,labels:{ font:{size:11},boxWidth:12,usePointStyle:true } } },scales:{ y:{ position:'left',title:{display:true,text:'销售额（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} },y1:{ position:'right',title:{display:true,text:'同比增涨率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}},grid:{display:false} } } }
+    });
+    new Chart(document.getElementById('rateTrendChart').getContext('2d'), {
+      type: 'line', data: { labels: mt.months, datasets: [{ label:'25年毛利率',data:mt.rate_2025,borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年毛利率',data:mt.rate_2026,borderColor:'#378ADD',borderWidth:2,pointRadius:5,tension:0.3 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
+    });
+    new Chart(document.getElementById('profitTrendChart').getContext('2d'), {
+      type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月毛利',data:mt.profit_2025,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年月毛利',data:mt.profit_2026,backgroundColor:'#378ADD',borderRadius:2 }] },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
+    });
+  }
+
+  // Site table
+  var siteHtml = '';
+  (p.site_stats||[]).forEach(function(s){ siteHtml += '<tr><td>'+s['站点']+'</td><td style="text-align:right">'+fmt(s['销售额'])+'</td><td style="text-align:right;'+(s['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(s['利润'])+'</td><td style="text-align:right">'+pctV(s['利润率'])+'</td></tr>'; });
+  document.getElementById('site-tbody').innerHTML = siteHtml;
+
+  // Brand table
+  var brandHtml = '';
+  (p.brand_stats||[]).forEach(function(b){ brandHtml += '<tr><td>'+b['品牌']+'</td><td style="text-align:right">'+fmt(b['销售额'])+'</td><td style="text-align:right">'+fmt(b['利润'])+'</td><td style="text-align:right">'+pctV(b['利润率'])+'</td><td style="text-align:right">'+(b['ASIN数']||0)+'</td><td style="text-align:right">'+pctV(b['销售额占比'])+'</td><td style="text-align:right">'+chgTag(b['销售额环比'])+'</td></tr>'; });
+  document.getElementById('brand-tbody').innerHTML = brandHtml;
+}
+
+function renderManagerTab() {
+  var p = DATA.period; var ops = p.operator_stats || [];
+  var teamStats = p.team_stats || [];
+  var asins = p.asin_ranking || [];
+
+  // === 团队绩效对比图表 ===
+  var opLabels = ops.map(function(o){ return o['业务员']; });
+  var opSales = ops.map(function(o){ return o['销售额']||0; });
+  var opProfits = ops.map(function(o){ return o['利润']||0; });
+
+  var elTeam = document.getElementById('teamChart');
+  if (elTeam) new Chart(elTeam.getContext('2d'), {
+    type: 'bar', data: { labels: opLabels, datasets: [
+      { label: '销售额', data: opSales, backgroundColor: '#378ADD', borderRadius: 4, yAxisID: 'y' },
+      { label: '利润', data: opProfits, type: 'line', borderColor: '#639922', borderWidth: 2, pointRadius: 4, fill: false, yAxisID: 'y1', tension: 0 }
+    ] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { font: { size: 11 }, boxWidth: 12 } } },
+      scales: { y: { position: 'left', ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        y1: { position: 'right', ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k';}, font:{size:11} }, grid: { display: false } },
+        x: { ticks: { font:{size:11} }, grid: { display: false } } }
+    }
+  });
+
+  var elAcos = document.getElementById('teamAcosChart');
+  if (elAcos) {
+    var acosVals = ops.map(function(o){ return o['ACoS']||0; });
+    new Chart(elAcos.getContext('2d'), {
+      type: 'bar', data: { labels: opLabels, datasets: [{ label: 'ACoS%', data: acosVals, backgroundColor: acosVals.map(function(v){ return v>40?'#E24B4A':v>25?'#BA7517':'#639922' }), borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { max: 60, ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+    });
+  }
+
+  // === 小组绩效总览 (与V1完全一致的12列) ===
+  var thHtml = '<thead><tr><th>小组</th><th>成员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody>';
+  teamStats.forEach(function(t){
+    var sa = t['库存预警数']||0;
+    var saHtml = sa > 0 ? '<span class="tag red">'+sa+'</span>' : '<span class="tag green">0</span>';
+    thHtml += '<tr><td>'+t['小组']+'</td><td style="font-size:11px;color:#888;">'+t['成员']+'</td><td style="text-align:right">'+fmt(t['销售额'])+'</td><td style="text-align:right">'+chgTag(t['销售额环比'])+'</td><td style="text-align:right">'+fmt(t['利润'])+'</td><td style="text-align:right">'+chgTag(t['利润环比'])+'</td><td style="text-align:right">'+pctV(t['利润率'])+'</td><td style="text-align:right">'+pctV(t['利润占比'])+'</td><td style="text-align:right">'+(t['订单量']||0).toLocaleString()+'</td><td style="text-align:right">'+pctV(t['退款率'])+'</td><td style="text-align:right">'+pctV(t['ACoS'])+'</td><td style="text-align:right">'+(t['管理ASIN数']||0)+'</td><td>'+saHtml+'</td></tr>';
+  });
+  document.getElementById('team-summary-table').innerHTML = thHtml + '</tbody>';
+
+  // === 孙杰组 · 成员绩效明细 ===
+  var sunjieOps = ops.filter(function(o){ return o['所属组']==='孙杰组'; }).sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+  var sunjieHtml = '';
+  sunjieOps.forEach(function(o){
+    var sa = o['库存预警数']||0;
+    var saHtml = sa > 0 ? '<span class="tag red">'+sa+'</span>' : '<span class="tag green">0</span>';
+    sunjieHtml += '<tr><td>'+o['业务员']+'</td><td style="text-align:right">'+fmt(o['销售额'])+'</td><td style="text-align:right">'+chgTag(o['销售额环比'])+'</td><td style="text-align:right">'+fmt(o['利润'])+'</td><td style="text-align:right">'+chgTag(o['利润环比'])+'</td><td style="text-align:right">'+pctV(o['利润率'])+'</td><td style="text-align:right">'+pctV(o['利润占比'])+'</td><td style="text-align:right">'+(o['订单量']||0).toLocaleString()+'</td><td style="text-align:right">'+pctV(o['退款率'])+'</td><td style="text-align:right">'+pctV(o['ACoS'])+'</td><td style="text-align:right">'+(o['管理ASIN数']||0)+'</td><td>'+saHtml+'</td></tr>';
+  });
+  document.getElementById('sunjie-rows-tbody').innerHTML = sunjieHtml;
+  if (!sunjieOps.length) document.getElementById('sunjie-detail-section').style.display = 'none';
+
+  // === 小伟组 · 成员绩效明细 ===
+  var xiaoweiOps = ops.filter(function(o){ return o['所属组']!=='孙杰组'; }).sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+  var xiaoweiHtml = '';
+  xiaoweiOps.forEach(function(o){
+    var sa = o['库存预警数']||0;
+    var saHtml = sa > 0 ? '<span class="tag red">'+sa+'</span>' : '<span class="tag green">0</span>';
+    xiaoweiHtml += '<tr><td>'+o['业务员']+'</td><td style="text-align:right">'+fmt(o['销售额'])+'</td><td style="text-align:right">'+chgTag(o['销售额环比'])+'</td><td style="text-align:right">'+fmt(o['利润'])+'</td><td style="text-align:right">'+chgTag(o['利润环比'])+'</td><td style="text-align:right">'+pctV(o['利润率'])+'</td><td style="text-align:right">'+pctV(o['利润占比'])+'</td><td style="text-align:right">'+(o['订单量']||0).toLocaleString()+'</td><td style="text-align:right">'+pctV(o['退款率'])+'</td><td style="text-align:right">'+pctV(o['ACoS'])+'</td><td style="text-align:right">'+(o['管理ASIN数']||0)+'</td><td>'+saHtml+'</td></tr>';
+  });
+  document.getElementById('xiaowei-rows-tbody').innerHTML = xiaoweiHtml;
+  if (!xiaoweiOps.length) document.getElementById('xiaowei-detail-section').style.display = 'none';
+
+  // For supervisor views (hideBossTab), show only matching team
+  if (CFG.hideBossTab && CFG.teamFilter) {
+    if (CFG.teamFilter === '孙杰组') document.getElementById('xiaowei-detail-section').style.display = 'none';
+    else document.getElementById('sunjie-detail-section').style.display = 'none';
+  }
+
+  // === 父ASIN完整排行 ===
+  var isTeam = !!CFG.teamFilter;
+  if (isTeam) {
+    var stockTh = document.getElementById('stock-alert-th');
+    if (stockTh) stockTh.style.display = 'none';
+  }
+  var ah = '';
+  asins.forEach(function(a){
+    var pc=a['利润率']>10?'up':(a['利润率']<5?'down':'warn');
+    var stockDays=a['库存天数']||0;
+    var stockAlert=(stockDays>0&&stockDays<15)?'<span class="tag red">缺货</span>':(stockDays>180?'<span class="tag amber">积压</span>':'<span class="tag green">正常</span>');
+    ah += '<tr><td>'+a['父ASIN']+' <span style="font-size:10px;color:#888;">'+a['业务员']+'</span></td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+(a['销量']||0)+'</td><td style="text-align:right;'+(a['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(a['利润'])+'</td><td style="text-align:right" class="'+pc+'">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['利润占比'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td>'+(isTeam?'':'<td>'+stockAlert+'</td>')+'<td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td></tr>';
+  });
+  document.getElementById('asin-full-tbody').innerHTML = ah;
+}
+
+function renderOperatorTab() {
+  var ops = DATA.period.operator_stats || [];
+  var asins = DATA.period.asin_ranking || [];
+  var momLabel = DATA.period.mom_periods || '';
+
+  // === 运营环比趋势图 ===
+  document.getElementById('op-mom-label').textContent = momLabel;
+  document.getElementById('op-profit-mom-label').textContent = momLabel;
+
+  var opDataSm = ops.filter(function(o){ return o['销售额环比']!=null; }).map(function(o){ return {name:o['业务员'],v:o['销售额环比']}; });
+  var elSm = document.getElementById('opSalesMomChart');
+  if (elSm && opDataSm.length) new Chart(elSm.getContext('2d'), {
+    type: 'line', data: { labels: opDataSm.map(function(d){return d.name;}), datasets: [{ label: '销售额环比%', data: opDataSm.map(function(d){return d.v;}), borderColor: '#BA7517', backgroundColor: 'rgba(186,117,23,0.1)', fill: false, pointRadius: 5, pointBackgroundColor: '#BA7517', tension: 0.2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+  });
+
+  var opDataPm = ops.filter(function(o){ return o['利润环比']!=null; }).map(function(o){ return {name:o['业务员'],v:o['利润环比']}; });
+  var elPm = document.getElementById('opProfitMomChart');
+  if (elPm && opDataPm.length) new Chart(elPm.getContext('2d'), {
+    type: 'line', data: { labels: opDataPm.map(function(d){return d.name;}), datasets: [{ label: '利润环比%', data: opDataPm.map(function(d){return d.v;}), borderColor: '#639922', backgroundColor: 'rgba(99,153,34,0.1)', fill: false, pointRadius: 5, pointBackgroundColor: '#639922', tension: 0.2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
+  });
+
+  // === 利润贡献瀑布图 (TOP30) ===
+  var elWf = document.getElementById('profitWaterfallChart');
+  if (elWf) {
+    var sorted = asins.slice().sort(function(a,b){ return (b['利润']||0)-(a['利润']||0); }).slice(0, 30);
+    var wfLabels = sorted.map(function(a){ return (a['父ASIN']||'').slice(0,10)+' ('+(a['业务员']||'?')+')'; });
+    var wfProfits = sorted.map(function(a){ return Math.round(a['利润']||0); });
+    var wfColors = wfProfits.map(function(v){ return v>=0 ? (v>5000?'#639922':'#8CB936') : '#E24B4A'; });
+    new Chart(elWf.getContext('2d'), {
+      type: 'bar', data: { labels: wfLabels, datasets: [{ label: '利润($)', data: wfProfits, backgroundColor: wfColors, borderRadius: 2 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:9} }, grid: { display: false } } } }
+    });
+  }
+
+  // === 按业务员ASIN明细 (团队分组) ===
+  var sunjieOps = ops.filter(function(o){ return o['所属组'] === '孙杰组'; });
+  var xiaoweiOps = ops.filter(function(o){ return o['所属组'] !== '孙杰组'; });
+  sunjieOps.sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+  xiaoweiOps.sort(function(a,b){ return (b['销售额']||0)-(a['销售额']||0); });
+
+  function renderOpCards(opList, totalProfit) {
+    var cards = '';
+    opList.forEach(function(o, idx) {
+      var opName = o['业务员'];
+      var oAsins = asins.filter(function(a){ return a['业务员']===opName; });
+      cards += '<div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>'+opName+' ('+o['所属组']+')</div>';
+      cards += '<div class="kpi-grid">';
+      cards += '<div class="kpi-card green"><div class="label">销售额</div><div class="value">'+fmt(o['销售额'])+'</div><div class="change '+chgClass(o['销售额环比'])+'">'+chgTag(o['销售额环比'])+' 环比</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">利润</div><div class="value">'+fmt(o['利润'])+' ('+pctV(o['利润率'])+')</div><div class="change '+chgClass(o['利润环比'])+'">'+chgTag(o['利润环比'])+' 环比</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">订单量</div><div class="value">'+(o['订单量']||0).toLocaleString()+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">退款率</div><div class="value">'+pctV(o['退款率'])+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">ACoS</div><div class="value">'+pctV(o['ACoS'])+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">管理ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div><div class="change">销售额占比 '+pctV(o['销售额占比'])+'</div></div>';
+      var sa = o['库存预警数']||0;
+      cards += '<div class="kpi-card '+(sa>0?'red':'green')+'"><div class="label">库存预警</div><div class="value">'+sa+'</div><div class="change '+(sa>0?'down':'up')+'">'+(sa>0?'[WARN] 需关注':'[OK] 正常')+'</div></div>';
+      cards += '</div>';
+      cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody>';
+      oAsins.forEach(function(a){
+        cards += '<tr><td>'+a['父ASIN']+'</td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td><td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td></tr>';
+      });
+      cards += '</tbody></table></div></div>';
+    });
+    return cards;
+  }
+
+  var sunjieProfit = sunjieOps.reduce(function(s,o){ return s+(o['利润']||0); },0);
+  var xiaoweiProfit = xiaoweiOps.reduce(function(s,o){ return s+(o['利润']||0); },0);
+  var html = '';
+  if (sunjieOps.length) html += '<div style="font-size:13px;font-weight:500;color:#3B6D11;margin-bottom:8px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3B6D11;margin-right:6px;"></span>孙杰组</div>' + renderOpCards(sunjieOps, sunjieProfit);
+  if (xiaoweiOps.length) html += '<div style="font-size:13px;font-weight:500;color:#639922;margin:12px 0 8px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#639922;margin-right:6px;"></span>小伟组</div>' + renderOpCards(xiaoweiOps, xiaoweiProfit);
+  document.getElementById('operator-cards').innerHTML = html || '<p style="color:#888;">暂无数据</p>';
+}
+
+var productSortKey = '销售额', productSortDir = -1;
+function sortProduct(key) {
+  if (productSortKey===key) productSortDir*=-1; else { productSortKey=key; productSortDir=-1; }
+  renderProductTab();
+}
+function renderProductTab() {
+  var asins = (DATA.period.asin_ranking||[]).slice();
+  asins.sort(function(a,b){ var va=a[productSortKey]||0, vb=b[productSortKey]||0; return (va-vb)*productSortDir; });
+  var h = '';
+  asins.forEach(function(a){ h += '<tr><td>'+a['父ASIN']+' <span style="font-size:10px;color:#888;">'+(a['业务员']||'')+'</span></td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+chgTag(a['销售额环比'])+'</td><td style="text-align:right">'+chgTag(a['销售额同比'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+chgTag(a['利润环比'])+'</td><td style="text-align:right">'+chgTag(a['利润同比'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right">'+pctV(a['退款率'])+'</td><td style="text-align:right">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right">'+pctV(a['头程费用占比'])+'</td></tr>'; });
+  document.getElementById('product-tbody').innerHTML = h;
+}
+
+function renderFbaTab() {
+  var f = DATA.fba; if (!f) return;
+  var mom = f.mom || {};
+  // 动态月份标签: period="2026-05" → prevMonth="04", currMonth="05"
+  var fbaPeriod = f.period || CFG.focusPeriod;
+  var fbaParts = fbaPeriod.split('-');
+  var currMonth = fbaParts[1];
+  var prevMonth = String(Number(currMonth) - 1).padStart(2,'0');
+  if (prevMonth === '00') { prevMonth = '12'; }
+  var prevLabel = prevMonth + '月货值';
+  var currLabel = currMonth + '月货值';
+  var totalLevels = Object.values(f.level_dist).reduce(function(a,b){return a+b;},0);
+  var healthyRate = f.level_dist['良好'] ? Math.round(f.level_dist['良好']/totalLevels*100) : 0;
+
+  var kpiHtml = '';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">总可售</div><div class="value">'+f.total_qty.toLocaleString()+'件</div><div class="change">环比 '+chgTag(mom['可售_环比'])+'</div></div>';
+  kpiHtml += '<div class="kpi-card green"><div class="label">库存货值</div><div class="value">¥'+Math.round(f.total_value/10000)+'万</div><div class="change">环比 '+chgTag(mom['货值_环比'])+'</div></div>';
+  kpiHtml += '<div class="kpi-card amber"><div class="label">健康率</div><div class="value">'+healthyRate+'%</div><div class="change">'+chgTag(mom['健康率_环比'])+'</div></div>';
+  kpiHtml += '<div class="kpi-card red"><div class="label">异常数</div><div class="value">'+(f.out_of_stock.length+f.overstock.length)+'个</div><div class="change">缺货'+f.out_of_stock.length+' · 积压'+f.overstock.length+'</div></div>';
+  document.getElementById('fba-kpi').innerHTML = kpiHtml;
+
+  // Age distribution chart
+  var ageLabels = Object.keys(f.age_dist);
+  var ageValues = ageLabels.map(function(k){ return f.age_dist[k]; });
+  var prevAge = mom.prev_age_dist || {};
+  var prevValues = ageLabels.map(function(k){ return prevAge[k]||0; });
+  document.getElementById('fba-age-sub').textContent = '库龄分布 (件) - ' + fbaPeriod;
+  new Chart(document.getElementById('fbaAgeChart').getContext('2d'), {
+    type: 'bar', data: { labels: ageLabels, datasets: [{ label:'上月',data:prevValues,backgroundColor:'#ccc',borderRadius:4 },{ label:CFG.focusPeriod,data:ageValues,backgroundColor:'#E24B4A',borderRadius:4 }] },
+    options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12}} },scales:{ y:{ title:{display:true,text:'件数'},ticks:{font:{size:10}} } } }
+  });
+
+  // Operator table
+  var ops = (f.operators||[]).slice().sort(function(a,b){ return (b['货值']||0)-(a['货值']||0); });
+  var opHtml = '';
+  ops.forEach(function(o) {
+    opHtml += '<tr class="op-row" style="cursor:pointer;"><td><strong>'+o['业务员']+'</strong> <span style="font-size:10px;color:#888;">▸</span></td><td>'+(o['所属组']||'')+'</td><td style="text-align:right">'+(o['可售']||0).toLocaleString()+'</td><td style="text-align:right">'+chgTag(o['可售环比'])+'</td><td style="text-align:right">¥'+Math.round(o['货值']||0).toLocaleString()+'</td><td style="text-align:right">'+chgTag(o['货值环比'])+'</td><td style="text-align:right">'+(o['可售天数']||0)+'天</td><td style="text-align:right">'+(o['父ASIN数']||0)+'</td><td style="text-align:right">'+(o['滞销率']||0)+'%</td></tr>';
+    var asins = o['asins'] || [];
+    if (asins.length) {
+      opHtml += '<tr class="asin-detail" style="display:none;background:#fafaf8;"><td colspan="9" style="padding:0;"><table style="width:100%;font-size:12px;border-collapse:collapse;"><tr style="background:#f0f0f0;color:#666;"><td style="padding:4px 12px;">父ASIN</td><td style="text-align:right;padding:4px 8px;">'+prevLabel+'</td><td style="text-align:right;padding:4px 8px;">'+currLabel+'</td><td style="text-align:right;padding:4px 8px;">环比</td><td style="text-align:right;padding:4px 8px;">可售天数</td></tr>';
+      asins.forEach(function(a) {
+        var chg = a['变化'], chgPct = a['环比'];
+        var chgStr = chgPct!=null ? ('<span style="color:'+(chg>=0?'#3B6D11':'#A32D2D')+'">'+(chg>=0?'↑+':'↓')+Math.abs(chgPct)+'%</span>') : '新增';
+        var daysVal = a['可售天数'];
+        opHtml += '<tr class="asin-row" style="cursor:pointer;" title="点击展开SKU明细"><td style="padding:4px 12px;">'+a['父ASIN']+' <span class="sku-arrow" style="font-size:10px;color:#888;">▸</span></td><td style="text-align:right;padding:4px 8px;">¥'+Math.round(a['货值_4月']||0).toLocaleString()+'</td><td style="text-align:right;padding:4px 8px;">¥'+Math.round(a['货值_5月']||0).toLocaleString()+'</td><td style="text-align:right;padding:4px 8px;">'+chgStr+'</td><td style="text-align:right;padding:4px 8px;'+(daysVal!=null&&daysVal>180?'color:#E24B4A;font-weight:500;':'')+'">'+(daysVal!=null?daysVal+'天':'-')+'</td></tr>';
+        var skus = a['skus'] || [];
+        if (skus.length) {
+          opHtml += '<tr class="sku-detail" style="display:none;background:#fafaf5;"><td colspan="5" style="padding:0 0 0 20px;border-left:2px solid #ddd;"><table style="width:100%;font-size:11px;border-collapse:collapse;"><tr style="background:#edede8;color:#888;"><td style="padding:3px 8px;">SKU</td><td style="text-align:right;padding:3px 6px;">'+prevLabel+'</td><td style="text-align:right;padding:3px 6px;">'+currLabel+'</td><td style="text-align:right;padding:3px 6px;">环比</td><td style="text-align:right;padding:3px 6px;">可售天数</td><td style="text-align:right;padding:3px 6px;">可售</td></tr>';
+          skus.forEach(function(s) {
+            var schg = s['变化'], schgPct = s['环比'];
+            var schgStr = schgPct!=null ? ('<span style="color:'+(schg>=0?'#3B6D11':'#A32D2D')+'">'+(schg>=0?'↑+':'↓')+Math.abs(schgPct)+'%</span>') : '新增';
+            var sdaysVal = s['可售天数'];
+            opHtml += '<tr><td style="padding:3px 8px;font-size:11px;">'+s['SKU']+'</td><td style="text-align:right;padding:3px 6px;">¥'+Math.round(s['货值_4月']||0).toLocaleString()+'</td><td style="text-align:right;padding:3px 6px;">¥'+Math.round(s['货值_5月']||0).toLocaleString()+'</td><td style="text-align:right;padding:3px 6px;">'+schgStr+'</td><td style="text-align:right;padding:3px 6px;'+(sdaysVal!=null&&sdaysVal>180?'color:#E24B4A;font-weight:500;':'')+'">'+(sdaysVal!=null?sdaysVal+'天':'-')+'</td><td style="text-align:right;padding:3px 6px;">'+(s['可售']||0)+'</td></tr>';
+          });
+          opHtml += '</table></td></tr>';
+        }
+      });
+      opHtml += '</table></td></tr>';
+    }
+  });
+  document.getElementById('fba-operator-tbody').innerHTML = opHtml;
+
+  // Op row click handlers
+  document.querySelectorAll('#fba-operator-tbody .op-row').forEach(function(row) {
+    row.onclick = function() {
+      var d = this.nextElementSibling;
+      if (d && d.classList.contains('asin-detail')) {
+        var showing = d.style.display === 'table-row';
+        d.style.display = showing ? 'none' : 'table-row';
+        var arrow = this.querySelector('span');
+        if (arrow) arrow.textContent = showing ? '▸' : '▾';
+      }
+    };
+  });
+  document.querySelectorAll('#fba-operator-tbody .asin-row').forEach(function(row) {
+    row.onclick = function(e) {
+      e.stopPropagation();
+      var d = this.nextElementSibling;
+      if (d && d.classList.contains('sku-detail')) {
+        var showing = d.style.display === 'table-row';
+        d.style.display = showing ? 'none' : 'table-row';
+        var arrow = this.querySelector('.sku-arrow');
+        if (arrow) arrow.textContent = showing ? '▸' : '▾';
+      }
+    };
+  });
+
+  // Bubble chart
+  (function() {
+    var el = document.getElementById('fbaScatterChart'); if (!el) return;
+    var colors = {'孙杰组':'#378ADD','小伟组':'#639922'};
+    var datasets = [];
+    ops.forEach(function(o) {
+      var t = o['所属组'] || '其他';
+      datasets.push({ label:o['业务员'], data:[{ x:o['货值']/10000, y:o['可售天数'], r:Math.max(8,(o['父ASIN数']||0)*1.5) }], backgroundColor:colors[t]||'#888', borderColor:colors[t]||'#888', borderWidth:1 });
+    });
+    new Chart(el.getContext('2d'), { type:'bubble', data:{ datasets:datasets }, options:{ responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:false} } } });
+  })();
+
+  // OOS / Overstock lists
+  var oosHtml = '';
+  (f.out_of_stock||[]).forEach(function(a){ oosHtml += '<div style="padding:6px 0;border-bottom:0.5px solid #f0f0f0;"><strong>'+a['父 ASIN']+'</strong> <span style="color:#888;font-size:11px;">'+(a['业务员']||'')+' · '+(a['店铺']||'')+'</span></div>'; });
+  document.getElementById('fba-oos-list').innerHTML = oosHtml || '<div style="color:#3B6D11;padding:10px 0;">✅ 无缺货</div>';
+
+  var overHtml = '';
+  (f.overstock||[]).forEach(function(a){ overHtml += '<div style="padding:6px 0;border-bottom:0.5px solid #f0f0f0;"><strong>'+a['父 ASIN']+'</strong> <span style="color:#888;font-size:11px;">'+(a['业务员']||'')+' · 可售'+(a['可售']||0)+'件 · ¥'+Math.round(a['货值']||0).toLocaleString()+' · '+(a['历史供货天数']||0)+'天</span></div>'; });
+  document.getElementById('fba-overstock-list').innerHTML = overHtml || '<div style="color:#3B6D11;padding:10px 0;">✅ 无积压</div>';
+}
+
+if (CFG.hideBossTab) {
+  var bb = document.querySelector('.tab-btn.boss');
+  if (bb) bb.style.display = 'none';
+  document.getElementById('trend-section').style.display = 'none';
+}
+</script>
+</body>
+</html>

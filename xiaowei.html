@@ -32,7 +32,7 @@
   .section { margin-bottom: 28px; }
   .section-title { font-size: 14px; font-weight: 500; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 0.5px solid #e0e0e0; display: flex; align-items: center; gap: 8px; }
   .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 20px; }
   .kpi-card { background: #fff; border-radius: 10px; padding: 14px; border: 0.5px solid #e0e0e0; }
   .kpi-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
   .kpi-card .value { font-size: 20px; font-weight: 500; }
@@ -277,12 +277,12 @@ function renderBossTab() {
 
   var kpiHtml = '';
   kpiHtml += '<div class="kpi-card blue"><div class="label">总营收</div><div class="value">' + fmt(k['总营收']) + '</div><div class="change ' + chgClass(yoy['总营收']) + '">' + pct(yoy['总营收']) + ' 同比</div><div class="change ' + chgClass(mom['总营收']) + '" style="font-size:10px;color:#888;">' + pct(mom['总营收']) + ' 环比</div></div>';
-  kpiHtml += '<div class="kpi-card blue"><div class="label">净利润率</div><div class="value">' + k['净利润率'] + '%</div><div class="change ' + chgClass(yoy['净利润率']) + '">' + pct(yoy['净利润率']) + ' 同比</div></div>';
-  kpiHtml += '<div class="kpi-card blue"><div class="label">总利润</div><div class="value">' + fmt(k['总利润']) + '</div><div class="change ' + chgClass(yoy['总利润']) + '">' + pct(yoy['总利润']) + ' 同比</div></div>';
-  kpiHtml += '<div class="kpi-card blue"><div class="label">整体ACoS</div><div class="value">' + k['整体ACoS'] + '%</div><div class="change ' + (k['整体ACoS']<25?'up':'warn') + '">' + (k['整体ACoS']<25?'健康':'偏高') + '</div></div>';
-  kpiHtml += '<div class="kpi-card blue"><div class="label">TACoS</div><div class="value">' + (k['广告花费占比']||0).toFixed(1) + '%</div><div class="change ' + ((k['广告花费占比']||0)<15?'up':'warn') + '">广告占总销售比</div></div>';
-  kpiHtml += '<div class="kpi-card blue"><div class="label">总订单量</div><div class="value">' + (k['总订单量']||0).toLocaleString() + '</div><div class="change ' + chgClass(yoy['总订单量']) + '">' + pct(yoy['总订单量']) + ' 同比</div></div>';
-  kpiHtml += '<div class="kpi-card blue"><div class="label">退款率</div><div class="value">' + k['退款率'] + '%</div><div class="change ' + (yoy['退款率']>0?'down':'up') + '">' + pct(yoy['退款率']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card green"><div class="label">利润</div><div class="value">' + fmt(k['总利润']) + '</div><div class="change ' + chgClass(yoy['总利润']) + '">' + pct(yoy['总利润']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card green"><div class="label">利润率</div><div class="value">' + k['净利润率'] + '%</div><div class="change ' + chgClass(yoy['净利润率']) + '">' + pct(yoy['净利润率']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card amber"><div class="label">订单量</div><div class="value">' + (k['总订单量']||0).toLocaleString() + '</div><div class="change ' + chgClass(yoy['总订单量']) + '">' + pct(yoy['总订单量']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card amber"><div class="label">TACoS</div><div class="value">' + (k['广告花费占比']||0).toFixed(1) + '%</div><div class="change ' + ((k['广告花费占比']||0)<15?'up':'warn') + '">广告占总销售比</div></div>';
+  kpiHtml += '<div class="kpi-card red"><div class="label">ACoS</div><div class="value">' + k['整体ACoS'] + '%</div><div class="change ' + (k['整体ACoS']<25?'up':'warn') + '">' + (k['整体ACoS']<25?'健康':'偏高') + '</div></div>';
+  kpiHtml += '<div class="kpi-card red"><div class="label">退款率</div><div class="value">' + k['退款率'] + '%</div><div class="change ' + (yoy['退款率']>0?'down':'up') + '">' + pct(yoy['退款率']) + ' 同比</div></div>';
   document.getElementById('boss-kpi').innerHTML = kpiHtml;
 
   // YoY chart

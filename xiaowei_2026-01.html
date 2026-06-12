@@ -153,8 +153,12 @@
   <div id="tab-inventory" class="tab-panel">
     <div class="report-header" style="background:linear-gradient(135deg,#A32D2D,#E24B4A);"><h2>FBA 库存健康度</h2><p>库存现状 · 缺货/积压预警</p><div class="meta"><div class="meta-item"><strong>2026-01</strong>报告周期</div></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存总览</div><div class="kpi-grid" id="fba-kpi"></div></div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存水平分布</div><div class="chart-grid"><div class="chart-card" style="grid-column:span 2;"><div class="chart-sub" id="fba-age-sub"></div><div style="height:260px;"><canvas id="fbaAgeChart"></canvas></div></div></div></div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>健康象限</div><div style="height:420px;"><canvas id="fbaScatterChart"></canvas></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存分布与健康象限</div>
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-sub" id="fba-age-sub"></div><div style="height:260px;"><canvas id="fbaAgeChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-sub" id="fba-scatter-sub">气泡大小=ASIN数，悬停查看详情</div><div style="height:260px;"><canvas id="fbaScatterChart"></canvas></div></div>
+      </div>
+    </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>业务员</th><th>所属组</th><th style="text-align:right">可售</th><th style="text-align:right">环比</th><th style="text-align:right">货值</th><th style="text-align:right">货值环比</th><th style="text-align:right">可售天数</th><th style="text-align:right">ASIN数</th><th style="text-align:right">滞销率</th></tr></thead><tbody id="fba-operator-tbody"></tbody></table></div></div>
     <div class="two-col"><div class="info-card red"><h3>缺货预警</h3><div id="fba-oos-list"></div></div><div class="info-card amber"><h3>积压预警</h3><div id="fba-overstock-list"></div></div></div>
   </div>

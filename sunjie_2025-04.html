@@ -217,7 +217,7 @@ async function initApp() {
       fetch(base + '/periods_kpi.json').then(function(r){return r.json();}),
       fetch(base + '/monthly_trends.json').then(function(r){return r.json();}),
       fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}),
-      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();})
+      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(){return fetch(base + '/fba_latest.json').then(function(r){return r.json();});})
     ]);
     DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
 

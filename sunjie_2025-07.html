@@ -649,39 +649,55 @@ function renderFbaTab() {
     options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12}} },scales:{ y:{ title:{display:true,text:'件数'},ticks:{font:{size:10}} } } }
   });
 
-  // Per-operator age distribution chart
+  // Per-operator age distribution chart (group by team for manager)
   var opAge = f.op_age_dist || [];
   var prevOpAge = (f.mom && f.mom.prev_op_age_dist) || [];
   var prevMap = {};
   prevOpAge.forEach(function(p){ prevMap[p['业务员']] = p; });
+  if (CFG.teamFilter) {
+    opAge = opAge.filter(function(o){ return o['所属组'] === CFG.teamFilter; });
+  }
   if (opAge.length > 0) {
     var ageBuckets = ['0-30天','31-60天','61-90天','91-180天','181-365天','365天+'];
     var container = document.getElementById('fba-opage-charts');
     container.innerHTML = '';
-    var fbaPeriod = CFG.focusPeriod;
-    var fp = fbaPeriod.split('-');
+    var fp = CFG.focusPeriod.split('-');
     var currMonth = fp[1];
     var prevMonth = String(Number(currMonth) - 1 || 12).padStart(2,'0');
     var prevLabel = prevMonth + '月';
     var currLabel = currMonth + '月';
-    opAge.forEach(function(op){
-      var pid = 'opage-' + op['业务员'].replace(/\s/g,'');
-      var div = document.createElement('div');
-      div.style.cssText = 'background:#fff;border-radius:10px;padding:12px;border:0.5px solid #e0e0e0;';
-      div.innerHTML = '<div style=font-size:12px;font-weight:500;margin-bottom:6px;color:#A32D2D;>'+op['业务员']+'</div><div style=height:180px;><canvas id='+pid+'></canvas></div>';
-      container.appendChild(div);
-      var currVals = ageBuckets.map(function(b){ return op[b]||0; });
-      var prev = prevMap[op['业务员']];
-      var prevVals = ageBuckets.map(function(b){ return prev ? (prev[b]||0) : 0; });
-      new Chart(document.getElementById(pid).getContext('2d'), {
-        type: 'bar', data: { labels: ageBuckets.map(function(s){return s.replace('-','~').replace('天','');}), datasets: [{ label: prevLabel, data: prevVals, backgroundColor: '#ccc', borderRadius: 3 },{ label: currLabel, data: currVals, backgroundColor: '#E24B4A', borderRadius: 3 }] },
-        options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:9},boxWidth:10}} },scales:{ y:{ ticks:{font:{size:9}},title:{display:true,text:'件',font:{size:9}} },x:{ ticks:{font:{size:9}} } } }
+    var teams = {};
+    opAge.forEach(function(op){ var t=op['所属组']||'其他'; if(!teams[t]) teams[t]=[]; teams[t].push(op); });
+    Object.keys(teams).forEach(function(t){
+      if (Object.keys(teams).length > 1) {
+        var header = document.createElement('div');
+        header.style.cssText = 'grid-column:1/-1;font-size:13px;font-weight:500;color:#A32D2D;padding:4px 0 0;';
+        header.textContent = t;
+        container.appendChild(header);
+      }
+      teams[t].forEach(function(op){
+        var pid = 'opage-' + op['业务员'].replace(/\s/g,'');
+        var div = document.createElement('div');
+        div.style.cssText = 'background:#fff;border-radius:10px;padding:12px;border:0.5px solid #e0e0e0;';
+        div.innerHTML = '<div style=font-size:12px;font-weight:500;margin-bottom:6px;color:#A32D2D;>'+op['业务员']+'</div><div style=height:180px;><canvas id='+pid+'></canvas></div>';
+        container.appendChild(div);
+        var currVals = ageBuckets.map(function(b){ return op[b]||0; });
+        var prev = prevMap[op['业务员']];
+        var prevVals = ageBuckets.map(function(b){ return prev ? (prev[b]||0) : 0; });
+        new Chart(document.getElementById(pid).getContext('2d'), {
+          type: 'bar', data: { labels: ageBuckets.map(function(s){return s.replace('-','~').replace('天','');}), datasets: [{ label: prevLabel, data: prevVals, backgroundColor: '#ccc', borderRadius: 3 },{ label: currLabel, data: currVals, backgroundColor: '#E24B4A', borderRadius: 3 }] },
+          options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:9},boxWidth:10}} },scales:{ y:{ ticks:{font:{size:9}},title:{display:true,text:'件',font:{size:9}} },x:{ ticks:{font:{size:9}} } } }
+        });
       });
     });
   }
 
-  // Operator table
-  var ops = (f.operators||[]).slice().sort(function(a,b){ return (b['货值']||0)-(a['货值']||0); });
+  // Operator table (filtered by team for manager)
+  var ops = (f.operators||[]).slice();
+  if (CFG.teamFilter) {
+    ops = ops.filter(function(o){ return o['所属组'] === CFG.teamFilter; });
+  }
+  ops.sort(function(a,b){ return (b['货值']||0)-(a['货值']||0); });
   var opHtml = '';
   ops.forEach(function(o) {
     var odays = o['可售天数']||0;

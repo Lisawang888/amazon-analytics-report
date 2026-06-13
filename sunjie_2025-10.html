@@ -167,7 +167,7 @@
         <div class="chart-card"><div class="chart-sub" id="fba-scatter-sub">气泡大小=ASIN数，悬停查看详情</div><div style="height:260px;"><canvas id="fbaScatterChart"></canvas></div></div>
       </div>
     </div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员库龄分布</div><div class="chart-card" style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #e0e0e0;"><div class="chart-sub" id="fba-opage-sub">各运营库存库龄分段（可售件数）</div><div style="height:300px;"><canvas id="fbaOpAgeChart"></canvas></div></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员库龄分布</div><div class="chart-sub" id="fba-opage-sub" style="margin-bottom:12px;">各运营库存库龄分段对比（灰色=上月，红色=本月）</div><div id="fba-opage-charts" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>业务员</th><th>所属组</th><th style="text-align:right">可售</th><th style="text-align:right">环比</th><th style="text-align:right">货值</th><th style="text-align:right">货值环比</th><th style="text-align:right">可售天数</th><th style="text-align:right">ASIN数</th><th style="text-align:right">滞销率</th></tr></thead><tbody id="fba-operator-tbody"></tbody></table></div></div>
     <div class="two-col"><div class="info-card red"><h3>缺货预警</h3><div id="fba-oos-list"></div></div><div class="info-card amber"><h3>积压预警</h3><div id="fba-overstock-list"></div></div></div>
   </div>
@@ -651,17 +651,28 @@ function renderFbaTab() {
 
   // Per-operator age distribution chart
   var opAge = f.op_age_dist || [];
+  var prevOpAge = (f.mom && f.mom.prev_op_age_dist) || [];
+  var prevMap = {};
+  prevOpAge.forEach(function(p){ prevMap[p['业务员']] = p; });
   if (opAge.length > 0) {
-    var opAgeLabels = opAge.map(function(o){ return o['业务员']; });
     var ageBuckets = ['0-30天','31-60天','61-90天','91-180天','181-365天','365天+'];
-    var ageColors = ['#E24B4A','#F08060','#F5A623','#F7DC6F','#A8D46A','#639922'];
-    var datasets = ageBuckets.map(function(b, i) {
-      return { label: b, data: opAge.map(function(o){ return o[b]||0; }), backgroundColor: ageColors[i], borderRadius: 0, stack: 'o' };
-    });
-    document.getElementById('fba-opage-sub').textContent = '各运营库存库龄分段（可售件数）- ' + fbaPeriod;
-    new Chart(document.getElementById('fbaOpAgeChart').getContext('2d'), {
-      type: 'bar', data: { labels: opAgeLabels, datasets: datasets },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12,usePointStyle:true}} },scales:{ x:{ stacked:true,ticks:{font:{size:10}} },y:{ stacked:true,title:{display:true,text:'可售件数'},ticks:{font:{size:10}} } } }
+    var container = document.getElementById('fba-opage-charts');
+    container.innerHTML = '';
+    var prevLabel = fbaPeriod.replace(/\d{4}-(\d{2})/, function(_,m){ return (Number(m)-1||12).toString().padStart(2,'0')+'月' });
+    var currLabel = fbaPeriod.split('-')[1] + '月';
+    opAge.forEach(function(op){
+      var pid = 'opage-' + op['业务员'].replace(/\s/g,'');
+      var div = document.createElement('div');
+      div.style.cssText = 'background:#fff;border-radius:10px;padding:12px;border:0.5px solid #e0e0e0;';
+      div.innerHTML = '<div style=font-size:12px;font-weight:500;margin-bottom:6px;color:#A32D2D;>'+op['业务员']+'</div><div style=height:180px;><canvas id='+pid+'></canvas></div>';
+      container.appendChild(div);
+      var currVals = ageBuckets.map(function(b){ return op[b]||0; });
+      var prev = prevMap[op['业务员']];
+      var prevVals = ageBuckets.map(function(b){ return prev ? (prev[b]||0) : 0; });
+      new Chart(document.getElementById(pid).getContext('2d'), {
+        type: 'bar', data: { labels: ageBuckets.map(function(s){return s.replace('-','~').replace('天','');}), datasets: [{ label: prevLabel, data: prevVals, backgroundColor: '#ccc', borderRadius: 3 },{ label: currLabel, data: currVals, backgroundColor: '#E24B4A', borderRadius: 3 }] },
+        options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:9},boxWidth:10}} },scales:{ y:{ ticks:{font:{size:9}},title:{display:true,text:'件',font:{size:9}} },x:{ ticks:{font:{size:9}} } } }
+      });
     });
   }
 

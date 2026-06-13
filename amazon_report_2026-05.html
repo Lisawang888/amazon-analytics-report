@@ -217,7 +217,7 @@ async function initApp() {
       fetch(base + '/periods_kpi.json').then(function(r){return r.json();}),
       fetch(base + '/monthly_trends.json').then(function(r){return r.json();}),
       fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}),
-      fetch(base + '/fba_latest.json').then(function(r){return r.json();})
+      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();})
     ]);
     DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
 
@@ -658,8 +658,12 @@ function renderFbaTab() {
     var ageBuckets = ['0-30天','31-60天','61-90天','91-180天','181-365天','365天+'];
     var container = document.getElementById('fba-opage-charts');
     container.innerHTML = '';
-    var prevLabel = fbaPeriod.replace(/\d{4}-(\d{2})/, function(_,m){ return (Number(m)-1||12).toString().padStart(2,'0')+'月' });
-    var currLabel = fbaPeriod.split('-')[1] + '月';
+    var fbaPeriod = CFG.focusPeriod;
+    var fp = fbaPeriod.split('-');
+    var currMonth = fp[1];
+    var prevMonth = String(Number(currMonth) - 1 || 12).padStart(2,'0');
+    var prevLabel = prevMonth + '月';
+    var currLabel = currMonth + '月';
     opAge.forEach(function(op){
       var pid = 'opage-' + op['业务员'].replace(/\s/g,'');
       var div = document.createElement('div');

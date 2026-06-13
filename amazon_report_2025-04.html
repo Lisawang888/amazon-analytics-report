@@ -666,6 +666,14 @@ function renderFbaTab() {
     var prevMonth = String(Number(currMonth) - 1 || 12).padStart(2,'0');
     var prevLabel = prevMonth + '月';
     var currLabel = currMonth + '月';
+    // Sort by total inventory (sum of all age buckets) descending
+    opAge.forEach(function(op){
+      var total = 0;
+      ageBuckets.forEach(function(b){ total += (op[b]||0); });
+      op._totalQty = total;
+    });
+    opAge.sort(function(a,b){ return (b._totalQty||0)-(a._totalQty||0); });
+
     var teams = {};
     opAge.forEach(function(op){ var t=op['所属组']||'其他'; if(!teams[t]) teams[t]=[]; teams[t].push(op); });
     Object.keys(teams).forEach(function(t){

@@ -466,7 +466,7 @@ function renderEfficiency(teams) {
   var metrics = [
     { key: '人均销售额', label: '人均月销售额', fmt: function(v){ return '$' + Math.round(v).toLocaleString(); } },
     { key: '人均利润', label: '人均月利润', fmt: function(v){ return '$' + Math.round(v).toLocaleString(); } },
-    { key: '人均ASIN', label: '人均管理ASIN', fmt: function(v){ return v.toFixed(1) + ' 个'; } }
+    { key: '人均父ASIN', label: '人均管理父ASIN', fmt: function(v){ return v.toFixed(1) + ' 个'; } }
   ];
   var html = '';
   metrics.forEach(function(m) {

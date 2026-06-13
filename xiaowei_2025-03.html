@@ -116,6 +116,7 @@
       <div class="chart-grid"><div class="chart-card"><div class="chart-title">2026年月度库存分布</div><div class="chart-sub">按仓库类型 · 含采购在途</div><div style="height:260px;"><canvas id="invDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">月度总库存趋势</div><div class="chart-sub">总库存金额（含采购在途）</div><div style="height:260px;"><canvas id="invTrendChart"></canvas></div></div></div>
     </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>站点汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>站点</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th></tr></thead><tbody id="site-tbody"></tbody></table></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>店铺汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>店铺</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th></tr></thead><tbody id="store-tbody"></tbody></table></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>品牌汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>品牌</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="brand-tbody"></tbody></table></div></div>
   </div>
 
@@ -404,6 +405,11 @@ function renderBossTab() {
   (p.site_stats||[]).forEach(function(s){ siteHtml += '<tr><td>'+s['站点']+'</td><td style="text-align:right">'+fmt(s['销售额'])+'</td><td style="text-align:right;'+(s['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(s['利润'])+'</td><td style="text-align:right">'+pctV(s['利润率'])+'</td></tr>'; });
   document.getElementById('site-tbody').innerHTML = siteHtml;
 
+  // Store table
+  var storeHtml = '';
+  (p.store_stats||[]).forEach(function(s){ storeHtml += '<tr><td>'+s['店铺']+'</td><td style="text-align:right">'+fmt(s['销售额'])+'</td><td style="text-align:right;'+(s['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(s['利润'])+'</td><td style="text-align:right">'+pctV(s['利润率'])+'</td></tr>'; });
+  document.getElementById('store-tbody').innerHTML = storeHtml;
+
   // Brand table
   var brandHtml = '';
   (p.brand_stats||[]).forEach(function(b){ brandHtml += '<tr><td>'+b['品牌']+'</td><td style="text-align:right">'+fmt(b['销售额'])+'</td><td style="text-align:right">'+fmt(b['利润'])+'</td><td style="text-align:right">'+pctV(b['利润率'])+'</td><td style="text-align:right">'+(b['ASIN数']||0)+'</td><td style="text-align:right">'+pctV(b['销售额占比'])+'</td><td style="text-align:right">'+chgTag(b['销售额环比'])+'</td></tr>'; });
@@ -443,17 +449,18 @@ function renderManagerTab() {
   }
 
   // === 团队月度利润/销售额/毛利率趋势 ===
-  if (DATA.trends && CFG.teamFilter) {
+  if (DATA.trends) {
     var mt = DATA.trends;
     var isSun = CFG.teamFilter === '孙杰组';
-    var s25 = isSun ? mt.sj_sales_2025 : mt.xw_sales_2025;
-    var s26 = isSun ? mt.sj_sales_2026 : mt.xw_sales_2026;
-    var p25 = isSun ? mt.sj_profit_2025 : mt.xw_profit_2025;
-    var p26 = isSun ? mt.sj_profit_2026 : mt.xw_profit_2026;
-    var r25 = isSun ? mt.sj_rate_2025 : mt.xw_rate_2025;
-    var r26 = isSun ? mt.sj_rate_2026 : mt.xw_rate_2026;
-    var t25 = isSun ? mt.sj_tacos_2025 : mt.xw_tacos_2025;
-    var t26 = isSun ? mt.sj_tacos_2026 : mt.xw_tacos_2026;
+    var hasTeam = !!(CFG.teamFilter);
+    var s25 = hasTeam ? (isSun ? mt.sj_sales_2025 : mt.xw_sales_2025) : mt.sales_2025;
+    var s26 = hasTeam ? (isSun ? mt.sj_sales_2026 : mt.xw_sales_2026) : mt.sales_2026;
+    var p25 = hasTeam ? (isSun ? mt.sj_profit_2025 : mt.xw_profit_2025) : mt.profit_2025;
+    var p26 = hasTeam ? (isSun ? mt.sj_profit_2026 : mt.xw_profit_2026) : mt.profit_2026;
+    var r25 = hasTeam ? (isSun ? mt.sj_rate_2025 : mt.xw_rate_2025) : mt.rate_2025;
+    var r26 = hasTeam ? (isSun ? mt.sj_rate_2026 : mt.xw_rate_2026) : mt.rate_2026;
+    var t25 = hasTeam ? (isSun ? mt.sj_tacos_2025 : mt.xw_tacos_2025) : null;
+    var t26 = hasTeam ? (isSun ? mt.sj_tacos_2026 : mt.xw_tacos_2026) : null;
     var elSt = document.getElementById('teamSalesTrendChart');
     if (elSt) new Chart(elSt.getContext('2d'), {
       type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年销售额',data:s25,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年销售额',data:s26,backgroundColor:'#639922',borderRadius:2 }] },
@@ -470,7 +477,7 @@ function renderManagerTab() {
       options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
     });
     var elTt = document.getElementById('teamTacosTrendChart');
-    if (elTt) new Chart(elTt.getContext('2d'), {
+    if (elTt && t25) new Chart(elTt.getContext('2d'), {
       type: 'line', data: { labels: mt.months, datasets: [{ label:'25年TACoS',data:t25,borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年TACoS',data:t26,borderColor:'#639922',borderWidth:2.5,pointRadius:5,tension:0.3 }] },
       options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'TACoS（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
     });

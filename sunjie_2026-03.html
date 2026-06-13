@@ -217,7 +217,7 @@ async function initApp() {
       fetch(base + '/periods_kpi.json').then(function(r){return r.json();}),
       fetch(base + '/monthly_trends.json').then(function(r){return r.json();}),
       fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}),
-      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(){return fetch(base + '/fba_latest.json').then(function(r){return r.json();});})
+      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(){return null;})
     ]);
     DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
 
@@ -618,28 +618,28 @@ function renderProductTab() {
 }
 
 function renderFbaTab() {
-  var f = DATA.fba; if (!f) return;
+  var f = DATA.fba || {};
   var mom = f.mom || {};
-  // 动态月份标签: period="2026-05" → prevMonth="04", currMonth="05"
-  var fbaPeriod = f.period || CFG.focusPeriod;
-  var fbaParts = fbaPeriod.split('-');
-  var currMonth = fbaParts[1];
-  var prevMonth = String(Number(currMonth) - 1).padStart(2,'0');
-  if (prevMonth === '00') { prevMonth = '12'; }
-  var prevLabel = prevMonth + '月货值';
-  var currLabel = currMonth + '月货值';
+  var fbaPeriod = CFG.focusPeriod;
+  var fp = fbaPeriod.split('-');
+  var currMonth = fp[1];
+  var prevMonth = String(Number(currMonth) - 1 || 12).padStart(2,'0');
+  var prevLabel = prevMonth + '月';
+  var currLabel = currMonth + '月';
+  var noData = !DATA.fba;
   var totalLevels = Object.values(f.level_dist).reduce(function(a,b){return a+b;},0);
   var healthyRate = f.level_dist['良好'] ? Math.round(f.level_dist['良好']/totalLevels*100) : 0;
 
   var kpiHtml = '';
-  kpiHtml += '<div class="kpi-card blue"><div class="label">总可售</div><div class="value">'+f.total_qty.toLocaleString()+'件</div><div class="change">环比 '+chgTag(mom['可售_环比'])+'</div></div>';
-  kpiHtml += '<div class="kpi-card green"><div class="label">库存货值</div><div class="value">¥'+Math.round(f.total_value/10000)+'万</div><div class="change">环比 '+chgTag(mom['货值_环比'])+'</div></div>';
-  kpiHtml += '<div class="kpi-card amber"><div class="label">健康率</div><div class="value">'+healthyRate+'%</div><div class="change">'+chgTag(mom['健康率_环比'])+'</div></div>';
-  kpiHtml += '<div class="kpi-card red"><div class="label">异常数</div><div class="value">'+(f.out_of_stock.length+f.overstock.length)+'个</div><div class="change">缺货'+f.out_of_stock.length+' · 积压'+f.overstock.length+'</div></div>';
+  kpiHtml += '<div class="kpi-card blue"><div class="label">总可售</div><div class="value">'+(f.total_qty||0).toLocaleString()+'件</div><div class="change">环比 '+chgTag(mom['可售_环比'])+'</div></div>';
+  kpiHtml += '<div class="kpi-card green"><div class="label">库存货值</div><div class="value">¥'+Math.round((f.total_value||0)/10000)+'万</div><div class="change">环比 '+chgTag(mom['货值_环比'])+'</div></div>';
+  kpiHtml += '<div class="kpi-card amber"><div class="label">健康率</div><div class="value">'+(healthyRate||0)+'%</div><div class="change">'+chgTag(mom['健康率_环比'])+'</div></div>';
+  kpiHtml += '<div class="kpi-card red"><div class="label">异常数</div><div class="value">'+((f.out_of_stock||[]).length+(f.overstock||[]).length)+'个</div><div class="change">缺货'+(f.out_of_stock||[]).length+' · 积压'+(f.overstock||[]).length+'</div></div>';
   document.getElementById('fba-kpi').innerHTML = kpiHtml;
 
   // Age distribution chart
-  var ageLabels = Object.keys(f.age_dist);
+  var ageDist = f.age_dist || {};
+  var ageLabels = noData ? ['0-30天','31-60天','61-90天','91-180天','181-365天','365天+'] : Object.keys(ageDist);
   var ageValues = ageLabels.map(function(k){ return f.age_dist[k]; });
   var prevAge = mom.prev_age_dist || {};
   var prevValues = ageLabels.map(function(k){ return prevAge[k]||0; });

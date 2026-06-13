@@ -115,9 +115,9 @@
       <div class="chart-grid"><div class="chart-card" style="grid-column:span 2;"><div class="chart-title">2026年回款趋势</div><div class="chart-sub">月度实际回款金额（USD）</div><div style="height:260px;"><canvas id="repaymentChart"></canvas></div></div></div>
       <div class="chart-grid"><div class="chart-card"><div class="chart-title">2026年月度库存分布</div><div class="chart-sub">按仓库类型 · 含采购在途</div><div style="height:260px;"><canvas id="invDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">月度总库存趋势</div><div class="chart-sub">总库存金额（含采购在途）</div><div style="height:260px;"><canvas id="invTrendChart"></canvas></div></div></div>
     </div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>站点汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>站点</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th></tr></thead><tbody id="site-tbody"></tbody></table></div></div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>店铺汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>店铺</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="store-tbody"></tbody></table></div></div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>品牌汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>品牌</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="brand-tbody"></tbody></table></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>站点汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>站点</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">父ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="site-tbody"></tbody></table></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>店铺汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>店铺</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">父ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="store-tbody"></tbody></table></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>品牌汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>品牌</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">父ASIN数</th><th style="text-align:right">销售额占比</th><th style="text-align:right">环比</th></tr></thead><tbody id="brand-tbody"></tbody></table></div></div>
   </div>
 
   <!-- Manager Tab -->
@@ -402,17 +402,17 @@ function renderBossTab() {
 
   // Site table
   var siteHtml = '';
-  (p.site_stats||[]).forEach(function(s){ siteHtml += '<tr><td>'+s['站点']+'</td><td style="text-align:right">'+fmt(s['销售额'])+'</td><td style="text-align:right;'+(s['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(s['利润'])+'</td><td style="text-align:right">'+pctV(s['利润率'])+'</td></tr>'; });
+  (p.site_stats||[]).forEach(function(s){ siteHtml += '<tr><td>'+s['站点']+'</td><td style="text-align:right">'+fmt(s['销售额'])+'</td><td style="text-align:right;'+(s['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(s['利润'])+'</td><td style="text-align:right">'+pctV(s['利润率'])+'</td><td style="text-align:right">'+(s['父ASIN数']||0)+'</td><td style="text-align:right">'+pctV(s['销售额占比'])+'</td><td style="text-align:right">'+chgTag(s['销售额环比'])+'</td></tr>'; });
   document.getElementById('site-tbody').innerHTML = siteHtml;
 
   // Store table
   var storeHtml = '';
-  (p.store_stats||[]).forEach(function(s){ storeHtml += '<tr><td>'+s['店铺']+'</td><td style="text-align:right">'+fmt(s['销售额'])+'</td><td style="text-align:right">'+fmt(s['利润'])+'</td><td style="text-align:right">'+pctV(s['利润率'])+'</td><td style="text-align:right">'+(s['ASIN数']||0)+'</td><td style="text-align:right">'+pctV(s['销售额占比'])+'</td><td style="text-align:right">'+chgTag(s['销售额环比'])+'</td></tr>'; });
+  (p.store_stats||[]).forEach(function(s){ storeHtml += '<tr><td>'+s['店铺']+'</td><td style="text-align:right">'+fmt(s['销售额'])+'</td><td style="text-align:right">'+fmt(s['利润'])+'</td><td style="text-align:right">'+pctV(s['利润率'])+'</td><td style="text-align:right">'+(s['父ASIN数']||0)+'</td><td style="text-align:right">'+pctV(s['销售额占比'])+'</td><td style="text-align:right">'+chgTag(s['销售额环比'])+'</td></tr>'; });
   document.getElementById('store-tbody').innerHTML = storeHtml;
 
   // Brand table
   var brandHtml = '';
-  (p.brand_stats||[]).forEach(function(b){ brandHtml += '<tr><td>'+b['品牌']+'</td><td style="text-align:right">'+fmt(b['销售额'])+'</td><td style="text-align:right">'+fmt(b['利润'])+'</td><td style="text-align:right">'+pctV(b['利润率'])+'</td><td style="text-align:right">'+(b['ASIN数']||0)+'</td><td style="text-align:right">'+pctV(b['销售额占比'])+'</td><td style="text-align:right">'+chgTag(b['销售额环比'])+'</td></tr>'; });
+  (p.brand_stats||[]).forEach(function(b){ brandHtml += '<tr><td>'+b['品牌']+'</td><td style="text-align:right">'+fmt(b['销售额'])+'</td><td style="text-align:right">'+fmt(b['利润'])+'</td><td style="text-align:right">'+pctV(b['利润率'])+'</td><td style="text-align:right">'+(b['父ASIN数']||0)+'</td><td style="text-align:right">'+pctV(b['销售额占比'])+'</td><td style="text-align:right">'+chgTag(b['销售额环比'])+'</td></tr>'; });
   document.getElementById('brand-tbody').innerHTML = brandHtml;
 }
 

@@ -32,7 +32,7 @@
   .section { margin-bottom: 28px; }
   .section-title { font-size: 14px; font-weight: 500; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 0.5px solid #e0e0e0; display: flex; align-items: center; gap: 8px; }
   .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
   .kpi-card { background: #fff; border-radius: 10px; padding: 14px; border: 0.5px solid #e0e0e0; }
   .kpi-card .label { font-size: 12px; color: #888; margin-bottom: 4px; }
   .kpi-card .value { font-size: 20px; font-weight: 500; }
@@ -167,7 +167,7 @@
         <div class="chart-card"><div class="chart-sub" id="fba-scatter-sub">气泡大小=ASIN数，悬停查看详情</div><div style="height:260px;"><canvas id="fbaScatterChart"></canvas></div></div>
       </div>
     </div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员库龄分布</div><div class="chart-sub" id="fba-opage-sub" style="margin-bottom:12px;">各运营库存库龄分段对比（灰色=上月，红色=本月）</div><div id="fba-opage-charts" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员库龄分布</div><div class="chart-sub" id="fba-opage-sub" style="margin-bottom:12px;">成本 = 采购成本 + 头程费用（灰色=上月，红色=本月）</div><div id="fba-opage-charts" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>业务员</th><th>所属组</th><th style="text-align:right">可售</th><th style="text-align:right">环比</th><th style="text-align:right">货值</th><th style="text-align:right">货值环比</th><th style="text-align:right">可售天数</th><th style="text-align:right">ASIN数</th><th style="text-align:right">滞销率</th></tr></thead><tbody id="fba-operator-tbody"></tbody></table></div></div>
     <div class="two-col"><div class="info-card red"><h3>缺货预警</h3><div id="fba-oos-list"></div></div><div class="info-card amber"><h3>积压预警</h3><div id="fba-overstock-list"></div></div></div>
   </div>
@@ -643,10 +643,10 @@ function renderFbaTab() {
   var ageValues = ageLabels.map(function(k){ return f.age_dist[k]; });
   var prevAge = mom.prev_age_dist || {};
   var prevValues = ageLabels.map(function(k){ return prevAge[k]||0; });
-  document.getElementById('fba-age-sub').textContent = '库龄分布 (件) - ' + fbaPeriod;
+  document.getElementById('fba-age-sub').textContent = '库龄分布 (成本=采购成本+头程费用) - ' + fbaPeriod;
   new Chart(document.getElementById('fbaAgeChart').getContext('2d'), {
     type: 'bar', data: { labels: ageLabels, datasets: [{ label:'上月',data:prevValues,backgroundColor:'#ccc',borderRadius:4 },{ label:CFG.focusPeriod,data:ageValues,backgroundColor:'#E24B4A',borderRadius:4 }] },
-    options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12}} },scales:{ y:{ title:{display:true,text:'件数'},ticks:{font:{size:10}} } } }
+    options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11},boxWidth:12}} },scales:{ y:{ title:{display:true,text:'成本(¥)'},ticks:{ callback:function(v){return '¥'+Math.round(v/10000)+'万';},font:{size:10}} } } }
   });
 
   // Per-operator age distribution chart (group by team for manager)
@@ -666,13 +666,13 @@ function renderFbaTab() {
     var prevMonth = String(Number(currMonth) - 1 || 12).padStart(2,'0');
     var prevLabel = prevMonth + '月';
     var currLabel = currMonth + '月';
-    // Sort by total inventory (sum of all age buckets) descending
+    // Sort by total cost (sum of all age buckets) descending
     opAge.forEach(function(op){
       var total = 0;
       ageBuckets.forEach(function(b){ total += (op[b]||0); });
-      op._totalQty = total;
+      op._totalCost = total;
     });
-    opAge.sort(function(a,b){ return (b._totalQty||0)-(a._totalQty||0); });
+    opAge.sort(function(a,b){ return (b._totalCost||0)-(a._totalCost||0); });
 
     var teams = {};
     opAge.forEach(function(op){ var t=op['所属组']||'其他'; if(!teams[t]) teams[t]=[]; teams[t].push(op); });
@@ -694,7 +694,7 @@ function renderFbaTab() {
         var prevVals = ageBuckets.map(function(b){ return prev ? (prev[b]||0) : 0; });
         new Chart(document.getElementById(pid).getContext('2d'), {
           type: 'bar', data: { labels: ageBuckets.map(function(s){return s.replace('-','~').replace('天','');}), datasets: [{ label: prevLabel, data: prevVals, backgroundColor: '#ccc', borderRadius: 3 },{ label: currLabel, data: currVals, backgroundColor: '#E24B4A', borderRadius: 3 }] },
-          options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:9},boxWidth:10}} },scales:{ y:{ ticks:{font:{size:9}},title:{display:true,text:'件',font:{size:9}} },x:{ ticks:{font:{size:9}} } } }
+          options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:9},boxWidth:10}} },scales:{ y:{ ticks:{callback:function(v){return '¥'+Math.round(v/10000)+'万';},font:{size:9}},title:{display:true,text:'成本(¥)',font:{size:9}} },x:{ ticks:{font:{size:9}} } } }
         });
       });
     });

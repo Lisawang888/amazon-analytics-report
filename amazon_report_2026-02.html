@@ -453,33 +453,52 @@ function renderManagerTab() {
     var mt = DATA.trends;
     var isSun = CFG.teamFilter === '孙杰组';
     var hasTeam = !!(CFG.teamFilter);
-    var s25 = hasTeam ? (isSun ? mt.sj_sales_2025 : mt.xw_sales_2025) : mt.sales_2025;
-    var s26 = hasTeam ? (isSun ? mt.sj_sales_2026 : mt.xw_sales_2026) : mt.sales_2026;
-    var p25 = hasTeam ? (isSun ? mt.sj_profit_2025 : mt.xw_profit_2025) : mt.profit_2025;
-    var p26 = hasTeam ? (isSun ? mt.sj_profit_2026 : mt.xw_profit_2026) : mt.profit_2026;
-    var r25 = hasTeam ? (isSun ? mt.sj_rate_2025 : mt.xw_rate_2025) : mt.rate_2025;
-    var r26 = hasTeam ? (isSun ? mt.sj_rate_2026 : mt.xw_rate_2026) : mt.rate_2026;
-    var t25 = hasTeam ? (isSun ? mt.sj_tacos_2025 : mt.xw_tacos_2025) : null;
-    var t26 = hasTeam ? (isSun ? mt.sj_tacos_2026 : mt.xw_tacos_2026) : null;
+
+    // Build datasets based on view
+    function buildDatasets(get25, get26) {
+      if (hasTeam) {
+        return [{ label:'25年',data:get25(isSun),backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年',data:get26(isSun),backgroundColor:'#639922',borderRadius:2 }];
+      } else {
+        return [
+          { label:'孙杰25年',data:get25(true),backgroundColor:'#378ADD',borderRadius:2 },
+          { label:'孙杰26年',data:get26(true),backgroundColor:'#185FA5',borderRadius:2 },
+          { label:'小伟25年',data:get25(false),backgroundColor:'#8CB936',borderRadius:2 },
+          { label:'小伟26年',data:get26(false),backgroundColor:'#639922',borderRadius:2 }
+        ];
+      }
+    }
+    function buildLineDatasets(get25, get26) {
+      if (hasTeam) {
+        return [{ label:'25年',data:get25(isSun),borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年',data:get26(isSun),borderColor:'#639922',borderWidth:2.5,pointRadius:5,tension:0.3 }];
+      } else {
+        return [
+          { label:'孙杰25年',data:get25(true),borderColor:'#378ADD',borderWidth:2,pointRadius:3,tension:0.3 },
+          { label:'孙杰26年',data:get26(true),borderColor:'#185FA5',borderWidth:2.5,pointRadius:4,tension:0.3 },
+          { label:'小伟25年',data:get25(false),borderColor:'#8CB936',borderWidth:2,pointRadius:3,tension:0.3,borderDash:[4,2] },
+          { label:'小伟26年',data:get26(false),borderColor:'#639922',borderWidth:2.5,pointRadius:4,tension:0.3,borderDash:[4,2] }
+        ];
+      }
+    }
+
     var elSt = document.getElementById('teamSalesTrendChart');
     if (elSt) new Chart(elSt.getContext('2d'), {
-      type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年销售额',data:s25,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年销售额',data:s26,backgroundColor:'#639922',borderRadius:2 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'销售额（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
+      type: 'bar', data: { labels: mt.months, datasets: buildDatasets(function(sj){return sj?mt.sj_sales_2025:mt.xw_sales_2025;}, function(sj){return sj?mt.sj_sales_2026:mt.xw_sales_2026;}) },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:10}}} },scales:{ y:{ title:{display:true,text:'销售额(万美元)',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
     });
     var elPt = document.getElementById('teamProfitTrendChart');
     if (elPt) new Chart(elPt.getContext('2d'), {
-      type: 'bar', data: { labels: mt.months, datasets: [{ label:'25年月利润',data:p25,backgroundColor:'#A8C4E2',borderRadius:2 },{ label:'26年月利润',data:p26,backgroundColor:'#639922',borderRadius:2 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'利润（万美元）',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
+      type: 'bar', data: { labels: mt.months, datasets: buildDatasets(function(sj){return sj?mt.sj_profit_2025:mt.xw_profit_2025;}, function(sj){return sj?mt.sj_profit_2026:mt.xw_profit_2026;}) },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:10}}} },scales:{ y:{ title:{display:true,text:'利润(万美元)',font:{size:12}},ticks:{callback:function(v){return (v/10000).toFixed(0)+'万';}} } } }
     });
     var elRt = document.getElementById('teamRateTrendChart');
     if (elRt) new Chart(elRt.getContext('2d'), {
-      type: 'line', data: { labels: mt.months, datasets: [{ label:'25年毛利率',data:r25,borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年毛利率',data:r26,borderColor:'#639922',borderWidth:2.5,pointRadius:5,tension:0.3 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'毛利率（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
+      type: 'line', data: { labels: mt.months, datasets: buildLineDatasets(function(sj){return sj?mt.sj_rate_2025:mt.xw_rate_2025;}, function(sj){return sj?mt.sj_rate_2026:mt.xw_rate_2026;}) },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:10}}} },scales:{ y:{ title:{display:true,text:'毛利率(%)',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
     });
     var elTt = document.getElementById('teamTacosTrendChart');
-    if (elTt && t25) new Chart(elTt.getContext('2d'), {
-      type: 'line', data: { labels: mt.months, datasets: [{ label:'25年TACoS',data:t25,borderColor:'#CCC',borderWidth:2,pointRadius:4,tension:0.3 },{ label:'26年TACoS',data:t26,borderColor:'#639922',borderWidth:2.5,pointRadius:5,tension:0.3 }] },
-      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:11}}} },scales:{ y:{ title:{display:true,text:'TACoS（%）',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
+    if (elTt) new Chart(elTt.getContext('2d'), {
+      type: 'line', data: { labels: mt.months, datasets: buildLineDatasets(function(sj){return sj?mt.sj_tacos_2025:mt.xw_tacos_2025;}, function(sj){return sj?mt.sj_tacos_2026:mt.xw_tacos_2026;}) },
+      options: { responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:true,labels:{font:{size:10}}} },scales:{ y:{ title:{display:true,text:'TACoS(%)',font:{size:12}},ticks:{callback:function(v){return v+'%';}} } } }
     });
   }
 

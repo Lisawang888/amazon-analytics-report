@@ -488,8 +488,12 @@ function renderEfficiency(teams) {
 function renderManagerTab() {
   var p = DATA.period; var ops = p.operator_stats || [];
   renderInsights('mgr-insights', 'mgr-insights-section');
-  renderEfficiency(p.team_stats || []);
-  var teamStats = p.team_stats || [];
+  var ts = p.team_stats || [];
+  console.log('[效率] team_stats:', ts.length, 'teams');
+  console.log('[效率] 数据生成时间:', p._generated_at || '(未知)');
+  ts.forEach(function(t,i){ console.log('[效率] team['+i+'] '+t['小组']+': 人均父ASIN='+t['人均父ASIN']+', 成员数='+t['成员数']+', 管理ASIN数='+t['管理ASIN数']); });
+  renderEfficiency(ts);
+  var teamStats = ts;
   var asins = p.asin_ranking || [];
 
   // === 团队绩效对比图表 ===

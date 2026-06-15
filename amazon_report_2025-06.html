@@ -127,7 +127,7 @@
     <div class="section">
       <div class="section-title"><span class="dot" style="background:#378ADD"></span>营收与利润分析</div>
       <div class="chart-grid"><div class="chart-card"><div class="chart-title">营收与利润同比</div><div class="chart-sub" id="yoy-subtitle"></div><div style="height:230px;"><canvas id="yoyChart"></canvas></div></div><div class="chart-card"><div class="chart-title">店铺营收占比</div><div class="chart-sub" id="store-subtitle"></div><div style="height:230px;"><canvas id="storeChart"></canvas></div></div></div>
-      <div class="chart-grid"><div class="chart-card"><div class="chart-title">ASIN 利润率分布</div><div class="chart-sub" id="profitdist-subtitle"></div><div style="height:230px;"><canvas id="profitDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">成本结构分析</div><div class="chart-sub">各项成本占总销售额比例</div><div style="height:230px;"><canvas id="costChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">父ASIN 利润率分布</div><div class="chart-sub" id="profitdist-subtitle"></div><div style="height:230px;"><canvas id="profitDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">成本结构分析</div><div class="chart-sub">各项成本占总销售额比例</div><div style="height:230px;"><canvas id="costChart"></canvas></div></div></div>
     </div>
     <div class="section" id="trend-section">
       <div class="section-title"><span class="dot" style="background:#378ADD"></span>年度经营趋势</div>
@@ -143,7 +143,7 @@
 
   <!-- Manager Tab -->
   <div id="tab-manager" class="tab-panel">
-    <div class="report-header green"><h2>运营管理报告 · 主管版</h2><p>团队绩效对比 · ASIN表现追踪</p><div class="meta"><div class="meta-item"><strong>2025-06</strong>报告周期</div></div></div>
+    <div class="report-header green"><h2>运营管理报告 · 主管版</h2><p>团队绩效对比 · 父ASIN表现追踪</p><div class="meta"><div class="meta-item"><strong>2025-06</strong>报告周期</div></div></div>
     <div class="section insight-section" id="mgr-insights-section" style="display:none;"><div class="section-title"><span class="dot" style="background:#639922"></span>本期洞察</div><div id="mgr-insights"></div></div>
     <div class="section">
       <div class="section-title"><span class="dot" style="background:#639922"></span>团队绩效对比</div>
@@ -192,11 +192,11 @@
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存分布与健康象限</div>
       <div class="chart-grid">
         <div class="chart-card"><div class="chart-sub" id="fba-age-sub"></div><div style="height:260px;"><canvas id="fbaAgeChart"></canvas></div></div>
-        <div class="chart-card"><div class="chart-sub" id="fba-scatter-sub">气泡大小=ASIN数，悬停查看详情</div><div style="height:260px;"><canvas id="fbaScatterChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-sub" id="fba-scatter-sub">气泡大小=父ASIN数，悬停查看详情</div><div style="height:260px;"><canvas id="fbaScatterChart"></canvas></div></div>
       </div>
     </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员库龄分布</div><div class="chart-sub" id="fba-opage-sub" style="margin-bottom:12px;">成本 = 采购成本 + 头程费用（灰色=上月，红色=本月）</div><div id="fba-opage-charts" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div></div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>业务员</th><th>所属组</th><th style="text-align:right">可售</th><th style="text-align:right">环比</th><th style="text-align:right">货值</th><th style="text-align:right">货值环比</th><th style="text-align:right">可售天数</th><th style="text-align:right">ASIN数</th><th style="text-align:right">滞销率</th></tr></thead><tbody id="fba-operator-tbody"></tbody></table></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>业务员</th><th>所属组</th><th style="text-align:right">可售</th><th style="text-align:right">环比</th><th style="text-align:right">货值</th><th style="text-align:right">货值环比</th><th style="text-align:right">可售天数</th><th style="text-align:right">父ASIN数</th><th style="text-align:right">滞销率</th></tr></thead><tbody id="fba-operator-tbody"></tbody></table></div></div>
     <div class="two-col"><div class="info-card red"><h3>缺货预警</h3><div id="fba-oos-list"></div></div><div class="info-card amber"><h3>积压预警</h3><div id="fba-overstock-list"></div></div></div>
   </div>
 </div>
@@ -365,7 +365,7 @@ function renderBossTab() {
   var asins = p.asin_ranking || [];
   var dist = { loss:0, low:0, mid:0, high:0 };
   asins.forEach(function(a){ var r=a['利润率']||0; if(r<0) dist.loss++; else if(r<5) dist.low++; else if(r<15) dist.mid++; else dist.high++; });
-  document.getElementById('profitdist-subtitle').textContent = '活跃ASIN: ' + k['活跃ASIN数'] + '个 (亏损'+dist.loss+'/低利润'+dist.low+'/中等'+dist.mid+'/高利润'+dist.high+')';
+  document.getElementById('profitdist-subtitle').textContent = '活跃父ASIN: ' + k['活跃ASIN数'] + '个 (亏损'+dist.loss+'/低利润'+dist.low+'/中等'+dist.mid+'/高利润'+dist.high+')';
   new Chart(document.getElementById('profitDistChart').getContext('2d'), {
     type: 'doughnut', data: { labels: ['亏损(<0%)','低利润(0-5%)','中等(5-15%)','高利润(>15%)'], datasets: [{ data: [dist.loss,dist.low,dist.mid,dist.high], backgroundColor: ['#E24B4A','#BA7517','#378ADD','#639922'] }] },
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'right',labels:{font:{size:10}}} } }
@@ -681,7 +681,7 @@ function renderOperatorTab() {
       cards += '<div class="kpi-card green"><div class="label">退款率</div><div class="value">'+pctV(o['退款率'])+'</div></div>';
       cards += '<div class="kpi-card green"><div class="label">ACoS</div><div class="value">'+pctV(o['ACoS'])+'</div></div>';
       cards += '<div class="kpi-card green"><div class="label">TACoS</div><div class="value">'+pctV(o['广告花费占比'])+'</div></div>';
-      cards += '<div class="kpi-card green"><div class="label">管理ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div><div class="change">销售额占比 '+pctV(o['销售额占比'])+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">管理父ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div><div class="change">销售额占比 '+pctV(o['销售额占比'])+'</div></div>';
       cards += '</div>';
       cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody>';
       oAsins.forEach(function(a){

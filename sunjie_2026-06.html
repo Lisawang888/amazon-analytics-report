@@ -117,6 +117,8 @@
   <button class="tab-btn inventory" onclick="switchTab('inventory')">FBA库存</button>
 </div>
 <div style="background:#fff;padding:0 40px 8px;display:flex;gap:6px;overflow-x:auto;" id="month-nav"></div>
+<div id="data-loading" style="background:#fff;padding:20px 40px;text-align:center;color:#888;font-size:13px;">数据加载中...</div>
+<div id="data-error" style="display:none;background:#FCEBEB;padding:16px 40px;color:#A32D2D;font-size:13px;border-left:3px solid #E24B4A;"></div>
 
 <div class="content">
   <!-- BOSS Tab -->
@@ -241,11 +243,15 @@ var DATA = {};
 async function initApp() {
   try {
     var base = 'report_data';
+    var loadErr = document.getElementById('data-loading');
+    var errDiv = document.getElementById('data-error');
+    if (loadErr) loadErr.style.display = 'none';
+
     var [kpiRes, trendsRes, periodRes, fbaRes] = await Promise.all([
-      fetch(base + '/periods_kpi.json').then(function(r){return r.json();}),
-      fetch(base + '/monthly_trends.json').then(function(r){return r.json();}),
-      fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}),
-      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(){return null;})
+      fetch(base + '/periods_kpi.json').then(function(r){ return r.json(); }).catch(function(e){ throw new Error('periods_kpi.json load failed: ' + e.message); }),
+      fetch(base + '/monthly_trends.json').then(function(r){ return r.json(); }).catch(function(e){ throw new Error('monthly_trends.json load failed: ' + e.message); }),
+      fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){ return r.json(); }).catch(function(e){ throw new Error('periods/' + CFG.focusPeriod + '.json load failed: ' + e.message); }),
+      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){ return r.json(); }).catch(function(){ return null; })
     ]);
     DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
 
@@ -256,7 +262,14 @@ async function initApp() {
     renderOperatorTab();
     renderProductTab();
     renderFbaTab();
-  } catch(e) { console.error('Data load error:', e); }
+  } catch(e) {
+    console.error('Data load error:', e);
+    var errDiv = document.getElementById('data-error');
+    if (errDiv) {
+      errDiv.style.display = 'block';
+      errDiv.innerHTML = '<strong>⚠️ 数据加载失败</strong><br>' + e.message + '<br><br>请检查网络连接或按 Ctrl+Shift+R 强制刷新。';
+    }
+  }
 }
 
 function applyTeamFilter() {

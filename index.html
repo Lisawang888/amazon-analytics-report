@@ -358,10 +358,10 @@ function renderBossTab() {
   kpiHtml += '<div class="kpi-card blue"><div class="label">总营收</div><div class="value">' + fmt(k['总营收']) + '</div><div class="change ' + chgClass(yoy['总营收']) + '">' + pct(yoy['总营收']) + ' 同比</div><div class="change ' + chgClass(mom['总营收']) + '" style="font-size:10px;color:#888;">' + pct(mom['总营收']) + ' 环比</div></div>';
   kpiHtml += '<div class="kpi-card green"><div class="label">利润</div><div class="value">' + fmt(k['总利润']) + '</div><div class="change ' + chgClass(yoy['总利润']) + '">' + pct(yoy['总利润']) + ' 同比</div><div class="change ' + chgClass(mom['总利润']) + '" style="font-size:10px;color:#888;">' + pct(mom['总利润']) + ' 环比</div></div>';
   kpiHtml += '<div class="kpi-card green"><div class="label">利润率</div><div class="value">' + k['净利润率'] + '%</div><div class="change ' + chgClass(yoy['净利润率']) + '">' + pct(yoy['净利润率']) + ' 同比</div></div>';
-  kpiHtml += '<div class="kpi-card amber"><div class="label">订单量</div><div class="value">' + (k['总订单量']||0).toLocaleString() + '</div><div class="change ' + chgClass(yoy['总订单量']) + '">' + pct(yoy['总订单量']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card amber"><div class="label">订单量</div><div class="value">' + (k['总订单量']||0).toLocaleString() + '</div><div class="change ' + chgClass(yoy['总订单量']) + '">' + pct(yoy['总订单量']) + ' 同比</div><div class="change ' + chgClass(mom['总订单量']) + '" style="font-size:10px;color:#888;">' + pct(mom['总订单量']) + ' 环比</div></div>';
   kpiHtml += '<div class="kpi-card amber"><div class="label">TACoS</div><div class="value">' + (k['广告花费占比']||0).toFixed(1) + '%</div><div class="change ' + ((k['广告花费占比']||0)<15?'up':'warn') + '">广告占总销售比</div></div>';
   kpiHtml += '<div class="kpi-card red"><div class="label">ACoS</div><div class="value">' + k['整体ACoS'] + '%</div><div class="change ' + (k['整体ACoS']<25?'up':'warn') + '">' + (k['整体ACoS']<25?'健康':'偏高') + '</div></div>';
-  kpiHtml += '<div class="kpi-card red"><div class="label">退款率</div><div class="value">' + k['退款率'] + '%</div><div class="change ' + (yoy['退款率']>0?'down':'up') + '">' + pct(yoy['退款率']) + ' 同比</div></div>';
+  kpiHtml += '<div class="kpi-card red"><div class="label">退款率</div><div class="value">' + k['退款率'] + '%</div><div class="change ' + (yoy['退款率']>0?'down':'up') + '">' + pct(yoy['退款率']) + ' 同比</div><div class="change ' + (mom['退款率']>0?'down':'up') + '" style="font-size:10px;color:#888;">' + pct(mom['退款率']) + ' 环比</div></div>';
   document.getElementById('boss-kpi').innerHTML = kpiHtml;
 
   // YoY chart

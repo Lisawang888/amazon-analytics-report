@@ -1,5 +1,5 @@
 {
-  "_generated_at": "2026-07-08 15:35:43",
+  "_generated_at": "2026-07-08 15:52:25",
   "focus_period": "2025-01",
   "asin_ranking": [
     {
@@ -3106,5 +3106,6 @@
   },
   "mom": {},
   "yoy_periods": "2026-01 vs 2025-01",
-  "mom_periods": ""
+  "mom_periods": "",
+  "profit_decomposition": {}
 }

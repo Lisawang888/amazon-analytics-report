@@ -710,17 +710,11 @@ function renderOperatorTab() {
         cards += '</div>';
       }
       cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th><th style="text-align:right">利润归因</th></tr></thead><tbody>';
-      var attrib = '';
       oAsins.forEach(function(a){
-        attrib = '';
-        if (pd && pd.items) {
-          var match = pd.items.find(function(it){ return it['父ASIN'] === a['父ASIN']; });
-          if (match) {
-            var c = match['贡献度'];
-            attrib = '<span style="color:'+(c < 0 ? '#A32D2D' : '#3B6D11')+';font-weight:500;">'+(c >= 0 ? '+' : '')+c.toFixed(1)+'%</span>';
-          }
-        }
-        cards += '<tr><td>'+a['父ASIN']+'</td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right">'+pctV(a['广告花费占比'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td><td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td><td style="text-align:right">'+attrib+'</td></tr>';
+        var _pd = (pd && pd.items) ? pd.items.find(function(it){ return it['父ASIN'] === a['父ASIN']; }) : null;
+        var _c = (_pd && typeof _pd['贡献度'] === 'number') ? _pd['贡献度'] : null;
+        var _a = _c != null ? '<span style="color:'+(_c < 0 ? '#A32D2D' : '#3B6D11')+';font-weight:500;">'+( _c >= 0 ? '+' : '')+_c.toFixed(1)+'%</span>' : '';
+        cards += '<tr><td>'+a['父ASIN']+'</td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right">'+pctV(a['广告花费占比'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td><td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td><td style="text-align:right">'+_a+'</td></tr>';
       });
       cards += '</tbody></table></div></div>';
     });

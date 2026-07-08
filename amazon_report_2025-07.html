@@ -127,7 +127,7 @@
     <div class="section">
       <div class="section-title"><span class="dot" style="background:#378ADD"></span>营收与利润分析</div>
       <div class="chart-grid"><div class="chart-card"><div class="chart-title">营收与利润同比</div><div class="chart-sub" id="yoy-subtitle"></div><div style="height:230px;"><canvas id="yoyChart"></canvas></div></div><div class="chart-card"><div class="chart-title">店铺营收占比</div><div class="chart-sub" id="store-subtitle"></div><div style="height:230px;"><canvas id="storeChart"></canvas></div></div></div>
-      <div class="chart-grid"><div class="chart-card"><div class="chart-title">父ASIN 利润率分布</div><div class="chart-sub" id="profitdist-subtitle"></div><div style="height:230px;"><canvas id="profitDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">成本结构分析</div><div class="chart-sub">各项成本占总销售额比例</div><div style="height:230px;"><canvas id="costChart"></canvas></div></div></div>
+      <div class="chart-grid"><div class="chart-card"><div class="chart-title">父ASIN 利润率分布</div><div class="chart-sub" id="profitdist-subtitle"></div><div style="height:230px;"><canvas id="profitDistChart"></canvas></div></div><div class="chart-card"><div class="chart-title">成本结构分析</div><div class="chart-sub" id="cost-subtitle">各项成本占总销售额比例</div><div style="height:230px;"><canvas id="costChart"></canvas></div></div></div>
     </div>
     <div class="section" id="trend-section">
       <div class="section-title"><span class="dot" style="background:#378ADD"></span>年度经营趋势</div>
@@ -164,7 +164,6 @@
     <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>小组绩效总览</div><div class="data-table-wrapper"><table class="data-table" id="team-summary-table"></table></div></div>
     <div class="section" id="sunjie-detail-section"><div class="section-title"><span class="dot" style="background:#378ADD"></span>孙杰组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="sunjie-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="sunjie-rows-tbody"></tbody></table></div></div>
     <div class="section" id="xiaowei-detail-section"><div class="section-title"><span class="dot" style="background:#639922"></span>小伟组 · 成员绩效明细</div><div class="data-table-wrapper"><table class="data-table" id="xiaowei-rows-table"><thead><tr><th>业务员</th><th style="text-align:right">销售额</th><th style="text-align:right">环比</th><th style="text-align:right">利润</th><th style="text-align:right">环比</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">订单量</th><th style="text-align:right">退款率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">父ASIN</th><th>库存预警</th></tr></thead><tbody id="xiaowei-rows-tbody"></tbody></table></div></div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#639922"></span>父ASIN完整排行</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">销量</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">利润占比</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">退款率</th><th style="text-align:right" id="stock-alert-th">库存预警</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody id="asin-full-tbody"></tbody></table></div></div>
   </div>
 
   <!-- Operator Tab -->
@@ -342,7 +341,11 @@ function renderBossTab() {
   var sameMonth = periodsKeys.filter(function(pk){ return pk.split('-')[1] === CFG.focusMonthNum; });
   var prevKey = sameMonth.length >= 2 ? sameMonth[sameMonth.length-2] : CFG.focusPeriod;
   var prevKpi = DATA.kpi[prevKey] || k;
-  document.getElementById('yoy-subtitle').textContent = CFG.focusPeriod + ' vs ' + prevKey + ' (单位: 万美元)';
+  var prevMonthKey = periodsKeys[periodsKeys.indexOf(CFG.focusPeriod) - 1] || '';
+  var prevMonthKpi = DATA.kpi[prevMonthKey] || {};
+  var revMom = prevMonthKpi['总营收'] ? ((k['总营收'] - prevMonthKpi['总营收']) / prevMonthKpi['总营收'] * 100).toFixed(1) : 0;
+  var profitMom = prevMonthKpi['总利润'] ? ((k['总利润'] - prevMonthKpi['总利润']) / prevMonthKpi['总利润'] * 100).toFixed(1) : 0;
+  document.getElementById('yoy-subtitle').textContent = CFG.focusPeriod + ' vs ' + prevKey + ' (单位: 万美元) | 环比: 营收' + (revMom>=0?'+':'') + revMom + '% 利润' + (profitMom>=0?'+':'') + profitMom + '%';
   new Chart(document.getElementById('yoyChart').getContext('2d'), {
     type: 'bar', data: { labels: [prevKey, CFG.focusPeriod], datasets: [{ label: '营收(万$)', data: [prevKpi['总营收']/10000, k['总营收']/10000], backgroundColor: ['#A8C4E2','#378ADD'] }, { label: '利润(万$)', data: [prevKpi['总利润']/10000, k['总利润']/10000], backgroundColor: ['#C4DCA8','#639922'] }] },
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,labels:{font:{size:11}}} } }
@@ -368,7 +371,7 @@ function renderBossTab() {
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'right',labels:{font:{size:10}}} } }
   });
 
-  // Cost structure
+  // Cost structure with MoM comparison
   var totalSales = k['总营收'] || 1;
   var logistics = asins.reduce(function(s,a){ return s+Math.abs(a['物流配送费']||0); },0);
   var commission = asins.reduce(function(s,a){ return s+Math.abs(a['销售佣金']||0); },0);
@@ -380,9 +383,31 @@ function renderBossTab() {
     '广告费': Math.round((k['广告花费占比']||0)*10)/10,
     '仓储费': Math.round(storage/totalSales*1000)/10
   };
+  // MoM data from KPI
+  var prevMonthKey = periodsKeys[periodsKeys.indexOf(CFG.focusPeriod) - 1] || '';
+  var prevMonthKpi = DATA.kpi[prevMonthKey] || {};
+  var prevTotalSales = prevMonthKpi['总营收'] || 1;
+  var prevCostData = {
+    '采购成本': Math.round(Math.abs(prevMonthKpi['采购成本']||0)/prevTotalSales*1000)/10,
+    '物流配送费': Math.round(Math.abs(prevMonthKpi['物流配送费']||0)/prevTotalSales*1000)/10,
+    '销售佣金': Math.round(Math.abs(prevMonthKpi['销售佣金']||0)/prevTotalSales*1000)/10,
+    '广告费': Math.round(Math.abs(prevMonthKpi['广告花费']||0)/prevTotalSales*1000)/10,
+    '仓储费': Math.round(Math.abs(prevMonthKpi['仓储费']||0)/prevTotalSales*1000)/10
+  };
+  var costMomLabels = Object.keys(costData);
+  var costMomNote = costMomLabels.map(function(lbl){
+    var curr = costData[lbl] || 0;
+    var prev = prevCostData[lbl] || 0;
+    var diff = (curr - prev).toFixed(1);
+    return lbl + ' ' + (diff>=0?'+':'') + diff + '%';
+  }).join(' · ');
+  document.getElementById('cost-subtitle').textContent = '各项成本占总销售额比例 | 环比: ' + costMomNote;
   new Chart(document.getElementById('costChart').getContext('2d'), {
-    type: 'bar', data: { labels: Object.keys(costData), datasets: [{ label: '占比%', data: Object.values(costData), backgroundColor: ['#378ADD','#639922','#BA7517','#E24B4A','#7F277D'] }] },
-    options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ x:{ ticks:{ callback:function(v){ return v+'%'; }} } } }
+    type: 'bar', data: { labels: costMomLabels, datasets: [
+      { label: '上月', data: costMomLabels.map(function(lbl){ return prevCostData[lbl] || 0; }), backgroundColor: '#ccc', borderRadius: 3 },
+      { label: CFG.focusPeriod, data: Object.values(costData), backgroundColor: ['#378ADD','#639922','#BA7517','#E24B4A','#7F277D'], borderRadius: 3 }
+    ] },
+    options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,labels:{font:{size:11}}} }, scales:{ x:{ ticks:{ callback:function(v){ return v+'%'; }} } } }
   });
 
   // Trend charts
@@ -610,21 +635,6 @@ function renderManagerTab() {
     if (CFG.teamFilter === '孙杰组') document.getElementById('xiaowei-detail-section').style.display = 'none';
     else document.getElementById('sunjie-detail-section').style.display = 'none';
   }
-
-  // === 父ASIN完整排行 ===
-  var isTeam = !!CFG.teamFilter;
-  if (isTeam) {
-    var stockTh = document.getElementById('stock-alert-th');
-    if (stockTh) stockTh.style.display = 'none';
-  }
-  var ah = '';
-  asins.forEach(function(a){
-    var pc=a['利润率']>10?'up':(a['利润率']<5?'down':'warn');
-    var stockDays=a['库存天数']||0;
-    var stockAlert=(stockDays>0&&stockDays<15)?'<span class="tag red">缺货</span>':(stockDays>180?'<span class="tag amber">积压</span>':'<span class="tag green">正常</span>');
-    ah += '<tr><td>'+a['父ASIN']+' <span style="font-size:10px;color:#888;">'+a['业务员']+'</span></td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+(a['销量']||0)+'</td><td style="text-align:right;'+(a['利润率']<5?'color:#A32D2D;':'')+'">'+fmt(a['利润'])+'</td><td style="text-align:right" class="'+pc+'">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['利润占比'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right">'+pctV(a['广告花费占比'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td>'+(isTeam?'':'<td>'+stockAlert+'</td>')+'<td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td></tr>';
-  });
-  document.getElementById('asin-full-tbody').innerHTML = ah;
 }
 
 function renderOperatorTab() {

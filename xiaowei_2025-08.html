@@ -173,8 +173,9 @@
     <div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>运营环比趋势</div>
       <div class="chart-grid"><div class="chart-card"><div class="chart-title">销售额环比（%）</div><div class="chart-sub" id="op-mom-label"></div><div style="height:280px;"><canvas id="opSalesMomChart"></canvas></div></div><div class="chart-card"><div class="chart-title">利润环比（%）</div><div class="chart-sub" id="op-profit-mom-label"></div><div style="height:280px;"><canvas id="opProfitMomChart"></canvas></div></div></div>
     </div>
-    <div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>父ASIN 利润贡献度</div>
-      <div style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #ddd;"><div class="chart-sub">正利润在上、负利润在下 · TOP30 按利润排序</div><div style="height:340px;"><canvas id="profitWaterfallChart"></canvas></div></div>
+    <div class="section"><div class="section-title"><span class="dot" style="background:#BA7517"></span>利润变动归因</div>
+      <div style="background:#fff;border-radius:10px;padding:16px;border:0.5px solid #ddd;"><div class="chart-sub">按贡献度排序 · 红=拉低利润，绿=拉升利润</div><div style="height:380px;"><canvas id="profitDecompChart"></canvas></div></div>
+      <div class="data-table-wrapper" style="margin-top:12px;"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">业务员</th><th style="text-align:right">上月利润</th><th style="text-align:right">本月利润</th><th style="text-align:right">变化</th><th style="text-align:right">贡献度</th></tr></thead><tbody id="profit-decomp-tbody"></tbody></table></div>
     </div>
     <div id="operator-cards"></div>
   </div>
@@ -653,17 +654,53 @@ function renderOperatorTab() {
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: function(v){return v+'%';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:11} }, grid: { display: false } } } }
   });
 
-  // === 利润贡献瀑布图 (TOP30) ===
-  var elWf = document.getElementById('profitWaterfallChart');
-  if (elWf) {
-    var sorted = asins.slice().sort(function(a,b){ return (b['利润']||0)-(a['利润']||0); }).slice(0, 30);
-    var wfLabels = sorted.map(function(a){ return (a['父ASIN']||'').slice(0,10)+' ('+(a['业务员']||'?')+')'; });
-    var wfProfits = sorted.map(function(a){ return Math.round(a['利润']||0); });
-    var wfColors = wfProfits.map(function(v){ return v>=0 ? (v>5000?'#639922':'#8CB936') : '#E24B4A'; });
-    new Chart(elWf.getContext('2d'), {
-      type: 'bar', data: { labels: wfLabels, datasets: [{ label: '利润($)', data: wfProfits, backgroundColor: wfColors, borderRadius: 2 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { title: {display:true,text:'利润（美元）',font:{size:12}}, ticks: { callback: function(v){return '$'+Math.round(v/1000)+'k';}, font:{size:11} }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { ticks: { font:{size:9} }, grid: { display: false } } } }
+  // === 利润变动归因图 + 表格 ===
+  var profitDecomp = DATA.period.profit_decomposition || {};
+  var decompItems = [];
+  Object.keys(profitDecomp).forEach(function(opName) {
+    var d = profitDecomp[opName];
+    (d.items || []).forEach(function(it) {
+      decompItems.push({
+        业务员: opName,
+        父ASIN: it['父ASIN'],
+        上月利润: it['上月利润'],
+        本月利润: it['本月利润'],
+        变化: it['变化'],
+        贡献度: it['贡献度']
+      });
     });
+  });
+  decompItems.sort(function(a,b){ return (a['贡献度']||0) - (b['贡献度']||0); });
+
+  var elDc = document.getElementById('profitDecompChart');
+  if (elDc && decompItems.length) {
+    // Group: negative and positive contributions
+    var negItems = decompItems.filter(function(it){ return it['贡献度'] < 0; });
+    var posItems = decompItems.filter(function(it){ return it['贡献度'] > 0; });
+    var negLabels = negItems.map(function(it){ return (it['父ASIN']||'').replace(/^B0/,'') + ' (' + it['业务员'] + ')'; });
+    var negVals = negItems.map(function(it){ return it['贡献度']; });
+    var posLabels = posItems.map(function(it){ return (it['父ASIN']||'').replace(/^B0/,'') + ' (' + it['业务员'] + ')'; });
+    var posVals = posItems.map(function(it){ return it['贡献度']; });
+    var allLabels = negLabels.concat(posLabels);
+    var allVals = negVals.concat(posVals);
+    var allColors = negVals.map(function(){ return '#E24B4A'; }).concat(posVals.map(function(){ return '#639922'; }));
+    new Chart(elDc.getContext('2d'), {
+      type: 'bar', data: { labels: allLabels, datasets: [{ label: '贡献度(%)', data: allVals, backgroundColor: allColors, borderRadius: 3 }] },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: { x: { ticks: { callback: function(v){return v+'%';}, font:{size:10} }, title: { display: true, text: '贡献度% (ASIN利润变化 / |上月该运营总利润|)', font:{size:10} } }, y: { ticks: { font:{size:10} } } } }
+    });
+  }
+
+  // Profit decomposition table
+  var dcTbody = document.getElementById('profit-decomp-tbody');
+  if (dcTbody && decompItems.length) {
+    var dcHtml = '';
+    decompItems.forEach(function(it) {
+      var chgCls = it['变化'] >= 0 ? 'up' : 'down';
+      var ctbCls = it['贡献度'] >= 0 ? 'up' : 'down';
+      dcHtml += '<tr><td>'+it['父ASIN']+'</td><td style="text-align:right">'+it['业务员']+'</td><td style="text-align:right">$'+Math.round(it['上月利润']).toLocaleString()+'</td><td style="text-align:right">$'+Math.round(it['本月利润']).toLocaleString()+'</td><td style="text-align:right" class="change '+chgCls+'">$'+Math.round(it['变化']).toLocaleString()+'</td><td style="text-align:right;font-weight:500;'+(it['贡献度']<-2?'color:#A32D2D;':'color:#3B6D11;')+'">'+(it['贡献度']>=0?'+':'')+it['贡献度'].toFixed(1)+'%</td></tr>';
+    });
+    dcTbody.innerHTML = dcHtml;
   }
 
   // === 按业务员ASIN明细 (团队分组) ===
@@ -687,9 +724,14 @@ function renderOperatorTab() {
       cards += '<div class="kpi-card green"><div class="label">TACoS</div><div class="value">'+pctV(o['广告花费占比'])+'</div></div>';
       cards += '<div class="kpi-card green"><div class="label">管理父ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div><div class="change">销售额占比 '+pctV(o['销售额占比'])+'</div></div>';
       cards += '</div>';
-      cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th></tr></thead><tbody>';
+      cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th><th style="text-align:right">利润归因</th></tr></thead><tbody>';
       oAsins.forEach(function(a){
-        cards += '<tr><td>'+a['父ASIN']+'</td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right">'+pctV(a['广告花费占比'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td><td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td></tr>';
+        var pa = profitDecomp[opName] || {};
+        var paItem = ((pa.items || []) || []).filter(function(it){ return it['父ASIN']===a['父ASIN']; });
+        var paVal = paItem.length ? paItem[0]['贡献度'] : null;
+        var paStr = paVal!=null ? ((paVal>=0?'+':'')+paVal.toFixed(1)+'%') : '-';
+        var paCls = paVal!=null && paVal<0 ? 'color:#A32D2D;font-weight:500;' : 'color:#3B6D11;';
+        cards += '<tr><td>'+a['父ASIN']+'</td><td style="text-align:right">'+fmt(a['销售额'])+'</td><td style="text-align:right">'+fmt(a['利润'])+'</td><td style="text-align:right">'+pctV(a['利润率'])+'</td><td style="text-align:right">'+pctV(a['ACoS'])+'</td><td style="text-align:right">'+pctV(a['广告花费占比'])+'</td><td style="text-align:right;'+(a['退款率']>9?'color:#A32D2D;':'')+'">'+pctV(a['退款率'])+'</td><td style="text-align:right;'+(a['采购成本占比']>20?'color:#A32D2D;':'')+'">'+pctV(a['采购成本占比'])+'</td><td style="text-align:right;'+(a['佣金占比']>15?'color:#A32D2D;':'')+'">'+pctV(a['佣金占比'])+'</td><td style="text-align:right;'+(a['头程费用占比']>7?'color:#A32D2D;':'')+'">'+pctV(a['头程费用占比'])+'</td><td style="text-align:right;'+(a['仓储费占比']>2?'color:#A32D2D;':'')+'">'+pctV(a['仓储费占比'])+'</td><td style="text-align:right;'+paCls+'">'+paStr+'</td></tr>';
       });
       cards += '</tbody></table></div></div>';
     });

@@ -246,6 +246,7 @@ var DATA = {};
 async function initApp() {
   try {
     var base = 'report_data';
+    var _cb = '?_t=' + Date.now();
     var [kpiRes, trendsRes, periodRes, fbaRes] = await Promise.all([
       fetch(base + '/periods_kpi.json' + _cb).then(function(r){return r.json();}),
       fetch(base + '/monthly_trends.json' + _cb).then(function(r){return r.json();}),

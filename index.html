@@ -787,8 +787,9 @@ function renderOperatorTab() {
         cards += '</div>';
       }
       cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th><th style="text-align:right">利润归因</th></tr></thead><tbody>';
+      var attrib = '';
       oAsins.forEach(function(a){
-        var attrib = '';
+        attrib = '';
         if (pd && pd.items) {
           var match = pd.items.find(function(it){ return it['父ASIN'] === a['父ASIN']; });
           if (match) {

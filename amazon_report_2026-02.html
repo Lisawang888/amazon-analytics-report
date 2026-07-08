@@ -332,7 +332,7 @@ function renderBossTab() {
   var p = DATA.period; var k = DATA.kpi[CFG.focusPeriod];
   // Render insights
   renderInsights('boss-insights', 'boss-insights-section');
-  var yoy = p.yoy || {}; var mom = p.mom || {};
+  var yoy = k.yoy || {}; var mom = k.mom || {};
   var yoyLabel = p.yoy_periods || '';
   document.getElementById('boss-subtitle').textContent = '同比分析 · ' + yoyLabel + ' · 战略决策支持';
 

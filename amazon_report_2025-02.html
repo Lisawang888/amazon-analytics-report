@@ -2,6 +2,9 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>亚马逊利润分析报告 · 2025-02</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -247,7 +250,7 @@ async function initApp() {
       fetch(base + '/periods_kpi.json' + _cb).then(function(r){return r.json();}),
       fetch(base + '/monthly_trends.json' + _cb).then(function(r){return r.json();}),
       fetch(base + '/periods/' + CFG.focusPeriod + '.json' + _cb).then(function(r){return r.json();}),
-      fetch(base + '/fba/' + CFG.focusPeriod + '.json' + _cb).then(function(r){return r.json();}).catch(function(){return null;})
+      fetch(base + '/fba/' + CFG.focusPeriod + '.json' + _cb, {cache:'no-cache'}).then(function(r){return r.json();}).catch(function(){return null;})
     ]);
     DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
 
@@ -773,6 +776,10 @@ function renderProductTab() {
 
 function renderFbaTab() {
   var f = DATA.fba || {};
+  if (!f.level_dist) {
+    document.getElementById('fba-kpi').innerHTML = '<div style="padding:20px;color:#888;text-align:center;">暂无 FBA 库存数据（刷新重试）</div>';
+    return;
+  }
   var mom = f.mom || {};
   var fbaPeriod = CFG.focusPeriod;
   var fp = fbaPeriod.split('-');

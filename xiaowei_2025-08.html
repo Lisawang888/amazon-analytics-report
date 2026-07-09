@@ -183,7 +183,7 @@
 
   <!-- FBA Tab -->
   <div id="tab-inventory" class="tab-panel">
-    <div class="report-header" style="background:linear-gradient(135deg,#A32D2D,#E24B4A);"><h2>FBA 库存健康度</h2><p>库存现状 · 缺货/积压预警</p><div class="meta"><div class="meta-item"><strong>2025-08</strong>报告周期</div></div></div>
+    <div class="report-header" style="background:linear-gradient(135deg,#A32D2D,#E24B4A);"><h2>FBA 库存健康度</h2><p>库存现状 · 库龄分析</p><div class="meta"><div class="meta-item"><strong>2025-08</strong>报告周期</div></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存总览</div><div class="kpi-grid" id="fba-kpi"></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>库存分布与健康象限</div>
       <div class="chart-grid">
@@ -193,7 +193,6 @@
     </div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员库龄分布</div><div class="chart-sub" id="fba-opage-sub" style="margin-bottom:12px;">成本 = 采购成本 + 头程费用（灰色=上月，红色=本月）</div><div id="fba-opage-charts" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div></div>
     <div class="section"><div class="section-title"><span class="dot" style="background:#E24B4A"></span>按业务员汇总</div><div class="data-table-wrapper"><table class="data-table"><thead><tr><th>业务员</th><th>所属组</th><th style="text-align:right">可售</th><th style="text-align:right">环比</th><th style="text-align:right">货值</th><th style="text-align:right">货值环比</th><th style="text-align:right">可售天数</th><th style="text-align:right">父ASIN数</th><th style="text-align:right">滞销率</th></tr></thead><tbody id="fba-operator-tbody"></tbody></table></div></div>
-    <div class="two-col"><div class="info-card red"><h3>缺货预警</h3><div id="fba-oos-list"></div></div><div class="info-card amber"><h3>积压预警</h3><div id="fba-overstock-list"></div></div></div>
   </div>
 </div>
 
@@ -871,16 +870,8 @@ function renderFbaTab() {
     });
     new Chart(el.getContext('2d'), { type:'bubble', data:{ datasets:datasets }, options:{ responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:false},tooltip:{callbacks:{label:function(ctx){var r=ctx.raw;return[ctx.dataset.label,'成本: ¥'+Math.round(r.x*10000).toLocaleString()+'', '可售天数: '+r.y+'天'];}} } },scales:{ x:{ title:{display:true,text:'成本（万元）',font:{size:12}} },y:{ title:{display:true,text:'可售天数',font:{size:12}} } } } });
   })();
-
-  // OOS / Overstock lists
-  var oosHtml = '';
-  (f.out_of_stock||[]).forEach(function(a){ oosHtml += '<div style="padding:6px 0;border-bottom:0.5px solid #f0f0f0;"><strong>'+a['父 ASIN']+'</strong> <span style="color:#888;font-size:11px;">'+(a['业务员']||'')+' · '+(a['店铺']||'')+'</span></div>'; });
-  document.getElementById('fba-oos-list').innerHTML = oosHtml || '<div style="color:#3B6D11;padding:10px 0;">✅ 无缺货</div>';
-
-  var overHtml = '';
-  (f.overstock||[]).forEach(function(a){ overHtml += '<div style="padding:6px 0;border-bottom:0.5px solid #f0f0f0;"><strong>'+a['父 ASIN']+'</strong> <span style="color:#888;font-size:11px;">'+(a['业务员']||'')+' · 可售'+(a['可售']||0)+'件 · ¥'+Math.round(a['货值']||0).toLocaleString()+' · '+(a['历史供货天数']||0)+'天</span></div>'; });
-  document.getElementById('fba-overstock-list').innerHTML = overHtml || '<div style="color:#3B6D11;padding:10px 0;">✅ 无积压</div>';
 }
+
 
 if (CFG.hideBossTab) {
   var bb = document.querySelector('.tab-btn.boss');

@@ -691,7 +691,7 @@ function renderOperatorTab() {
       cards += '<div class="kpi-card green"><div class="label">退款率</div><div class="value">'+pctV(o['退款率'])+'</div></div>';
       cards += '<div class="kpi-card green"><div class="label">ACoS</div><div class="value">'+pctV(o['ACoS'])+'</div></div>';
       cards += '<div class="kpi-card green"><div class="label">TACoS</div><div class="value">'+pctV(o['广告花费占比'])+'</div></div>';
-      cards += '<div class="kpi-card green"><div class="label">管理父ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div><div class="change">销售额占比 '+pctV(o['销售额占比'])+'</div></div>';
+      cards += '<div class="kpi-card green"><div class="label">管理父ASIN</div><div class="value">'+(o['管理ASIN数']||0)+'</div></div>';
       cards += '</div>';
       cards += '<div class="data-table-wrapper"><table class="data-table"><thead><tr><th>父ASIN</th><th style="text-align:right">销售额</th><th style="text-align:right">利润</th><th style="text-align:right">利润率</th><th style="text-align:right">ACoS</th><th style="text-align:right">TACoS</th><th style="text-align:right">退款率</th><th style="text-align:right">采购%</th><th style="text-align:right">佣金%</th><th style="text-align:right">头程%</th><th style="text-align:right">仓储%</th><th style="text-align:right">利润归因</th></tr></thead><tbody>';
       oAsins.forEach(function(a){

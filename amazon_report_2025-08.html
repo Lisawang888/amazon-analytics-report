@@ -341,10 +341,9 @@ function renderBossTab() {
   var prevKey = sameMonth.length >= 2 ? sameMonth[sameMonth.length-2] : CFG.focusPeriod;
   var prevKpi = DATA.kpi[prevKey] || k;
   var prevMonthKey = periodsKeys[periodsKeys.indexOf(CFG.focusPeriod) - 1] || '';
-  var prevMonthKpi = DATA.kpi[prevMonthKey] || {};
-  var revMom = prevMonthKpi['总营收'] ? ((k['总营收'] - prevMonthKpi['总营收']) / prevMonthKpi['总营收'] * 100).toFixed(1) : 0;
-  var profitMom = prevMonthKpi['总利润'] ? ((k['总利润'] - prevMonthKpi['总利润']) / prevMonthKpi['总利润'] * 100).toFixed(1) : 0;
-  document.getElementById('yoy-subtitle').textContent = CFG.focusPeriod + ' vs ' + prevKey + ' (单位: 万美元) | 环比: 营收' + (revMom>=0?'+':'') + revMom + '% 利润' + (profitMom>=0?'+':'') + profitMom + '%';
+  var revMom = prevKpi['总营收'] ? ((k['总营收'] - prevKpi['总营收']) / prevKpi['总营收'] * 100).toFixed(1) : 0;
+  var profitMom = prevKpi['总利润'] ? ((k['总利润'] - prevKpi['总利润']) / prevKpi['总利润'] * 100).toFixed(1) : 0;
+  document.getElementById('yoy-subtitle').textContent = CFG.focusPeriod + ' vs ' + prevKey + ' (单位: 万美元) | 同比: 营收' + (revMom>=0?'+':'') + revMom + '% 利润' + (profitMom>=0?'+':'') + profitMom + '%';
   new Chart(document.getElementById('yoyChart').getContext('2d'), {
     type: 'bar', data: { labels: [prevKey, CFG.focusPeriod], datasets: [{ label: '营收(万$)', data: [prevKpi['总营收']/10000, k['总营收']/10000], backgroundColor: ['#A8C4E2','#378ADD'] }, { label: '利润(万$)', data: [prevKpi['总利润']/10000, k['总利润']/10000], backgroundColor: ['#C4DCA8','#639922'] }] },
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,labels:{font:{size:11}}} } }

@@ -238,10 +238,10 @@ async function initApp() {
   try {
     var base = 'report_data';
     var [kpiRes, trendsRes, periodRes, fbaRes] = await Promise.all([
-      fetch(base + '/periods_kpi.json').then(function(r){return r.json();}),
-      fetch(base + '/monthly_trends.json').then(function(r){return r.json();}),
-      fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}),
-      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(){return null;})
+      fetch(base + '/periods_kpi.json').then(function(r){return r.json();}).catch(function(e){console.warn('periods_kpi fetch fail:',e);return null;}),
+      fetch(base + '/monthly_trends.json').then(function(r){return r.json();}).catch(function(e){console.warn('monthly_trends fetch fail:',e);return null;}),
+      fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(e){console.warn('period fetch fail:',e);return null;}),
+      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(e){console.warn('fba fetch fail:',e);return null;})
     ]);
     DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
 

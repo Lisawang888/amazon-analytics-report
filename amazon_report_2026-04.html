@@ -95,7 +95,706 @@
   .eff-card .eff-gap { font-size: 10px; color: #888; margin-top: 4px; }
   @media (max-width: 768px) { .eff-grid { grid-template-columns: 1fr; } }
 </style>
-<script>var AR_DATA = [{"month": "202501", "total": 301018.91, "stores": 5}, {"month": "202502", "total": 352884.4, "stores": 5}, {"month": "202503", "total": 515378.77, "stores": 5}, {"month": "202504", "total": 313254.82, "stores": 5}, {"month": "202505", "total": 546896.26, "stores": 5}, {"month": "202506", "total": 336797.05, "stores": 6}, {"month": "202507", "total": 558720.14, "stores": 7}, {"month": "202508", "total": 838940.08, "stores": 7}, {"month": "202509", "total": 586998.76, "stores": 7}, {"month": "202510", "total": 1043978.36, "stores": 7}, {"month": "202511", "total": 640862.83, "stores": 7}, {"month": "202512", "total": 971539.27, "stores": 12}, {"month": "202601", "total": 776667.51, "stores": 12}, {"month": "202602", "total": 834528.85, "stores": 12}, {"month": "202603", "total": 1441981.88, "stores": 12}, {"month": "202604", "total": 908004.44, "stores": 12}, {"month": "202605", "total": 1303694.13, "stores": 12}, {"month": "202606", "total": 1505152.9, "stores": 12}, {"month": "202607", "total": 1619982.12, "stores": 11}]; var INV_DATA = [{"month": "2025-01", "total": 5591259.83, "fba_in_stock": 5281211.36, "fba_in_transit": 310048.48, "domestic_in_stock": 0, "domestic_in_transit": 0, "overseas": 0}, {"month": "2025-02", "total": 6023268.56, "fba_in_stock": 5904915.43, "fba_in_transit": 118353.13, "domestic_in_stock": 0, "domestic_in_transit": 0, "overseas": 0}, {"month": "2025-03", "total": 4319623.03, "fba_in_stock": 3877759.12, "fba_in_transit": 358490.73, "domestic_in_stock": 67924.62, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-04", "total": 5348333.7, "fba_in_stock": 5115105.76, "fba_in_transit": 97314.76, "domestic_in_stock": 120464.62, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-05", "total": 6151788.56, "fba_in_stock": 5424822.53, "fba_in_transit": 520262.81, "domestic_in_stock": 191254.66, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-06", "total": 7770648.57, "fba_in_stock": 6795901.61, "fba_in_transit": 236286.33, "domestic_in_stock": 723012.07, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-07", "total": 8921948.58, "fba_in_stock": 7600710.07, "fba_in_transit": 240839.75, "domestic_in_stock": 607272.17, "domestic_in_transit": 457678.03, "overseas": 15448.56}, {"month": "2025-08", "total": 19098936.02, "fba_in_stock": 8213668.79, "fba_in_transit": 287601.43, "domestic_in_stock": 8331000.66, "domestic_in_transit": 2251216.58, "overseas": 15448.56}, {"month": "2025-09", "total": 16284057.53, "fba_in_stock": 10005758.25, "fba_in_transit": 3072854.7, "domestic_in_stock": 726190.39, "domestic_in_transit": 2229966.2, "overseas": 249287.99}, {"month": "2025-10", "total": 19559263.07, "fba_in_stock": 10069587.34, "fba_in_transit": 4521273.36, "domestic_in_stock": 1099166.39, "domestic_in_transit": 3619948.0, "overseas": 249287.99}, {"month": "2025-11", "total": 17505498.29, "fba_in_stock": 8996440.39, "fba_in_transit": 4922647.8, "domestic_in_stock": 738736.57, "domestic_in_transit": 2695650.0, "overseas": 152023.54}, {"month": "2025-12", "total": 21581680.8, "fba_in_stock": 9344021.38, "fba_in_transit": 3365816.34, "domestic_in_stock": 938616.94, "domestic_in_transit": 7781202.6, "overseas": 152023.54}, {"month": "2026-01", "total": 24629613.07, "fba_in_stock": 10261498.33, "fba_in_transit": 5449504.05, "domestic_in_stock": 1380055.95, "domestic_in_transit": 7386531.2, "overseas": 152023.54}, {"month": "2026-02", "total": 21511661.49, "fba_in_stock": 12504484.57, "fba_in_transit": 2382771.08, "domestic_in_stock": 998794.12, "domestic_in_transit": 5473588.18, "overseas": 152023.54}, {"month": "2026-03", "total": 28884311.97, "fba_in_stock": 13590703.21, "fba_in_transit": 1575125.55, "domestic_in_stock": 1672088.87, "domestic_in_transit": 12030945.78, "overseas": 15448.56}, {"month": "2026-04", "total": 38788083.19, "fba_in_stock": 14043225.14, "fba_in_transit": 6918342.74, "domestic_in_stock": 2472500.16, "domestic_in_transit": 15217440.18, "overseas": 136574.98}, {"month": "2026-05", "total": 35610758.99, "fba_in_stock": 16662194.44, "fba_in_transit": 9147064.52, "domestic_in_stock": 1483110.96, "domestic_in_transit": 8318389.07, "overseas": 0}, {"month": "2026-06", "total": 40517448.63, "fba_in_stock": 23534681.92, "fba_in_transit": 4441932.15, "domestic_in_stock": 1978135.58, "domestic_in_transit": 10562698.98, "overseas": 0}, {"month": "2026-07", "total": 39459371.0, "fba_in_stock": 26331133.07, "fba_in_transit": 4733557.4, "domestic_in_stock": 3541500.29, "domestic_in_transit": 4853179.83, "overseas": 0}]; var INV_OVERVIEW = {};</script>
+<script>var AR_DATA = [{"month": "202501", "total": 301018.91, "stores": 5}, {"month": "202502", "total": 352884.4, "stores": 5}, {"month": "202503", "total": 515378.77, "stores": 5}, {"month": "202504", "total": 313254.82, "stores": 5}, {"month": "202505", "total": 546896.26, "stores": 5}, {"month": "202506", "total": 336797.05, "stores": 6}, {"month": "202507", "total": 558720.14, "stores": 7}, {"month": "202508", "total": 838940.08, "stores": 7}, {"month": "202509", "total": 586998.76, "stores": 7}, {"month": "202510", "total": 1043978.36, "stores": 7}, {"month": "202511", "total": 640862.83, "stores": 7}, {"month": "202512", "total": 971539.27, "stores": 12}, {"month": "202601", "total": 776667.51, "stores": 12}, {"month": "202602", "total": 834528.85, "stores": 12}, {"month": "202603", "total": 1441981.88, "stores": 12}, {"month": "202604", "total": 908004.44, "stores": 12}, {"month": "202605", "total": 1303694.13, "stores": 12}, {"month": "202606", "total": 1505152.9, "stores": 12}, {"month": "202607", "total": 1619982.12, "stores": 11}]; var INV_DATA = [{"month": "2025-01", "total": 5591259.83, "fba_in_stock": 5281211.36, "fba_in_transit": 310048.48, "domestic_in_stock": 0, "domestic_in_transit": 0, "overseas": 0}, {"month": "2025-02", "total": 6023268.56, "fba_in_stock": 5904915.43, "fba_in_transit": 118353.13, "domestic_in_stock": 0, "domestic_in_transit": 0, "overseas": 0}, {"month": "2025-03", "total": 4319623.03, "fba_in_stock": 3877759.12, "fba_in_transit": 358490.73, "domestic_in_stock": 67924.62, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-04", "total": 5348333.7, "fba_in_stock": 5115105.76, "fba_in_transit": 97314.76, "domestic_in_stock": 120464.62, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-05", "total": 6151788.56, "fba_in_stock": 5424822.53, "fba_in_transit": 520262.81, "domestic_in_stock": 191254.66, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-06", "total": 7770648.57, "fba_in_stock": 6795901.61, "fba_in_transit": 236286.33, "domestic_in_stock": 723012.07, "domestic_in_transit": 0, "overseas": 15448.56}, {"month": "2025-07", "total": 8921948.58, "fba_in_stock": 7600710.07, "fba_in_transit": 240839.75, "domestic_in_stock": 607272.17, "domestic_in_transit": 457678.03, "overseas": 15448.56}, {"month": "2025-08", "total": 19098936.02, "fba_in_stock": 8213668.79, "fba_in_transit": 287601.43, "domestic_in_stock": 8331000.66, "domestic_in_transit": 2251216.58, "overseas": 15448.56}, {"month": "2025-09", "total": 16284057.53, "fba_in_stock": 10005758.25, "fba_in_transit": 3072854.7, "domestic_in_stock": 726190.39, "domestic_in_transit": 2229966.2, "overseas": 249287.99}, {"month": "2025-10", "total": 19559263.07, "fba_in_stock": 10069587.34, "fba_in_transit": 4521273.36, "domestic_in_stock": 1099166.39, "domestic_in_transit": 3619948.0, "overseas": 249287.99}, {"month": "2025-11", "total": 17505498.29, "fba_in_stock": 8996440.39, "fba_in_transit": 4922647.8, "domestic_in_stock": 738736.57, "domestic_in_transit": 2695650.0, "overseas": 152023.54}, {"month": "2025-12", "total": 21581680.8, "fba_in_stock": 9344021.38, "fba_in_transit": 3365816.34, "domestic_in_stock": 938616.94, "domestic_in_transit": 7781202.6, "overseas": 152023.54}, {"month": "2026-01", "total": 24629613.07, "fba_in_stock": 10261498.33, "fba_in_transit": 5449504.05, "domestic_in_stock": 1380055.95, "domestic_in_transit": 7386531.2, "overseas": 152023.54}, {"month": "2026-02", "total": 21511661.49, "fba_in_stock": 12504484.57, "fba_in_transit": 2382771.08, "domestic_in_stock": 998794.12, "domestic_in_transit": 5473588.18, "overseas": 152023.54}, {"month": "2026-03", "total": 28884311.97, "fba_in_stock": 13590703.21, "fba_in_transit": 1575125.55, "domestic_in_stock": 1672088.87, "domestic_in_transit": 12030945.78, "overseas": 15448.56}, {"month": "2026-04", "total": 38788083.19, "fba_in_stock": 14043225.14, "fba_in_transit": 6918342.74, "domestic_in_stock": 2472500.16, "domestic_in_transit": 15217440.18, "overseas": 136574.98}, {"month": "2026-05", "total": 35610758.99, "fba_in_stock": 16662194.44, "fba_in_transit": 9147064.52, "domestic_in_stock": 1483110.96, "domestic_in_transit": 8318389.07, "overseas": 0}, {"month": "2026-06", "total": 40517448.63, "fba_in_stock": 23534681.92, "fba_in_transit": 4441932.15, "domestic_in_stock": 1978135.58, "domestic_in_transit": 10562698.98, "overseas": 0}, {"month": "2026-07", "total": 39459371.0, "fba_in_stock": 26331133.07, "fba_in_transit": 4733557.4, "domestic_in_stock": 3541500.29, "domestic_in_transit": 4853179.83, "overseas": 0}]; var INV_OVERVIEW = {}; var FBA_EMBEDDED = {
+  "period": "2026-04",
+  "operators": [
+    {
+      "业务员": "何秋秋",
+      "可售": 3574,
+      "货值": 1197238.55,
+      "库存成本": 1524027.81,
+      "父ASIN数": 8,
+      "可售天数": 206,
+      "滞销率": 32.9,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "夏栢芝",
+      "可售": 4783,
+      "货值": 1223935.7,
+      "库存成本": 1586733.96,
+      "父ASIN数": 5,
+      "可售天数": 131,
+      "滞销率": 27.8,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "孙杰",
+      "可售": 42754,
+      "货值": 6226779.46,
+      "库存成本": 8325632.19,
+      "父ASIN数": 18,
+      "可售天数": 190,
+      "滞销率": 17.3,
+      "所属组": "孙杰组"
+    },
+    {
+      "业务员": "小伟",
+      "可售": 15171,
+      "货值": 2674416.0,
+      "库存成本": 3491711.29,
+      "父ASIN数": 13,
+      "可售天数": 214,
+      "滞销率": 16.1,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "岑天雨",
+      "可售": 1582,
+      "货值": 203926.0,
+      "库存成本": 286094.93,
+      "父ASIN数": 3,
+      "可售天数": 498,
+      "滞销率": 0.0,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "张炜艳",
+      "可售": 2069,
+      "货值": 230618.1,
+      "库存成本": 342668.59,
+      "父ASIN数": 3,
+      "可售天数": 1643,
+      "滞销率": 0.0,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "朱佳磊",
+      "可售": 3406,
+      "货值": 779859.3,
+      "库存成本": 966653.56,
+      "父ASIN数": 8,
+      "可售天数": 307,
+      "滞销率": 30.8,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "朱斌斌",
+      "可售": 4770,
+      "货值": 757467.01,
+      "库存成本": 974232.56,
+      "父ASIN数": 9,
+      "可售天数": 904,
+      "滞销率": 31.1,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "李韩笑",
+      "可售": 4124,
+      "货值": 864095.16,
+      "库存成本": 1129293.99,
+      "父ASIN数": 7,
+      "可售天数": 133,
+      "滞销率": 18.3,
+      "所属组": "孙杰组"
+    },
+    {
+      "业务员": "肖相勇",
+      "可售": 1559,
+      "货值": 277922.0,
+      "库存成本": 335208.77,
+      "父ASIN数": 2,
+      "可售天数": 745,
+      "滞销率": 0.0,
+      "所属组": "小伟组"
+    },
+    {
+      "业务员": "邱慧婷",
+      "可售": 5294,
+      "货值": 579737.64,
+      "库存成本": 722380.58,
+      "父ASIN数": 7,
+      "可售天数": 337,
+      "滞销率": 29.0,
+      "所属组": "孙杰组"
+    },
+    {
+      "业务员": "郑文茜",
+      "可售": 1686,
+      "货值": 194310.5,
+      "库存成本": 295282.34,
+      "父ASIN数": 2,
+      "可售天数": 2121,
+      "滞销率": 0.0,
+      "所属组": "孙杰组"
+    }
+  ],
+  "level_dist": {
+    "良好": 196,
+    "低库存": 84,
+    "冗余": 29,
+    "缺货": 21
+  },
+  "age_dist": {
+    "0-30天": 5802187,
+    "31-60天": 4038117,
+    "61-90天": 2675483,
+    "91-180天": 1334602,
+    "181-365天": 155078,
+    "365天+": 287
+  },
+  "op_age_dist": [
+    {
+      "业务员": "何秋秋",
+      "所属组": "小伟组",
+      "0-30天": 615816,
+      "31-60天": 320808,
+      "61-90天": 65722,
+      "91-180天": 76245,
+      "181-365天": 34847,
+      "365天+": 0
+    },
+    {
+      "业务员": "夏栢芝",
+      "所属组": "小伟组",
+      "0-30天": 610696,
+      "31-60天": 94300,
+      "61-90天": 54800,
+      "91-180天": 82440,
+      "181-365天": 38234,
+      "365天+": 0
+    },
+    {
+      "业务员": "孙杰",
+      "所属组": "孙杰组",
+      "0-30天": 1923713,
+      "31-60天": 1686093,
+      "61-90天": 1469051,
+      "91-180天": 417080,
+      "181-365天": 3264,
+      "365天+": 287
+    },
+    {
+      "业务员": "小伟",
+      "所属组": "小伟组",
+      "0-30天": 1530981,
+      "31-60天": 602703,
+      "61-90天": 284641,
+      "91-180天": 115101,
+      "181-365天": 8289,
+      "365天+": 0
+    },
+    {
+      "业务员": "岑天雨",
+      "所属组": "小伟组",
+      "0-30天": 107619,
+      "31-60天": 117395,
+      "61-90天": 53301,
+      "91-180天": 0,
+      "181-365天": 0,
+      "365天+": 0
+    },
+    {
+      "业务员": "张炜艳",
+      "所属组": "小伟组",
+      "0-30天": 27315,
+      "31-60天": 308109,
+      "61-90天": 0,
+      "91-180天": 0,
+      "181-365天": 0,
+      "365天+": 0
+    },
+    {
+      "业务员": "朱佳磊",
+      "所属组": "小伟组",
+      "0-30天": 424697,
+      "31-60天": 84816,
+      "61-90天": 132641,
+      "91-180天": 98522,
+      "181-365天": 4013,
+      "365天+": 0
+    },
+    {
+      "业务员": "朱斌斌",
+      "所属组": "小伟组",
+      "0-30天": 112202,
+      "31-60天": 137958,
+      "61-90天": 382068,
+      "91-180天": 145462,
+      "181-365天": 54885,
+      "365天+": 0
+    },
+    {
+      "业务员": "李韩笑",
+      "所属组": "孙杰组",
+      "0-30天": 196125,
+      "31-60天": 165601,
+      "61-90天": 203733,
+      "91-180天": 159653,
+      "181-365天": 11545,
+      "365天+": 0
+    },
+    {
+      "业务员": "肖相勇",
+      "所属组": "小伟组",
+      "0-30天": 153,
+      "31-60天": 181161,
+      "61-90天": 0,
+      "91-180天": 0,
+      "181-365天": 0,
+      "365天+": 0
+    },
+    {
+      "业务员": "邱慧婷",
+      "所属组": "孙杰组",
+      "0-30天": 160149,
+      "31-60天": 168820,
+      "61-90天": 4887,
+      "91-180天": 240099,
+      "181-365天": 0,
+      "365天+": 0
+    },
+    {
+      "业务员": "郑文茜",
+      "所属组": "孙杰组",
+      "0-30天": 92720,
+      "31-60天": 170353,
+      "61-90天": 24639,
+      "91-180天": 0,
+      "181-365天": 0,
+      "365天+": 0
+    }
+  ],
+  "out_of_stock": [
+    {
+      "父 ASIN": "B0GCJXMYBH",
+      "品名": "T-Arched-7535-Black",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "库存水平分类": "良好"
+    },
+    {
+      "父 ASIN": "B0DTJYJJR7",
+      "品名": "T-15REC-3624-Gold",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0DYJDDB5R",
+      "品名": "玻璃透明HMMMSJ-BV32-CLEAR",
+      "业务员": "小伟",
+      "店铺": "HMMM-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0DFCKVD45",
+      "品名": "D-Glass12x12x12",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0F21B2B6H",
+      "品名": "T-TMTP61165-N",
+      "业务员": "何秋秋",
+      "店铺": "MLTR-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0F5PKG8FK",
+      "品名": "F-14x12x12",
+      "业务员": "何秋秋",
+      "店铺": "YYFI-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0F9YQXK5J",
+      "品名": "HMMMWJ-CV-CLEAR10",
+      "业务员": "邱慧婷",
+      "店铺": "HMMM-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B09P45S5BZ",
+      "品名": "D-20x20x4-Glass",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0FG2SR1ZT",
+      "品名": "D-RFZCDJ-3055",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0FG2HWCP7",
+      "品名": "T-YJFXDJ-3020",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0FG81PF66",
+      "品名": "D-Arc4028-Black",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "库存水平分类": "低库存"
+    },
+    {
+      "父 ASIN": "B0DSHBGQGP",
+      "品名": "D-Rect-3060-Black",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "库存水平分类": "低库存"
+    },
+    {
+      "父 ASIN": "B0FMDDN57L",
+      "品名": "LA-R50Rect3020-GD",
+      "业务员": "朱佳磊",
+      "店铺": "HDLA-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0FP4YBJML",
+      "品名": "F-15REC3660-GD",
+      "业务员": "何秋秋",
+      "店铺": "YYFI-US",
+      "库存水平分类": "良好"
+    },
+    {
+      "父 ASIN": "B0FSL53M4B",
+      "品名": "LA-OV3020-Gold",
+      "业务员": "李韩笑",
+      "店铺": "HDLA-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0F3VXP9T7",
+      "品名": "D-RBZZ5620-T50-20251023",
+      "业务员": "李韩笑",
+      "店铺": "YLDE-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0FVRVHL5H",
+      "品名": "A-YJFXDJ-3020",
+      "业务员": "夏栢芝",
+      "店铺": "YMAM-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0DZT7J1PJ",
+      "品名": "T-BLK-A-75114-GD",
+      "业务员": "朱佳磊",
+      "店铺": "MLTR-US",
+      "库存水平分类": "良好"
+    },
+    {
+      "父 ASIN": "B0DYDNTHDX",
+      "品名": "T-BLQXYM14071-N",
+      "业务员": "何秋秋",
+      "店铺": "MLTR-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0FZ9VJX18",
+      "品名": "F-YJFXDJ-3055",
+      "业务员": "何秋秋",
+      "店铺": "YYFI-US",
+      "库存水平分类": "低库存"
+    },
+    {
+      "父 ASIN": "B0FZ9LKYCK",
+      "品名": "LA-YJFXDJ-3055",
+      "业务员": "李韩笑",
+      "店铺": "HDLA-US",
+      "库存水平分类": "低库存"
+    },
+    {
+      "父 ASIN": "B0D8GYHTVB",
+      "品名": "T-QD81162D",
+      "业务员": "朱佳磊",
+      "店铺": "MLTR-US",
+      "库存水平分类": "良好"
+    },
+    {
+      "父 ASIN": "B0F8PW2FMX",
+      "品名": "D-YMNJT-19089-N-新品",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "库存水平分类": "低库存"
+    },
+    {
+      "父 ASIN": "B0GH5P17KF",
+      "品名": "F-R50Rect3020-GD",
+      "业务员": "何秋秋",
+      "店铺": "YYFI-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0FX4NGXSC",
+      "品名": "YWFGBB-YBZ-5530x2-BK",
+      "业务员": "朱斌斌",
+      "店铺": "YWFG-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0F5HJ2L8B",
+      "品名": "F-ARC3624-GD",
+      "业务员": "夏栢芝",
+      "店铺": "YYFI-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0GVHCYHYS",
+      "品名": "YMAM-GYMM-5025x2-SL",
+      "业务员": "肖相勇",
+      "店铺": "YMAM-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0GH5NVT8K",
+      "品名": "宠物-狗窝MLTRXW-GC1-4835XXL-DKGY-新品",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0GX882LHB",
+      "品名": "HMM-CCZHPD-ST-5419-新品",
+      "业务员": "孙杰",
+      "店铺": "HMMM-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0D3DS9MCJ",
+      "品名": "折叠YMAMJW-FTSSY",
+      "业务员": "小伟",
+      "店铺": "YMAM-US",
+      "库存水平分类": "nan"
+    },
+    {
+      "父 ASIN": "B0DJQMJMPG",
+      "品名": "T-G4460",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "库存水平分类": "缺货"
+    },
+    {
+      "父 ASIN": "B0DQTWJ8V5",
+      "品名": "D-Arc19090-Black",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "库存水平分类": "良好"
+    },
+    {
+      "父 ASIN": "B0DJXZLTBP",
+      "品名": "T-Rec-7535-Black",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "库存水平分类": "良好"
+    }
+  ],
+  "overstock": [
+    {
+      "父 ASIN": "B09P45S5BZ",
+      "品名": "D-54x30x2Silver",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "可售": 723,
+      "货值": 115693.87,
+      "历史供货天数": 321.7,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0GBWD3M5P",
+      "品名": "D-YJREC-5615-BK",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "可售": 1562,
+      "货值": 104454.0,
+      "历史供货天数": 612.3,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0F32P1ZN6",
+      "品名": "宠物座椅-前-黑/灰HMMMWJ-DogCarSeat-B-GREY",
+      "业务员": "邱慧婷",
+      "店铺": "HMMM-US",
+      "可售": 968,
+      "货值": 92807.44,
+      "历史供货天数": 305.8,
+      "滞销率": 93.4
+    },
+    {
+      "父 ASIN": "B0G4M4PF8C",
+      "品名": "FG-YJFXDJ-3224x2-新品",
+      "业务员": "朱斌斌",
+      "店铺": "YWFG-US",
+      "可售": 248,
+      "货值": 84838.0,
+      "历史供货天数": 765.2,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0GDZJGMFT",
+      "品名": "T-LKZJDJ-3050-BK-新品",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "可售": 282,
+      "货值": 76506.6,
+      "历史供货天数": 1257.5,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0BW71P5V3",
+      "品名": "D-54x30x2-Black",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "可售": 413,
+      "货值": 67243.46,
+      "历史供货天数": 293.4,
+      "滞销率": 59.5
+    },
+    {
+      "父 ASIN": "B0GDWWTMNZ",
+      "品名": "F-LKZJDJ-3040-BK-新品",
+      "业务员": "何秋秋",
+      "店铺": "YYFI-US",
+      "可售": 256,
+      "货值": 59953.32,
+      "历史供货天数": 593.8,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B09P45S5BZ",
+      "品名": "D-60x25x2-Silver",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "可售": 318,
+      "货值": 49162.1,
+      "历史供货天数": 202.0,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0GGNRKS4R",
+      "品名": "A-BLQXR7171-N",
+      "业务员": "张炜艳",
+      "店铺": "YMAM-US",
+      "可售": 368,
+      "货值": 48594.0,
+      "历史供货天数": 749.7,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0GG3M3M8M",
+      "品名": "LBTRTY-CHKK-AR9666-BK",
+      "业务员": "岑天雨",
+      "店铺": "LBTR-US",
+      "可售": 285,
+      "货值": 47642.0,
+      "历史供货天数": 1227.3,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0DTJYJJR7",
+      "品名": "T-15REC-4830-Black",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "可售": 478,
+      "货值": 46265.0,
+      "历史供货天数": 309.8,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0F8PW2FMX",
+      "品名": "D-YMNJT-14061-BR",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "可售": 240,
+      "货值": 44115.0,
+      "历史供货天数": 213.3,
+      "滞销率": 92.2
+    },
+    {
+      "父 ASIN": "B0GDZJGMFT",
+      "品名": "T-LKZJDJ-3055-BK-新品",
+      "业务员": "小伟",
+      "店铺": "MLTR-US",
+      "可售": 124,
+      "货值": 43691.34,
+      "历史供货天数": 258.9,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B09P45S5BZ",
+      "品名": "D-70x24x2Silver",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "可售": 219,
+      "货值": 42566.25,
+      "历史供货天数": 512.6,
+      "滞销率": 55.7
+    },
+    {
+      "父 ASIN": "B0G9287Q5R",
+      "品名": "LA-50x25x2Silver-新品",
+      "业务员": "朱佳磊",
+      "店铺": "HDLA-US",
+      "可售": 180,
+      "货值": 39705.3,
+      "历史供货天数": 5435.0,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0FMDDN57L",
+      "品名": "LA-R50Rect3624x2-BK",
+      "业务员": "朱佳磊",
+      "店铺": "HDLA-US",
+      "可售": 294,
+      "货值": 39530.0,
+      "历史供货天数": 190.3,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0GDWWTMNZ",
+      "品名": "F-LKZJDJ-3055-BK-新品",
+      "业务员": "何秋秋",
+      "店铺": "YYFI-US",
+      "可售": 130,
+      "货值": 39233.04,
+      "历史供货天数": 668.8,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0GG3R3DTF",
+      "品名": "A-TMTP10271-LBR",
+      "业务员": "张炜艳",
+      "店铺": "YMAM-US",
+      "可售": 269,
+      "货值": 38592.0,
+      "历史供货天数": 1937.4,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0GDWWTMNZ",
+      "品名": "F-LKZJDJ-3050-BK-新品",
+      "业务员": "何秋秋",
+      "店铺": "YYFI-US",
+      "可售": 138,
+      "货值": 37710.7,
+      "历史供货天数": 969.0,
+      "滞销率": 0.0
+    },
+    {
+      "父 ASIN": "B0F8PW2FMX",
+      "品名": "D-YMNJT-19089-BR-新品",
+      "业务员": "孙杰",
+      "店铺": "YLDE-US",
+      "可售": 6,
+      "货值": 37410.99,
+      "历史供货天数": 1012.5,
+      "滞销率": 0.0
+    }
+  ],
+  "mom": {},
+  "total_qty": 90772,
+  "total_value": 15210305.420000002,
+  "total_cost": 19979920.569999997
+};</script>
 </head>
 <body>
 <div id="pw-gate" style="max-width:360px;margin:120px auto;text-align:center;">
@@ -244,9 +943,12 @@ async function initApp() {
       fetch(base + '/periods_kpi.json').then(function(r){return r.json();}).catch(function(e){console.warn('periods_kpi fetch fail:',e);return null;}),
       fetch(base + '/monthly_trends.json').then(function(r){return r.json();}).catch(function(e){console.warn('monthly_trends fetch fail:',e);return null;}),
       fetch(base + '/periods/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(e){console.warn('period fetch fail:',e);return null;}),
-      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(e){console.warn('fba fetch fail:',e);return null;})
+      fetch(base + '/fba/' + CFG.focusPeriod + '.json').then(function(r){return r.json();}).catch(function(e){console.warn('fba fetch fail, use embedded:',e);return null;})
     ]);
-    DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes; DATA.fba = fbaRes;
+    DATA.kpi = kpiRes; DATA.trends = trendsRes; DATA.period = periodRes;
+    // 如果 fetch 失败，使用内嵌的 FBA 数据兜底
+    DATA.fba = fbaRes || (typeof FBA_EMBEDDED !== 'undefined' && FBA_EMBEDDED ? FBA_EMBEDDED : null);
+    if (!fbaRes && DATA.fba) console.log('FBA: using embedded data (fetch failed, fallback OK)');
 
     if (CFG.teamFilter) applyTeamFilter();
     renderMonthNav();

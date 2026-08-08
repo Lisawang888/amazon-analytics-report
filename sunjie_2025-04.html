@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>亚马逊利润分析报告 · 2025-04 · 孙杰组</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -730,6 +733,7 @@ function renderProductTab() {
 }
 
 function renderFbaTab() {
+  try {
   var f = DATA.fba || {};
   var mom = f.mom || {};
   var fbaPeriod = CFG.focusPeriod;
@@ -739,8 +743,8 @@ function renderFbaTab() {
   var prevLabel = prevMonth + '月';
   var currLabel = currMonth + '月';
   var noData = !DATA.fba;
-  var totalLevels = Object.values(f.level_dist).reduce(function(a,b){return a+b;},0);
-  var healthyRate = f.level_dist['良好'] ? Math.round(f.level_dist['良好']/totalLevels*100) : 0;
+  var totalLevels = Object.values(f.level_dist || {}).reduce(function(a,b){return a+b;},0);
+  var healthyRate = (f.level_dist && f.level_dist['良好']) ? Math.round(f.level_dist['良好']/totalLevels*100) : 0;
 
   // ERP库存总览补充面板 (总库存/FBA/国内/海外)
   var erp = INV_OVERVIEW || {};
@@ -916,6 +920,11 @@ function renderFbaTab() {
     });
     new Chart(el.getContext('2d'), { type:'bubble', data:{ datasets:datasets }, options:{ responsive:true,maintainAspectRatio:false,plugins:{ legend:{display:false},tooltip:{callbacks:{label:function(ctx){var r=ctx.raw;return[ctx.dataset.label,'成本: ¥'+Math.round(r.x*10000).toLocaleString()+'', '可售天数: '+r.y+'天'];}} } },scales:{ x:{ title:{display:true,text:'成本（万元）',font:{size:12}} },y:{ title:{display:true,text:'可售天数',font:{size:12}} } } } });
   })();
+  } catch(e) {
+    console.error('renderFbaTab error:', e);
+    var errBox = document.getElementById('fba-kpi');
+    if (errBox) errBox.innerHTML = '<div class="alert red" style="margin-bottom:16px;">FBA Tab 渲染失败：' + (e.message||e) + '<br>DATA.fba = ' + (DATA.fba?'OK':'null/undefined') + '<br>请打开浏览器DevTools查看 console 详情</div>';
+  }
 }
 
 

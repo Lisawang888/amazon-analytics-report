@@ -735,6 +735,12 @@ function renderProductTab() {
 function renderFbaTab() {
   try {
   var f = DATA.fba || {};
+  // 防御性: 如果 DATA.fba 为空，给出明确诊断
+  if (!DATA.fba) {
+    var errBox = document.getElementById('fba-kpi');
+    if (errBox) errBox.innerHTML = '<div class="alert red">FBA 数据未加载 (DATA.fba = null/undefined)<br>可能原因: CDN 缓存 / JSON 路径错误 / 网络问题<br>请打开 DevTools 查看 Network 面板中 report_data/fba/2026-07.json 的状态码</div>';
+    return;
+  }
   var mom = f.mom || {};
   var fbaPeriod = CFG.focusPeriod;
   var fp = fbaPeriod.split('-');
@@ -789,7 +795,7 @@ function renderFbaTab() {
   // Age distribution chart
   var ageDist = f.age_dist || {};
   var ageLabels = noData ? ['0-30天','31-60天','61-90天','91-180天','181-365天','365天+'] : Object.keys(ageDist);
-  var ageValues = ageLabels.map(function(k){ return f.age_dist[k]; });
+  var ageValues = ageLabels.map(function(k){ return ageDist[k]; });
   var prevAge = mom.prev_age_dist || {};
   var prevValues = ageLabels.map(function(k){ return prevAge[k]||0; });
   document.getElementById('fba-age-sub').textContent = '库龄分布 (成本=采购成本+头程费用) - ' + fbaPeriod;

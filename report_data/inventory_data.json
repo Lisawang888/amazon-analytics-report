@@ -160,5 +160,23 @@
     "domestic_in_stock": 1978135.58,
     "domestic_in_transit": 10562698.98,
     "overseas": 0
+  },
+  {
+    "month": "2026-07",
+    "total": 39459371.00,
+    "fba_in_stock": 26331133.07,
+    "fba_in_transit": 4733557.40,
+    "domestic_in_stock": 3541500.29,
+    "domestic_in_transit": 4853179.83,
+    "overseas": 0
+  },
+  {
+    "month": "2026-08",
+    "total": 45279317.29,
+    "fba_in_stock": 29528516.97,
+    "fba_in_transit": 1979065.81,
+    "domestic_in_stock": 5144047.34,
+    "domestic_in_transit": 7704647.16,
+    "overseas": 923040.00
   }
 ]

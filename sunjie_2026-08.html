@@ -11982,6 +11982,12 @@ var DATA = {};
 async function initApp() {
   try {
     var base = 'report_data';
+    // 动态读取最新月份指针 latest.json；失败则保持 CFG 默认 focusPeriod
+    try {
+      var _latest = await fetch(base + '/periods/latest.json').then(function(r){ return r.json(); });
+      if (_latest && _latest.latest) { CFG.focusPeriod = _latest.latest; CFG.focusMonthNum = _latest.latest.split('-')[1]; }
+      if (_latest && _latest.periods && _latest.periods.length) { CFG.periodsList = _latest.periods; }
+    } catch (e) { console.warn('latest.json load failed, using default focusPeriod:', e); }
     var [kpiRes, trendsRes, periodRes, fbaRes] = await Promise.all([
       fetch(base + '/periods_kpi.json').then(function(r){return r.json();}).catch(function(e){console.warn('periods_kpi fetch fail:',e);return null;}),
       fetch(base + '/monthly_trends.json').then(function(r){return r.json();}).catch(function(e){console.warn('monthly_trends fetch fail:',e);return null;}),

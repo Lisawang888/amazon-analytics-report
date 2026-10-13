@@ -11981,6 +11981,17 @@ function switchTab(name) {
 var DATA = {};
 
 function safeRender(fn, name) { try { fn(); } catch(e) { console.error('render ' + name + ' failed:', e); } }
+function renderPeriodLabels() {
+  var p = CFG.focusPeriod;
+  if (!p) return;
+  if (document.title) document.title = document.title.replace(/\d{4}-\d{2}/, p);
+  var h1 = document.querySelector('h1');
+  if (h1) h1.textContent = h1.textContent.replace(/\d{4}-\d{2}/, p);
+  document.querySelectorAll('.meta-item strong').forEach(function(s){
+    if (/^\d{4}-\d{2}$/.test((s.textContent||'').trim())) s.textContent = p;
+  });
+}
+
 async function initApp() {
   try {
     var base = 'report_data';
@@ -11990,6 +12001,7 @@ async function initApp() {
       if (_latest && _latest.latest) { CFG.focusPeriod = _latest.latest; CFG.focusMonthNum = _latest.latest.split('-')[1]; }
       if (_latest && _latest.periods && _latest.periods.length) { CFG.periodsList = _latest.periods; }
     } catch (e) { console.warn('latest.json load failed, using default focusPeriod:', e); }
+    renderPeriodLabels();
     var [kpiRes, trendsRes, periodRes, fbaRes] = await Promise.all([
       fetch(base + '/periods_kpi.json').then(function(r){return r.json();}).catch(function(e){console.warn('periods_kpi fetch fail:',e);return null;}),
       fetch(base + '/monthly_trends.json').then(function(r){return r.json();}).catch(function(e){console.warn('monthly_trends fetch fail:',e);return null;}),
